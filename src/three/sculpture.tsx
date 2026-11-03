@@ -21,6 +21,7 @@ import { sculptureFragment, sculptureVertex } from './shaders'
 import { scrollState } from '../lib/scroll'
 import { useTheme } from '../lib/theme'
 import { HALF, clamp } from '../lib/math'
+import { normalizePath } from '../lib/paths'
 
 export type PageKey = keyof typeof config.pages
 
@@ -35,7 +36,7 @@ const canHover = typeof window !== 'undefined' && window.matchMedia('(hover: hov
 export const useNarrow = () => useThree((s) => s.size.width / s.size.height < config.narrowAspect)
 
 export function resolvePage(pathname: string): PageKey {
-  const clean = `/${pathname.split('/').filter(Boolean).join('/')}`
+  const clean = normalizePath(pathname)
   return clean in config.pages ? (clean as PageKey) : '*'
 }
 

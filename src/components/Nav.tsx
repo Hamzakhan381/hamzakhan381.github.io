@@ -56,7 +56,7 @@ export function Nav() {
           <ul className="nav__links">
             {menuRoutes.map((r) => (
               <li key={r.path}>
-                <NavLink to={r.path} end>
+                <NavLink to={r.path} end={r.path === '/'}>
                   {r.label}
                 </NavLink>
               </li>
@@ -84,7 +84,7 @@ export function Nav() {
         <ul>
           {routes.map((r, i) => (
             <li key={r.path} style={{ '--i': i } as CSSProperties}>
-              <NavLink to={r.path} end>
+              <NavLink to={r.path} end={r.path === '/'}>
                 <span className="mobile-menu__num">0{i + 1}</span>
                 {r.label}
               </NavLink>

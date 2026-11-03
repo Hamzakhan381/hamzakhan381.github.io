@@ -14,6 +14,7 @@ import { gsap } from 'gsap'
 import routes from '../lib/routes.json'
 import { initScroll, scrollToTop } from '../lib/scroll'
 import { markAppLoaded } from '../lib/intro'
+import { normalizePath } from '../lib/paths'
 import { Nav } from '../components/Nav'
 import { Footer } from '../components/Footer'
 import { Loader } from '../components/Loader'
@@ -48,7 +49,7 @@ class SceneBoundary extends Component<{ children: ReactNode; onError: () => void
 
 function usePageMeta(pathname: string) {
   useEffect(() => {
-    const meta = routes.find((r) => r.path === pathname) ?? NOT_FOUND
+    const meta = routes.find((r) => r.path === normalizePath(pathname)) ?? NOT_FOUND
     document.title = meta.title
     document.querySelector('meta[name="description"]')?.setAttribute('content', meta.description)
   }, [pathname])
