@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { useThree } from '@react-three/fiber'
+import { useThree, type ThreeEvent } from '@react-three/fiber'
 import { CanvasTexture, Color, MathUtils, SRGBColorSpace } from 'three'
 import config from './scene.json'
 import { useTheme } from '../lib/theme'
@@ -115,4 +115,20 @@ export function Label({ text, height, color, position = [0, 0, 0], weight, mono,
       <meshBasicMaterial map={texture} color={color} transparent opacity={opacity} depthWrite={false} toneMapped={false} />
     </mesh>
   )
+}
+
+/* ---------- Pointer interaction under the HTML layer ---------- */
+
+/** Page content that should keep the pointer to itself even when a 3D object sits behind it. */
+const PAGE_CONTENT = 'a, button, input, textarea, select, label, summary, p, h1, h2, h3, h4, li, dt, dd, pre, .card, .nav, dialog'
+
+/** True when a pointer event on a 3D object started over empty page space rather than over text or controls. */
+export function fromEmptySpace(e: ThreeEvent<PointerEvent | MouseEvent>) {
+  const target = e.nativeEvent.target
+  return !(target instanceof Element && target.closest(PAGE_CONTENT))
+}
+
+/** Shows a pointer (and grows the custom cursor) while a clickable 3D object is under the mouse. */
+export function setPointer3D(on: boolean) {
+  document.documentElement.classList.toggle('cursor-3d', on)
 }

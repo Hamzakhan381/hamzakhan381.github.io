@@ -1,11 +1,11 @@
-import { useMemo, useRef, useState } from 'react'
-import { useFrame } from '@react-three/fiber'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { useFrame, type ThreeEvent } from '@react-three/fiber'
 import { Edges } from '@react-three/drei'
 import { Group, MathUtils, MeshBasicMaterial } from 'three'
 import config from '../scene.json'
-import { Label, readTrack, useHalfWidth, useNarrow, usePalette } from '../kit'
+import { Label, fromEmptySpace, readTrack, setPointer3D, useHalfWidth, useNarrow, usePalette } from '../kit'
 import { services } from '../../content'
-import { scrollState } from '../../lib/scroll'
+import { scrollState, scrollToCentre } from '../../lib/scroll'
 import { HALF } from '../../lib/math'
 
 const R = config.rack
@@ -34,6 +34,25 @@ export function ServerRack() {
   const leds = useRef<(MeshBasicMaterial | null)[]>([])
   const [active, setActive] = useState(-1)
   const activeRef = useRef(-1)
+  const hovered = useRef(-1)
+
+  // Hover a unit to slide it out; click to jump to that service's card.
+  const hoverAt = (i: number) => (e: ThreeEvent<PointerEvent>) => {
+    const next = fromEmptySpace(e) ? i : -1
+    if (next === hovered.current) return
+    hovered.current = next
+    setPointer3D(next >= 0)
+  }
+  const leave = () => {
+    hovered.current = -1
+    setPointer3D(false)
+  }
+  const open = (id: string) => (e: ThreeEvent<MouseEvent>) => {
+    if (!fromEmptySpace(e)) return
+    e.stopPropagation()
+    scrollToCentre(`service-${id}`)
+  }
+  useEffect(() => () => setPointer3D(false), [])
 
   const pitch = R.unitHeight + R.unitGap
   const height = units.length * pitch + R.unitGap
@@ -50,7 +69,7 @@ export function ServerRack() {
 
   useFrame((state, delta) => {
     const track = readTrack('services', R.z)
-    const focus = scrollState.focus
+    const focus = hovered.current >= 0 ? hovered.current : scrollState.focus
     if (focus !== activeRef.current) {
       activeRef.current = focus
       setActive(focus)
@@ -100,7 +119,7 @@ export function ServerRack() {
         const on = i === active
         return (
           <group key={service.id} ref={(el) => void (unitRefs.current[i] = el)} position={[0, unitY(i), 0]}>
-            <mesh>
+            <mesh onPointerMove={hoverAt(i)} onPointerOut={leave} onClick={open(service.id)}>
               <boxGeometry args={[unitWidth, R.unitHeight, unitDepth]} />
               <meshStandardMaterial color={palette.surface} roughness={0.5} />
               <Edges color={on ? palette.accent : palette.line} />

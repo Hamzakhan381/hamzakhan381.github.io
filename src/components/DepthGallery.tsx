@@ -2,7 +2,7 @@ import { useLayoutEffect, useRef, type CSSProperties } from 'react'
 import { gsap } from 'gsap'
 import type { Project } from '../content'
 import { FeaturedProject } from './ProjectCards'
-import { prefersReducedMotion } from '../lib/scroll'
+import { reduceMotion } from '../lib/scroll'
 import { useMediaQuery } from '../lib/useMediaQuery'
 import { flyIn } from '../lib/reveal'
 import { DOUBLE, clamp } from '../lib/math'
@@ -17,7 +17,7 @@ const G = motion.gallery
 export function DepthGallery({ projects }: { projects: Project[] }) {
   const ref = useRef<HTMLDivElement>(null)
   const wide = useMediaQuery('(min-width: 900px)')
-  const pinned = wide && !prefersReducedMotion
+  const pinned = wide && !reduceMotion
 
   useLayoutEffect(() => {
     const el = ref.current

@@ -3,6 +3,8 @@ import { useSyncExternalStore } from 'react'
 export type Theme = 'dark' | 'light'
 
 const STORAGE_KEY = 'theme'
+/** Page colours, mirrored into <meta name="theme-color"> so the phone browser bar matches. */
+const BROWSER_BAR: Record<Theme, string> = { dark: '#050607', light: '#f4f5f7' }
 const listeners = new Set<() => void>()
 
 function readInitial(): Theme {
@@ -10,20 +12,41 @@ function readInitial(): Theme {
   return preset === 'light' ? 'light' : 'dark'
 }
 
+function hasSavedChoice() {
+  try {
+    return localStorage.getItem(STORAGE_KEY) !== null
+  } catch {
+    return false
+  }
+}
+
+const paintBrowserBar = (theme: Theme) =>
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', BROWSER_BAR[theme])
+
 let current: Theme = readInitial()
+paintBrowserBar(current)
 
 export const getTheme = () => current
 
-export function setTheme(next: Theme) {
+/** `remember: false` applies a theme without saving it, e.g. when following the system setting. */
+export function setTheme(next: Theme, remember = true) {
   current = next
   document.documentElement.dataset.theme = next
-  try {
-    localStorage.setItem(STORAGE_KEY, next)
-  } catch {
-    /* storage blocked: the choice simply won't persist */
+  paintBrowserBar(next)
+  if (remember) {
+    try {
+      localStorage.setItem(STORAGE_KEY, next)
+    } catch {
+      /* storage blocked: the choice simply won't persist */
+    }
   }
   listeners.forEach((notify) => notify())
 }
+
+// Until the visitor picks a theme themselves, follow the operating system live.
+window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', (e) => {
+  if (!hasSavedChoice()) setTheme(e.matches ? 'light' : 'dark', false)
+})
 
 export function subscribeTheme(listener: () => void) {
   listeners.add(listener)

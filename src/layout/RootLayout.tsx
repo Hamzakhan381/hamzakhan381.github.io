@@ -13,13 +13,17 @@ import { Outlet, useLocation } from 'react-router'
 import { gsap } from 'gsap'
 import routes from '../lib/routes.json'
 import { initScroll, scrollToTop } from '../lib/scroll'
-import { markAppLoaded } from '../lib/intro'
+import { appLoaded, markAppLoaded } from '../lib/intro'
+import { openProjectFromUrl } from '../lib/projectDialog'
+import { getQuality, useQuality } from '../lib/quality'
 import { normalizePath } from '../lib/paths'
 import { Nav } from '../components/Nav'
 import { Footer } from '../components/Footer'
 import { Loader } from '../components/Loader'
 import { Cursor } from '../components/Cursor'
 import { CommandPalette } from '../components/CommandPalette'
+import { ProjectDialog } from '../components/ProjectDialog'
+import { SectionRail } from '../components/SectionRail'
 import { ToTop } from '../components/ToTop'
 import { Toaster } from '../components/Toaster'
 
@@ -76,9 +80,27 @@ function usePageMeta(pathname: string) {
   }, [pathname])
 }
 
+/** Opens the project named in `?project=` once the loader has lifted, and again after every navigation. */
+function useProjectDeepLink(pathname: string, search: string) {
+  useEffect(() => {
+    let cancelled = false
+    const sync = async () => {
+      await appLoaded
+      if (!cancelled) openProjectFromUrl()
+    }
+    void sync()
+    return () => {
+      cancelled = true
+    }
+  }, [pathname, search])
+}
+
 export function RootLayout() {
-  const { pathname } = useLocation()
-  const [ready, setReady] = useState(!hasWebGL)
+  const { pathname, search } = useLocation()
+  const quality = useQuality()
+  // Low-tier devices skip the WebGL scene entirely; the CSS backdrop stands in for it.
+  const show3D = hasWebGL && quality !== 'low'
+  const [ready, setReady] = useState(() => !hasWebGL || getQuality() === 'low')
   const markReady = useCallback(() => setReady(true), [])
   const [firstVisit] = useState(isFirstVisit)
   const onLoaderDone = useCallback(() => {
@@ -93,6 +115,7 @@ export function RootLayout() {
   useEffect(() => initScroll(), [])
   useLayoutEffect(() => scrollToTop(), [pathname])
   usePageMeta(pathname)
+  useProjectDeepLink(pathname, search)
 
   useEffect(() => {
     const timer = window.setTimeout(markReady, READY_TIMEOUT_MS)
@@ -113,15 +136,14 @@ export function RootLayout() {
 
   return (
     <>
-      {hasWebGL ? (
+      <div className="backdrop" aria-hidden="true" />
+      {show3D ? (
         <SceneBoundary onError={markReady}>
           <Suspense fallback={null}>
             <Scene pathname={pathname} onReady={markReady} />
           </Suspense>
         </SceneBoundary>
-      ) : (
-        <div className="scene-fallback" aria-hidden="true" />
-      )}
+      ) : null}
       <div className="vignette" aria-hidden="true" />
       {firstVisit ? <Loader ready={ready} onDone={onLoaderDone} /> : null}
       <Cursor />
@@ -129,6 +151,7 @@ export function RootLayout() {
         Skip to content
       </a>
       <Nav />
+      <SectionRail />
       <ViewTransition default="page-swap">
         <main id="main">
           <Outlet />
@@ -137,6 +160,7 @@ export function RootLayout() {
       </ViewTransition>
       <ToTop />
       <CommandPalette />
+      <ProjectDialog />
       <Toaster />
     </>
   )

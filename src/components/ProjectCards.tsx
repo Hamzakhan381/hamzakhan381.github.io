@@ -1,4 +1,5 @@
 import type { Project } from '../content'
+import { openProjectLink, projectHref } from '../lib/projectDialog'
 import { Icon } from './Icon'
 
 const INDEX_DIGITS = 2
@@ -6,11 +7,13 @@ const pad = (n: number) => String(n).padStart(INDEX_DIGITS, '0')
 
 function ProjectLinks({ project }: { project: Project }) {
   const { github, live } = project.links
-  if (!github && !live) return null
   return (
     <div className="project-links">
+      <a className="btn btn--small" href={projectHref(project.slug)} onClick={openProjectLink(project.slug)}>
+        Details <Icon name="plus" />
+      </a>
       {live ? (
-        <a className="btn btn--small" href={live} target="_blank" rel="noreferrer">
+        <a className="btn btn--small btn--ghost" href={live} target="_blank" rel="noreferrer">
           Live site <Icon name="arrowUpRight" />
         </a>
       ) : null}
@@ -23,9 +26,41 @@ function ProjectLinks({ project }: { project: Project }) {
   )
 }
 
+/** Faux terminal that "clones" the repo and prints the stack as a file tree. */
+export function StackTree({ project }: { project: Project }) {
+  const repo = project.links.github?.split('/').slice(-1)[0] ?? project.slug
+  return (
+    <div className="featured__screen" aria-hidden="true">
+      <div className="term__bar">
+        <span className="term__dot" />
+        <span className="term__dot" />
+        <span className="term__dot" />
+        <span className="term__title">~/projects/{project.slug}</span>
+      </div>
+      <pre>
+        <span className="tok-com"># {project.subtitle}</span>
+        {'\n'}
+        <span className="tok-fn">$</span> git clone {repo}
+        {'\n'}
+        <span className="tok-fn">$</span> cd {project.slug}
+        {'\n'}
+        <span className="tok-fn">$</span> tree --stack
+        {'\n'}
+        {project.stack.map((s, i) => (
+          <span key={s}>
+            {i === project.stack.length - 1 ? '└── ' : '├── '}
+            <span className="tok-str">{s}</span>
+            {'\n'}
+          </span>
+        ))}
+        <span className="tok-kw">✓</span> ready
+      </pre>
+    </div>
+  )
+}
+
 /** Large case-study panel: details on the left, a faux terminal "cloning" the repo on the right. */
 export function FeaturedProject({ project, index }: { project: Project; index: number }) {
-  const repo = project.links.github?.split('/').slice(-1)[0] ?? project.slug
   return (
     <article className="featured card">
       <div className="featured__info">
@@ -50,32 +85,7 @@ export function FeaturedProject({ project, index }: { project: Project; index: n
         </ul>
         <ProjectLinks project={project} />
       </div>
-      <div className="featured__screen" aria-hidden="true">
-        <div className="term__bar">
-          <span className="term__dot" />
-          <span className="term__dot" />
-          <span className="term__dot" />
-          <span className="term__title">~/projects/{project.slug}</span>
-        </div>
-        <pre>
-          <span className="tok-com"># {project.subtitle}</span>
-          {'\n'}
-          <span className="tok-fn">$</span> git clone {repo}
-          {'\n'}
-          <span className="tok-fn">$</span> cd {project.slug}
-          {'\n'}
-          <span className="tok-fn">$</span> tree --stack
-          {'\n'}
-          {project.stack.map((s, i) => (
-            <span key={s}>
-              {i === project.stack.length - 1 ? '└── ' : '├── '}
-              <span className="tok-str">{s}</span>
-              {'\n'}
-            </span>
-          ))}
-          <span className="tok-kw">✓</span> ready
-        </pre>
-      </div>
+      <StackTree project={project} />
     </article>
   )
 }

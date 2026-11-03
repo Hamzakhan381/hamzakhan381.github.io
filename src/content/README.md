@@ -7,7 +7,7 @@ missing or misspelled, the build fails and tells you which one.
 | File | What it controls |
 | --- | --- |
 | `profile.json` | Name, role, email, phone, location, availability badge, photo, social links |
-| `home.json` | Home hero, tech marquee, the five architecture layers, terminal session, featured project slugs, stats, testimonials |
+| `home.json` | Home hero, tech marquee, the five architecture layers, terminal session (plus the line it prints when a visitor clicks in to type commands), featured project slugs, stats, testimonials |
 | `about.json` | About hero, bio paragraphs, highlight numbers, principles, "Right now", certifications |
 | `experience.json` | Jobs shown in the git log (newest first); each one also draws a branch in the 3D git graph |
 | `education.json` | Degrees and focus areas |

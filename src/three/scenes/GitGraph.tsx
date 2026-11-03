@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useFrame } from '@react-three/fiber'
+import { useFrame, type ThreeEvent } from '@react-three/fiber'
 import { Billboard } from '@react-three/drei'
 import { CatmullRomCurve3, Group, LineCurve3, MathUtils, Mesh, TubeGeometry, Vector3 } from 'three'
 import config from '../scene.json'
-import { Label, readTrack, useHalfWidth, useNarrow, usePalette } from '../kit'
+import { Label, fromEmptySpace, readTrack, setPointer3D, useHalfWidth, useNarrow, usePalette } from '../kit'
 import { experience } from '../../content'
-import { scrollState } from '../../lib/scroll'
+import { scrollState, scrollToCentre } from '../../lib/scroll'
 import { DOUBLE, HALF, clamp } from '../../lib/math'
 
 const G = config.git
@@ -32,6 +32,25 @@ export function GitGraph() {
   const head = useRef<Mesh>(null)
   const [active, setActive] = useState(-1)
   const activeRef = useRef(-1)
+  const hovered = useRef(-1)
+
+  // Hover a branch label to highlight that role; click to jump to its git-log entry.
+  const hoverAt = (i: number) => (e: ThreeEvent<PointerEvent>) => {
+    const next = fromEmptySpace(e) ? i : -1
+    if (next === hovered.current) return
+    hovered.current = next
+    setPointer3D(next >= 0)
+  }
+  const leave = () => {
+    hovered.current = -1
+    setPointer3D(false)
+  }
+  const open = (i: number) => (e: ThreeEvent<MouseEvent>) => {
+    if (!fromEmptySpace(e)) return
+    e.stopPropagation()
+    scrollToCentre(`job-${i}`)
+  }
+  useEffect(() => () => setPointer3D(false), [])
 
   const { mainGeometry, branches, nodeSpots } = useMemo(() => {
     const top = G.height * HALF
@@ -85,7 +104,7 @@ export function GitGraph() {
   useFrame((_, delta) => {
     const track = readTrack('experience', G.z)
     const p = track.progress
-    const focus = scrollState.focus
+    const focus = hovered.current >= 0 ? hovered.current : scrollState.focus
     if (focus !== activeRef.current) {
       activeRef.current = focus
       setActive(focus)
@@ -123,7 +142,7 @@ export function GitGraph() {
           <mesh ref={(el) => void (branchMeshes.current[i] = el)} geometry={b.geometry}>
             <meshBasicMaterial color={i === active ? palette.accent : palette.line} toneMapped={false} />
           </mesh>
-          <Billboard position={b.label.toArray()}>
+          <Billboard position={b.label.toArray()} onPointerMove={hoverAt(i)} onPointerOut={leave} onClick={open(i)}>
             <Label text={experience[i].role} height={G.labelHeight} color={i === active ? palette.accent : palette.line} weight={600} mono={false} align="left" opacity={i === active || active < 0 ? 1 : DIM_OPACITY} />
             <Label text={`@ ${experience[i].org} · ${experience[i].period}`} height={G.subLabelHeight} color={palette.line} align="left" position={[0, -G.labelHeight, 0]} opacity={i === active || active < 0 ? 1 : DIM_OPACITY} />
           </Billboard>

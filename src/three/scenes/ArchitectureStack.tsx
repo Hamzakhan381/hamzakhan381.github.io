@@ -1,11 +1,11 @@
-import { useMemo, useRef, useState } from 'react'
-import { useFrame } from '@react-three/fiber'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { useFrame, type ThreeEvent } from '@react-three/fiber'
 import { Billboard, Edges } from '@react-three/drei'
 import { Group, InstancedMesh, MathUtils, Mesh, Object3D } from 'three'
 import config from '../scene.json'
-import { Label, readTrack, useHalfWidth, useNarrow, usePalette } from '../kit'
+import { Label, fromEmptySpace, readTrack, setPointer3D, useHalfWidth, useNarrow, usePalette } from '../kit'
 import { home } from '../../content'
-import { scrollState } from '../../lib/scroll'
+import { scrollState, scrollToCentre } from '../../lib/scroll'
 import { HALF, lerp } from '../../lib/math'
 
 const S = config.stack
@@ -39,6 +39,25 @@ export function ArchitectureStack() {
   const [active, setActive] = useState(-1)
   const activeRef = useRef(-1)
   const dummy = useMemo(() => new Object3D(), [])
+  const hovered = useRef(-1)
+
+  // Hover a slab to lift it; click to jump to the card that explains that layer.
+  const hoverAt = (i: number) => (e: ThreeEvent<PointerEvent>) => {
+    const next = fromEmptySpace(e) ? i : -1
+    if (next === hovered.current) return
+    hovered.current = next
+    setPointer3D(next >= 0)
+  }
+  const leave = () => {
+    hovered.current = -1
+    setPointer3D(false)
+  }
+  const open = (i: number) => (e: ThreeEvent<MouseEvent>) => {
+    if (!fromEmptySpace(e)) return
+    e.stopPropagation()
+    scrollToCentre(`layer-${i}`)
+  }
+  useEffect(() => () => setPointer3D(false), [])
 
   const chips = useMemo(() => {
     const [w, h, d] = S.chipSize
@@ -67,7 +86,7 @@ export function ArchitectureStack() {
   useFrame((state, delta) => {
     const track = readTrack('stack', S.z)
     const gap = lerp(S.gapClosed, S.gapOpen, smoothstep(0, S.explodeUntil, track.progress))
-    const focus = scrollState.focus
+    const focus = hovered.current >= 0 ? hovered.current : scrollState.focus
     if (focus !== activeRef.current) {
       activeRef.current = focus
       setActive(focus)
@@ -116,7 +135,7 @@ export function ArchitectureStack() {
           const on = i === active
           return (
             <group key={layer.name} ref={(el) => void (slabs.current[i] = el)}>
-              <mesh>
+              <mesh onPointerMove={hoverAt(i)} onPointerOut={leave} onClick={open(i)}>
                 <boxGeometry args={[S.width, S.thickness, S.depth]} />
                 <meshStandardMaterial color={palette.surface} transparent opacity={SLAB_OPACITY} roughness={0.55} metalness={0.1} />
                 <Edges color={on ? palette.accent : palette.line} />

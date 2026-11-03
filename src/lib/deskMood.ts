@@ -8,6 +8,9 @@ import { MS_PER_SECOND } from './math'
 export const deskMood = {
   typedAt: Number.NEGATIVE_INFINITY,
   sentAt: Number.NEGATIVE_INFINITY,
+  /** Last click on the developer (he waves and says a quip) and on the rubber duck (it hops). */
+  pokedAt: Number.NEGATIVE_INFINITY,
+  duckAt: Number.NEGATIVE_INFINITY,
   focused: false,
 }
 

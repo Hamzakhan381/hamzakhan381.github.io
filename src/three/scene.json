@@ -14,10 +14,6 @@
     "velocityForFull": 40,
     "warpDamping": 4
   },
-  "background": {
-    "dark": "#050607",
-    "light": "#f3f4f6"
-  },
   "palette": {
     "dark": {
       "line": "#e8edf3",
@@ -47,7 +43,12 @@
       -6,
       -2,
       -4
-    ]
+    ],
+    "light": {
+      "ambient": 1.55,
+      "key": 1.35,
+      "rim": 0.35
+    }
   },
   "transition": {
     "exitMs": 900,
@@ -56,14 +57,15 @@
     "minScale": 0.001
   },
   "glyphs": {
-    "desktop": 40,
-    "mobile": 16,
     "spreadX": 14,
     "spreadY": 9,
     "near": -3,
     "far": -16,
     "size": 0.5,
-    "opacity": 0.24,
+    "opacity": {
+      "dark": 0.24,
+      "light": 0.3
+    },
     "rise": 0.12,
     "parallax": 6,
     "set": [
@@ -89,7 +91,11 @@
       "λ"
     ],
     "travel": 2.2,
-    "fadeNear": 0.85
+    "fadeNear": 0.85,
+    "color": {
+      "dark": "#e8edf3",
+      "light": "#5b6b82"
+    }
   },
   "stack": {
     "x": 0.44,
@@ -245,5 +251,21 @@
       ]
     ],
     "barLine": 0.012
+  },
+  "quality": {
+    "high": {
+      "dpr": 1.75,
+      "touchDpr": 1.5,
+      "antialias": true,
+      "glyphs": 40
+    },
+    "medium": {
+      "dpr": 1.25,
+      "touchDpr": 1.25,
+      "antialias": false,
+      "glyphs": 14
+    },
+    "minDpr": 1,
+    "flipflops": 3
   }
 }

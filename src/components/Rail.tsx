@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, type ReactNode } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { prefersReducedMotion } from '../lib/scroll'
+import { reduceMotion } from '../lib/scroll'
 import { useMediaQuery } from '../lib/useMediaQuery'
 import { HALF, clamp } from '../lib/math'
 import motion from '../lib/motion.json'
@@ -16,7 +16,7 @@ const R = motion.rail
 export function Rail({ label, children }: { label: string; children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null)
   const wide = useMediaQuery('(min-width: 900px)')
-  const pinned = wide && !prefersReducedMotion
+  const pinned = wide && !reduceMotion
 
   useLayoutEffect(() => {
     const el = ref.current
@@ -24,19 +24,25 @@ export function Rail({ label, children }: { label: string; children: ReactNode }
     if (!el || !track || !pinned) return
     const cards = Array.from(track.children) as HTMLElement[]
     let distance = 0
+    let mid = 0
+    let centres: number[] = []
 
+    // Layout is read only here (on load and resize). Scrolling then just does arithmetic,
+    // so moving the track never forces the browser to recalculate layout mid-frame.
     const measure = () => {
       track.style.transform = 'none'
       distance = Math.max(track.scrollWidth - window.innerWidth, 0)
+      mid = window.innerWidth * HALF
+      const trackLeft = track.getBoundingClientRect().left
+      centres = cards.map((card) => trackLeft + card.offsetLeft + card.offsetWidth * HALF)
       el.style.setProperty('--rail-distance', `${distance}px`)
     }
     const place = (progress: number) => {
-      track.style.transform = `translate3d(${-progress * distance}px, 0, 0)`
-      const mid = window.innerWidth * HALF
+      const shift = progress * distance
+      track.style.transform = `translate3d(${-shift}px, 0, 0)`
       cards.forEach((_, i) => {
         const card = cards[i]
-        const box = card.getBoundingClientRect()
-        const offset = clamp((box.left + box.width * HALF - mid) / mid, -1, 1)
+        const offset = clamp((centres[i] - shift - mid) / mid, -1, 1)
         card.style.transform = `perspective(${motion.perspective}px) rotateY(${-offset * R.angle}deg) translateZ(${-Math.abs(offset) * R.depth}px) scale(${1 - Math.abs(offset) * R.scale})`
         card.style.opacity = String(1 - Math.abs(offset) * (1 - R.minOpacity))
       })

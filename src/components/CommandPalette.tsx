@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
 import { useNavigate } from 'react-router'
 import routes from '../lib/routes.json'
-import { profile } from '../content'
+import { profile, projects } from '../content'
 import { lockScroll } from '../lib/scroll'
+import { openProject } from '../lib/projectDialog'
 import { toggleTheme } from '../lib/theme'
 import { copyText } from '../lib/toast'
+import { forgetQuality, liteChosen, setQuality } from '../lib/quality'
 import { HALF } from '../lib/math'
 import { Icon, type IconName } from './Icon'
 
@@ -40,6 +42,29 @@ export function CommandPalette() {
         keywords: 'theme dark light mode color',
         run: () => toggleTheme(window.innerWidth * HALF, window.innerHeight * HALF),
       },
+      liteChosen()
+        ? {
+            id: 'lite',
+            label: 'Turn off lite mode (full 3D)',
+            hint: 'Performance',
+            icon: 'sun' as const,
+            keywords: 'lite performance fast slow lag 3d animation full',
+            run: () => {
+              forgetQuality()
+              window.location.reload()
+            },
+          }
+        : {
+            id: 'lite',
+            label: 'Turn on lite mode (less 3D, faster)',
+            hint: 'Performance',
+            icon: 'moon' as const,
+            keywords: 'lite performance fast slow lag 3d animation battery',
+            run: () => {
+              setQuality('low', true)
+              window.location.reload()
+            },
+          },
       {
         id: 'email',
         label: 'Copy email address',
@@ -55,6 +80,14 @@ export function CommandPalette() {
         icon: s.icon,
         keywords: `${s.label} social profile`,
         run: () => window.open(s.href, '_blank', 'noopener'),
+      })),
+      ...projects.items.map((p) => ({
+        id: `project-${p.slug}`,
+        label: p.title,
+        hint: `Project · ${p.category}`,
+        icon: 'code' as const,
+        keywords: `${p.subtitle} ${p.category} ${p.stack.join(' ')} project case study work`,
+        run: () => openProject(p.slug),
       })),
     ],
     [navigate],
@@ -88,7 +121,7 @@ export function CommandPalette() {
       input.current?.focus()
     }
     if (!open && el.open) el.close()
-    lockScroll(open)
+    lockScroll('palette', open)
   }, [open])
 
   const run = (command: Command | undefined) => {
@@ -111,6 +144,8 @@ export function CommandPalette() {
       ref={dialog}
       className="palette"
       aria-label="Command palette"
+      data-lenis-prevent
+      onCancel={() => setOpen(false)}
       onClose={() => setOpen(false)}
       onClick={(e) => {
         if (e.target === e.currentTarget) setOpen(false)

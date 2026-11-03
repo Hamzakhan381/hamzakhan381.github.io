@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from 'react'
 import { gsap } from 'gsap'
-import { prefersReducedMotion, scrollState } from '../lib/scroll'
+import { reduceMotion, scrollState } from '../lib/scroll'
 import { HALF, MS_PER_SECOND } from '../lib/math'
 import { Icon } from './Icon'
 
@@ -58,7 +58,7 @@ export function Carousel3D<T>({ items, label, renderItem }: Props<T>) {
       gsap.killTweensOf(angle.current)
       gsap.to(angle.current, {
         value: target,
-        duration: prefersReducedMotion ? 0 : SNAP_DURATION,
+        duration: reduceMotion ? 0 : SNAP_DURATION,
         ease: 'expo.out',
         onUpdate: apply,
       })
@@ -79,7 +79,7 @@ export function Carousel3D<T>({ items, label, renderItem }: Props<T>) {
   useEffect(() => {
     apply()
     const tick = (_: number, deltaMs: number) => {
-      if (paused.current || drag.current.active || prefersReducedMotion || gsap.isTweening(angle.current)) return
+      if (paused.current || drag.current.active || reduceMotion || gsap.isTweening(angle.current)) return
       angle.current.value -= (AUTO_DEG_PER_SECOND * deltaMs) / MS_PER_SECOND
       apply()
     }

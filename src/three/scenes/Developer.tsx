@@ -1,5 +1,5 @@
-import { createContext, useContext, useMemo, useRef, useState, type ReactNode } from 'react'
-import { useFrame, useThree } from '@react-three/fiber'
+import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useFrame, useThree, type ThreeEvent } from '@react-three/fiber'
 import { Billboard, Edges, Outlines, RoundedBox } from '@react-three/drei'
 import {
   Color,
@@ -15,7 +15,7 @@ import {
   Vector3,
 } from 'three'
 import D from './developer.json'
-import { Label, readTrack, useHalfWidth, useNarrow, usePalette } from '../kit'
+import { Label, fromEmptySpace, readTrack, setPointer3D, useHalfWidth, useNarrow, usePalette } from '../kit'
 import { contact } from '../../content'
 import { deskMood, now } from '../../lib/deskMood'
 import { scrollState } from '../../lib/scroll'
@@ -32,7 +32,7 @@ const CAPSULE_CAPS = 8
 const STEAM_SEGMENTS = 10
 const MIRROR = [-1, 1]
 
-type Mode = 'idle' | 'hello' | 'typing' | 'sent'
+type Mode = 'idle' | 'hello' | 'typing' | 'poke' | 'sent'
 
 /* ---------- Cartoon look: cel shading + ink outlines that follow the theme ---------- */
 
@@ -169,15 +169,39 @@ function Mug() {
   )
 }
 
-/** A rubber duck, for rubber-duck debugging. */
-function Duck() {
+/** A rubber duck, for rubber-duck debugging. Click it and it hops, spins and offers advice. */
+function Duck({ fill, ink }: { fill: Color; ink: Color }) {
   const K = D.duck
   const duck = useRef<Group>(null)
+  const [talking, setTalking] = useState(false)
   useFrame((state) => {
-    if (duck.current) duck.current.rotation.y = Math.sin(state.clock.elapsedTime * K.bobSpeed) * K.bob - HALF_PI * HALF
+    const since = now() - deskMood.duckAt
+    const hop = since < K.hopFor ? since / K.hopFor : 1
+    if (duck.current) {
+      duck.current.rotation.y = Math.sin(state.clock.elapsedTime * K.bobSpeed) * K.bob - HALF_PI * HALF + hop * K.spin
+      duck.current.position.y = K.position[1] + Math.sin(hop * Math.PI) * K.hop
+    }
+    const speaking = since < D.pokeFor
+    if (speaking !== talking) setTalking(speaking)
   })
+  const quack = (e: ThreeEvent<MouseEvent>) => {
+    if (!fromEmptySpace(e)) return
+    e.stopPropagation()
+    deskMood.duckAt = now()
+  }
   return (
-    <group ref={duck} position={v3(K.position)}>
+    <group
+      ref={duck}
+      position={v3(K.position)}
+      onClick={quack}
+      onPointerMove={(e) => setPointer3D(fromEmptySpace(e))}
+      onPointerOut={() => setPointer3D(false)}
+    >
+      {talking ? (
+        <Billboard position={v3(K.bubble)}>
+          <SpeechBubble text={contact.desk.duck} fill={fill} ink={ink} />
+        </Billboard>
+      ) : null}
       <mesh position={[0, K.body * K.bodyScale[1], 0]} scale={v3(K.bodyScale)}>
         <sphereGeometry args={[K.body, SMOOTH, SMOOTH]} />
         <Toon color={C.duck} />
@@ -296,6 +320,16 @@ export function Developer() {
   const [mode, setMode] = useState<Mode>('idle')
   const modeRef = useRef<Mode>('idle')
   const [statusIndex, setStatusIndex] = useState(0)
+  const [quip, setQuip] = useState(0)
+
+  // Click him: he waves and says the next quip.
+  const poke = (e: ThreeEvent<MouseEvent>) => {
+    if (!fromEmptySpace(e)) return
+    e.stopPropagation()
+    deskMood.pokedAt = now()
+    setQuip((q) => q + 1)
+  }
+  useEffect(() => () => setPointer3D(false), [])
 
   useFrame((state, delta) => {
     const t = state.clock.elapsedTime
@@ -307,6 +341,7 @@ export function Developer() {
     const typing = clock - deskMood.typedAt < D.typingFor
     const moods: [boolean, Mode][] = [
       [clock - deskMood.sentAt < D.cheerFor, 'sent'],
+      [clock - deskMood.pokedAt < D.pokeFor, 'poke'],
       [typing || deskMood.focused, 'typing'],
       [hovering, 'hello'],
     ]
@@ -324,7 +359,7 @@ export function Developer() {
       const side = MIRROR[i]
       const tap = Math.max(Math.sin(t * speed + i * Math.PI), 0) * A.typeLift
       if (next === 'sent') target.set(side * A.cheer[0], A.cheer[1] + Math.sin(t * A.cheerSpeed + i) * A.cheerShake, A.cheer[2])
-      else if (next === 'hello' && side > 0) target.set(A.wave[0] + Math.sin(t * A.waveSpeed) * A.waveSwing, A.wave[1], A.wave[2])
+      else if ((next === 'hello' || next === 'poke') && side > 0) target.set(A.wave[0] + Math.sin(t * A.waveSpeed) * A.waveSwing, A.wave[1], A.wave[2])
       else target.set(side * A.hand[0], A.hand[1] + tap, A.hand[2])
       hand.set(
         MathUtils.damp(hand.x, target.x, A.damping, delta),
@@ -349,7 +384,7 @@ export function Developer() {
       head.current.position.setY(D.head.y + Math.abs(Math.sin(t * D.head.bobSpeed)) * D.head.bob)
     }
     if (eyes.current) eyes.current.scale.setY(t % D.eyes.blinkEvery < D.eyes.blinkFor ? D.eyes.closed : 1)
-    if (brows.current) brows.current.position.setY(D.brows.y + (next === 'sent' || next === 'hello' ? D.brows.raise : 0))
+    if (brows.current) brows.current.position.setY(D.brows.y + (next === 'idle' || next === 'typing' ? 0 : D.brows.raise))
     if (mouth.current) mouth.current.scale.setScalar(next === 'sent' ? D.mouth.cheerScale : 1)
     if (glow.current) glow.current.intensity = (typing ? D.laptop.glowFast : D.laptop.glow) * (1 + Math.sin(t * speed) * HALF * HALF)
     if (bubble.current) bubble.current.scale.setScalar(MathUtils.damp(bubble.current.scale.x, next === 'idle' ? Number.EPSILON : 1, D.bubble.damping, delta))
@@ -365,13 +400,29 @@ export function Developer() {
 
   const H = D.head
   const E = D.eyes
-  const bubbleText = { idle: '', hello: contact.desk.hello, typing: contact.desk.typing, sent: contact.desk.sent }[mode]
+  const bubbleText = {
+    idle: '',
+    hello: contact.desk.hello,
+    typing: contact.desk.typing,
+    poke: contact.desk.quips[quip % contact.desk.quips.length],
+    sent: contact.desk.sent,
+  }[mode]
   const statusText = mode === 'sent' ? contact.desk.sentStatus : contact.desk.status[statusIndex]
 
   return (
     <LookContext.Provider value={look}>
       <group ref={outer}>
         <Desk surface={deskColor} />
+        {/* Invisible box around the developer that catches hover and clicks. */}
+        <mesh
+          position={v3(D.hitBox.position)}
+          onClick={poke}
+          onPointerMove={(e) => setPointer3D(fromEmptySpace(e))}
+          onPointerOut={() => setPointer3D(false)}
+        >
+          <boxGeometry args={v3(D.hitBox.size)} />
+          <meshBasicMaterial transparent opacity={0} depthWrite={false} colorWrite={false} />
+        </mesh>
         <Chair accent={palette.accent} />
 
         {/* Torso in a hoodie, with drawstrings */}
@@ -510,7 +561,7 @@ export function Developer() {
 
         <Laptop accent={palette.accent} sticker={palette.surface} glow={glow} />
         <Mug />
-        <Duck />
+        <Duck fill={palette.line} ink={palette.surface} />
 
         <Holo spec={D.holo.code} accent={palette.accent}>
           <CodeLines accent={palette.accent} line={palette.line} fast={mode === 'typing'} />

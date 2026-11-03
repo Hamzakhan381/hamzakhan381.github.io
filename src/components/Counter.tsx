@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef } from 'react'
 import { gsap } from 'gsap'
-import { prefersReducedMotion } from '../lib/scroll'
+import { reduceMotion } from '../lib/scroll'
 import motion from '../lib/motion.json'
 
 /** A number that counts up from zero the first time it scrolls into view. */
@@ -9,7 +9,7 @@ export function Counter({ value, suffix = '' }: { value: number; suffix?: string
 
   useLayoutEffect(() => {
     const el = ref.current
-    if (!el || prefersReducedMotion) return
+    if (!el || reduceMotion) return
     const counter = { n: 0 }
     el.textContent = `0${suffix}`
     const ctx = gsap.context(() => {

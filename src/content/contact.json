@@ -1,12 +1,20 @@
 {
   "hero": {
     "eyebrow": "Contact",
-    "lines": ["Let's build", "something great."],
+    "lines": [
+      "Let's build",
+      "something great."
+    ],
     "accentLine": 1,
     "lead": "Have a project, an opportunity, or just want to talk shop? Send a message and I'll reply within 24–48 hours."
   },
   "formTitle": "Send a message",
-  "subjects": ["New project", "Job opportunity", "Collaboration", "Just saying hi"],
+  "subjects": [
+    "New project",
+    "Job opportunity",
+    "Collaboration",
+    "Just saying hi"
+  ],
   "messageLimit": 1000,
   "sent": {
     "title": "Message drafted!",
@@ -16,7 +24,21 @@
     "hello": "Hi there!",
     "typing": "Ooh, a message…",
     "sent": "Got it, talk soon!",
-    "status": ["$ npm run dev", "✓ ready on :5173", "$ git commit -m \"ship it\"", "$ git push origin main", "✓ deployed"],
-    "sentStatus": "200 OK · message received"
+    "status": [
+      "$ npm run dev",
+      "✓ ready on :5173",
+      "$ git commit -m \"ship it\"",
+      "$ git push origin main",
+      "✓ deployed"
+    ],
+    "sentStatus": "200 OK · message received",
+    "quips": [
+      "Hi! I'm Hamza.",
+      "Need a website? Let's talk.",
+      "Rubber duck says: ship it.",
+      "Debugging is my cardio.",
+      "Click the duck. Trust me."
+    ],
+    "duck": "Quack! Tried console.log?"
   }
 }

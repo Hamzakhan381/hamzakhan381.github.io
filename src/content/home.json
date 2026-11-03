@@ -46,6 +46,8 @@
   "terminal": {
     "eyebrow": "Terminal",
     "title": "Scroll to run the session.",
+    "lead": "Scroll and it types itself. Then it's your turn: click it and try help.",
+    "welcome": "Interactive mode. Type help and press Enter.",
     "host": "hamza@portfolio",
     "session": [
       { "cmd": "whoami", "out": ["Muhammad Hamza Khan, Software Engineer"] },

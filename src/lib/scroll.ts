@@ -1,11 +1,15 @@
+import { useSyncExternalStore } from 'react'
 import Lenis from 'lenis'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { DOUBLE, MS_PER_SECOND, clamp } from './math'
+import { DOUBLE, HALF, MS_PER_SECOND, clamp } from './math'
+import { reduceMotion } from './quality'
+
+export { reduceMotion }
 
 gsap.registerPlugin(ScrollTrigger)
 
-const LENIS_LERP = 0.09
+const LENIS_LERP = 0.12
 const LENIS_WHEEL_MULTIPLIER = 0.9
 const ANCHOR_SCROLL_DURATION = 1.4
 const ANCHOR_OFFSET = -96
@@ -30,8 +34,6 @@ export const scrollState = {
 
 if (import.meta.env.DEV) Object.assign(window, { __scrollState: scrollState })
 
-export const prefersReducedMotion =
-  typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 let lenis: Lenis | null = null
 
@@ -56,7 +58,7 @@ export function initScroll() {
   ro.observe(document.body)
 
   const tick = (time: number) => lenis?.raf(time * MS_PER_SECOND)
-  if (!prefersReducedMotion) {
+  if (!reduceMotion) {
     lenis = new Lenis({ lerp: LENIS_LERP, wheelMultiplier: LENIS_WHEEL_MULTIPLIER, autoRaf: false })
     lenis.on('scroll', (instance: Lenis) => {
       scrollState.velocity = instance.velocity
@@ -85,19 +87,52 @@ export function scrollToTop() {
 
 export function scrollToTopSmooth() {
   if (lenis) lenis.scrollTo(0, { duration: ANCHOR_SCROLL_DURATION })
-  else window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' })
+  else window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' })
 }
 
-/** Freezes page scrolling behind overlays such as the menu and command palette. */
-export function lockScroll(locked: boolean) {
-  if (locked) lenis?.stop()
+const scrollLocks = new Set<string>()
+const lockListeners = new Set<() => void>()
+
+/**
+ * Freezes page scrolling behind overlays (menu, command palette, project dialog). Each overlay
+ * locks under its own name, so one closing never unlocks the page while another is still open.
+ */
+export function lockScroll(owner: string, locked: boolean) {
+  const wasLocked = scrollLocks.size > 0
+  if (locked) scrollLocks.add(owner)
+  else scrollLocks.delete(owner)
+  const isLocked = scrollLocks.size > 0
+  if (isLocked === wasLocked) return
+  if (isLocked) lenis?.stop()
   else lenis?.start()
-  document.documentElement.classList.toggle('scroll-locked', locked)
+  document.documentElement.classList.toggle('scroll-locked', isLocked)
+  lockListeners.forEach((notify) => notify())
+}
+
+/** True while an overlay covers the page; the 3D scene stops rendering behind it. */
+export const useScrollLocked = () =>
+  useSyncExternalStore(
+    (notify) => {
+      lockListeners.add(notify)
+      return () => {
+        lockListeners.delete(notify)
+      }
+    },
+    () => scrollLocks.size > 0,
+  )
+
+/** Scrolls an element to the middle of the screen, which is also where list items count as focused. */
+export function scrollToCentre(id: string) {
+  const el = document.getElementById(id)
+  if (!el) return
+  const offset = -(window.innerHeight - el.offsetHeight) * HALF
+  if (lenis) lenis.scrollTo(el, { duration: ANCHOR_SCROLL_DURATION, offset })
+  else window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY + offset, behavior: reduceMotion ? 'auto' : 'smooth' })
 }
 
 export function scrollToId(id: string) {
   const el = document.getElementById(id)
   if (!el) return
   if (lenis) lenis.scrollTo(el, { duration: ANCHOR_SCROLL_DURATION, offset: ANCHOR_OFFSET })
-  else el.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth' })
+  else el.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' })
 }

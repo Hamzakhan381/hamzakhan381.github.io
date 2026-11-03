@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef, type CSSProperties } from 'react'
 import { gsap } from 'gsap'
-import { prefersReducedMotion } from '../lib/scroll'
+import { reduceMotion } from '../lib/scroll'
 import motion from '../lib/motion.json'
 import type { Skills } from '../content'
 
@@ -12,7 +12,7 @@ export function SkillBars({ groups }: { groups: Skills['groups'] }) {
 
   useLayoutEffect(() => {
     const el = ref.current
-    if (!el || prefersReducedMotion) return
+    if (!el || reduceMotion) return
     const ctx = gsap.context(() => {
       Array.from(el.querySelectorAll<HTMLElement>('.bars__group')).forEach((group) => {
         gsap.from(group.querySelectorAll('.bars__fill'), {

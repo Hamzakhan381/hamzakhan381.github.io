@@ -1,11 +1,10 @@
 import { gsap } from 'gsap'
-import { prefersReducedMotion } from './scroll'
+import { reduceMotion } from './scroll'
 import motion from './motion.json'
-import { DOUBLE, HALF, hash } from './math'
+import { DOUBLE } from './math'
 
 const { perspective: PERSPECTIVE, scrub: SCRUB, depth: DEPTH, fly: FLY, swing: SWING, stair: STAIR, intro: INTRO } = motion
-const { heroScatter: SCATTER, exit: EXIT } = motion
-const SCATTER_CHANNELS = ['x', 'y', 'z', 'rotateX', 'rotateY'] as const
+const { heroOut: HERO_OUT, exit: EXIT } = motion
 const alternate = (i: number) => (i % DOUBLE ? 1 : -1)
 const all = (root: HTMLElement, selector: string) => Array.from(root.querySelectorAll<HTMLElement>(selector))
 
@@ -13,7 +12,7 @@ const scrubbed = (trigger: Element, start: string, end: string) => ({ trigger, s
 
 /** Cards rise out of the depth of the screen, alternating their swing, scrubbed to scroll. */
 export function flyIn(elements: Element[]) {
-  if (prefersReducedMotion) return
+  if (reduceMotion) return
   elements.forEach((el, i) => {
     gsap.fromTo(
       el,
@@ -25,7 +24,7 @@ export function flyIn(elements: Element[]) {
 
 /** Wires every scroll-driven 3D reveal inside a page. Call inside a gsap context scoped to the page. */
 export function setupReveals(root: HTMLElement) {
-  if (prefersReducedMotion) return
+  if (reduceMotion) return
 
   all(root, '[data-reveal]').forEach((el) => {
     gsap.fromTo(
@@ -46,20 +45,27 @@ export function setupReveals(root: HTMLElement) {
     )
   })
 
-  // Page titles break apart word by word in 3D as their header scrolls away.
+  // The page header tilts back and recedes into the scene as you scroll away from it, each title
+  // line trailing the one above. Moving away from the viewer keeps text crisp (it only shrinks)
+  // and the whole block travels together, so nothing piles up on the paragraph below.
   all(root, '.page-hero').forEach((hero) => {
-    all(hero, '.split-word').forEach((word, i) => {
-      const [hx, hy, hz, hrx, hry] = SCATTER_CHANNELS.map((_, channel) => hash(i, channel))
-      gsap.to(word, {
-        x: hx * SCATTER.x,
-        y: -(1 + hy) * SCATTER.y,
-        z: SCATTER.z * (HALF + Math.abs(hz)),
-        rotateX: hrx * SCATTER.rotate,
-        rotateY: hry * SCATTER.rotate,
-        opacity: 0,
+    const leaving = () => ({ trigger: hero, start: 'top top', end: 'bottom top', scrub: HERO_OUT.scrub })
+    gsap.to(hero, {
+      y: HERO_OUT.y,
+      z: HERO_OUT.z,
+      rotateX: HERO_OUT.rotateX,
+      opacity: 0,
+      transformPerspective: PERSPECTIVE,
+      transformOrigin: '50% 0%',
+      ease: 'power1.in',
+      scrollTrigger: leaving(),
+    })
+    all(hero, '.split-line').forEach((line, i) => {
+      gsap.to(line, {
+        z: -HERO_OUT.lineDepth * (i + 1),
         transformPerspective: PERSPECTIVE,
-        ease: 'none',
-        scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: true },
+        ease: 'power1.in',
+        scrollTrigger: leaving(),
       })
     })
   })
@@ -95,7 +101,7 @@ export function setupReveals(root: HTMLElement) {
 export function playIntro(root: HTMLElement) {
   const chars = all(root, '.split-char')
   const rest = all(root, '[data-intro]')
-  if (prefersReducedMotion) {
+  if (reduceMotion) {
     gsap.set([...chars, ...rest], { opacity: 1 })
     return
   }
@@ -104,9 +110,14 @@ export function playIntro(root: HTMLElement) {
     tl.fromTo(
       line.querySelectorAll('.split-char'),
       { opacity: 0, rotateX: INTRO.charRotate, y: '0.5em', transformPerspective: PERSPECTIVE, transformOrigin: '50% 100%' },
-      { opacity: 1, rotateX: 0, y: 0, duration: INTRO.duration, stagger: INTRO.charStagger },
+      { opacity: 1, rotateX: 0, y: 0, duration: INTRO.duration, stagger: INTRO.charStagger, clearProps: 'transform' },
       i * INTRO.lineDelay,
     )
   })
-  tl.fromTo(rest, { opacity: 0, y: INTRO.fadeY }, { opacity: 1, y: 0, duration: INTRO.duration, stagger: INTRO.fadeStagger }, INTRO.lineDelay)
+  tl.fromTo(
+    rest,
+    { opacity: 0, y: INTRO.fadeY },
+    { opacity: 1, y: 0, duration: INTRO.duration, stagger: INTRO.fadeStagger, clearProps: 'transform' },
+    INTRO.lineDelay,
+  )
 }

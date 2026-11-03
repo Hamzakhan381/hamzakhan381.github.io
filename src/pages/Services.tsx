@@ -17,7 +17,7 @@ function ServiceList() {
       <SectionHead eyebrow="What I offer" title="One rack," accent="six services." lead="Each unit in the rack slides out as you reach its service." />
       <ol ref={ref} className="svc">
         {services.items.map((s, i) => (
-          <li key={s.id} data-focus-item className={`svc__item ${active === i ? 'is-active' : ''}`}>
+          <li key={s.id} id={`service-${s.id}`} data-focus-item className={`svc__item ${active === i ? 'is-active' : ''}`}>
             <Tilt className="card svc__card" data-swing>
               <div className="svc__head">
                 <span className="svc__num">{pad(i + 1)}</span>

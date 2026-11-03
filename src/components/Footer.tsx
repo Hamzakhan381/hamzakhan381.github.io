@@ -3,6 +3,7 @@ import { Link } from 'react-router'
 import routes from '../lib/routes.json'
 import { profile } from '../content'
 import { Icon } from './Icon'
+import { SocialCube } from './SocialCube'
 
 export function Socials() {
   return (
@@ -34,12 +35,15 @@ export function Footer() {
   return (
     <footer className="footer">
       <div className="container">
-        <Link to="/contact" className="footer__cta" data-reveal>
-          <span className="footer__cta-small">Have a project in mind?</span>
-          <span className="footer__cta-big">
-            Let's talk <Icon name="arrowUpRight" />
-          </span>
-        </Link>
+        <div className="footer__top">
+          <Link to="/contact" className="footer__cta" data-reveal>
+            <span className="footer__cta-small">Have a project in mind?</span>
+            <span className="footer__cta-big">
+              Let's talk <Icon name="arrowUpRight" />
+            </span>
+          </Link>
+          <SocialCube />
+        </div>
         <div className="footer__row">
           <nav className="footer__links" aria-label="Footer">
             {routes.map((r) => (

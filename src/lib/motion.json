@@ -65,13 +65,6 @@
     "duration": 0.6,
     "scale": 0.85
   },
-  "heroScatter": {
-    "x": 220,
-    "y": 140,
-    "z": 420,
-    "rotate": 70,
-    "stagger": 0.02
-  },
   "exit": {
     "rotateX": -22,
     "z": -180,
@@ -82,5 +75,12 @@
     "depth": 260,
     "minOpacity": 0.35,
     "scale": 0.12
+  },
+  "heroOut": {
+    "y": -70,
+    "z": -240,
+    "rotateX": 14,
+    "lineDepth": 110,
+    "scrub": 0.5
   }
 }

@@ -10,20 +10,19 @@ import { ServerRack } from './scenes/ServerRack'
 import { NetworkGraph } from './scenes/NetworkGraph'
 import { Developer } from './scenes/Developer'
 import { CodeWindows } from './scenes/CodeWindows'
-import { scrollState } from '../lib/scroll'
+import { scrollState, useScrollLocked } from '../lib/scroll'
 import { normalizePath } from '../lib/paths'
 import { useTheme } from '../lib/theme'
+import { degrade, getQuality, useQuality } from '../lib/quality'
+import { dprFor, tierSettings } from './tier'
 
-const MAX_DPR = 1.75
-const TOUCH_MAX_DPR = 1.5
 const CAMERA_NEAR = 0.1
 const CAMERA_FAR = 60
 const FRAMES_BEFORE_READY = 2
 const T = config.transition
 const L = config.lights
 
-const isTouch = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
-const dprCeiling = isTouch ? TOUCH_MAX_DPR : MAX_DPR
+const Q = config.quality
 
 /** Which 3D scene belongs to which route; anything unknown (404) gets the code windows. */
 const scenes: Record<string, ComponentType> = {
@@ -113,22 +112,48 @@ function ReadySignal({ onReady }: { onReady: () => void }) {
 }
 
 export default function Scene({ pathname, onReady }: { pathname: string; onReady: () => void }) {
-  const [dpr, setDpr] = useState(Math.min(window.devicePixelRatio, dprCeiling))
-  const theme = useTheme()
+  const quality = useQuality()
+  const [antialias] = useState(() => tierSettings(getQuality()).antialias)
+  const [dpr, setDpr] = useState(() => dprFor(quality))
+  const dprRef = useRef(dpr)
+  // White surfaces need more fill light to read as white rather than grey.
+  const light = useTheme() === 'light'
+  // An open overlay covers the scene, so the GPU gets a break until it closes.
+  const paused = useScrollLocked()
+
+  useEffect(() => {
+    dprRef.current = dprFor(quality)
+    setDpr(dprRef.current)
+  }, [quality])
+
+  /** Missed frames: first drop to 1x pixels, and if that's still not enough, step the whole tier down. */
+  const lower = () => {
+    if (dprRef.current > Q.minDpr) {
+      dprRef.current = Q.minDpr
+      setDpr(Q.minDpr)
+    } else degrade()
+  }
+  const raise = () => {
+    dprRef.current = dprFor(getQuality())
+    setDpr(dprRef.current)
+  }
 
   return (
     <Canvas
       className="scene-canvas"
+      frameloop={paused ? 'never' : 'always'}
       dpr={dpr}
       camera={{ fov: config.camera.fov, near: CAMERA_NEAR, far: CAMERA_FAR, position: [0, 0, config.camera.z] }}
-      gl={{ antialias: true, powerPreference: 'high-performance', alpha: false, stencil: false }}
+      gl={{ antialias, powerPreference: 'high-performance', alpha: true, stencil: false }}
+      // Listen on the page root so 3D objects stay clickable underneath the HTML layer.
+      eventSource={document.getElementById('root') ?? undefined}
+      eventPrefix="client"
       aria-hidden="true"
     >
-      <color attach="background" args={[config.background[theme]]} />
-      <ambientLight intensity={L.ambient} />
-      <directionalLight intensity={L.key} position={L.keyPosition as [number, number, number]} />
-      <directionalLight intensity={L.rim} position={L.rimPosition as [number, number, number]} />
-      <PerformanceMonitor onDecline={() => setDpr(1)} onIncline={() => setDpr(dprCeiling)} />
+      <ambientLight intensity={light ? L.light.ambient : L.ambient} />
+      <directionalLight intensity={light ? L.light.key : L.key} position={L.keyPosition as [number, number, number]} />
+      <directionalLight intensity={light ? L.light.rim : L.rim} position={L.rimPosition as [number, number, number]} />
+      <PerformanceMonitor onDecline={lower} onIncline={raise} flipflops={Q.flipflops} onFallback={degrade} />
       <CameraRig />
       <CodeGlyphs />
       <SceneSwitcher pathname={pathname} />

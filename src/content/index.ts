@@ -50,7 +50,8 @@ export type Home = {
   hero: Hero
   marquee: string[]
   layers: SectionHead & { accent: string; items: Layer[] }
-  terminal: SectionHead & { host: string; session: TerminalStep[] }
+  /** `welcome` is printed when a visitor clicks into the terminal; the commands live in src/lib/shell.ts. */
+  terminal: SectionHead & { lead: string; welcome: string; host: string; session: TerminalStep[] }
   featured: SectionHead & { slugs: string[] }
   stackSphere: SectionHead & { lead: string }
   stats: Stat[]
@@ -119,7 +120,7 @@ export type Contact = {
   messageLimit: number
   sent: { title: string; text: string }
   /** Lines for the 3D developer on the contact page: speech bubbles and the floating terminal. */
-  desk: { hello: string; typing: string; sent: string; status: string[]; sentStatus: string }
+  desk: { hello: string; typing: string; sent: string; status: string[]; sentStatus: string; quips: string[]; duck: string }
 }
 
 export type CV = {

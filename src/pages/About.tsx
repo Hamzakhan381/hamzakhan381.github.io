@@ -64,7 +64,7 @@ function Experience() {
       <SectionHead eyebrow="Experience" title="git log" accent="--career" lead="Scroll through the history. The graph draws each branch as you reach it." />
       <ol ref={ref} className="gitlog">
         {experience.map((job, i) => (
-          <li key={job.org} data-focus-item className={`gitlog__item ${active === i ? 'is-active' : ''}`}>
+          <li key={job.org} id={`job-${i}`} data-focus-item className={`gitlog__item ${active === i ? 'is-active' : ''}`}>
             <Tilt className="card gitlog__card" data-swing>
               <p className="gitlog__meta">
                 <span className="gitlog__hash">commit {fakeHash(job.org + job.role)}</span>

@@ -4,7 +4,7 @@ import { Flip } from 'gsap/Flip'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import type { Project } from '../content'
 import { ProjectCard } from './ProjectCards'
-import { prefersReducedMotion } from '../lib/scroll'
+import { reduceMotion } from '../lib/scroll'
 import motion from '../lib/motion.json'
 
 gsap.registerPlugin(Flip)
@@ -20,7 +20,7 @@ export function FilterGrid({ projects, categories }: { projects: Project[]; cate
   const count = (c: string) => (c === ALL ? projects.length : projects.filter((p) => p.category === c).length)
 
   const choose = (next: string) => {
-    if (grid.current && !prefersReducedMotion) flipState.current = Flip.getState(grid.current.children)
+    if (grid.current && !reduceMotion) flipState.current = Flip.getState(grid.current.children)
     setFilter(next)
   }
 

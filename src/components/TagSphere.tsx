@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { gsap } from 'gsap'
-import { prefersReducedMotion } from '../lib/scroll'
+import { reduceMotion } from '../lib/scroll'
 import { DOUBLE, HALF, MS_PER_SECOND } from '../lib/math'
 
 const GOLDEN_ANGLE = 2.399963229728653
@@ -27,8 +27,14 @@ export function TagSphere({ tags, label }: { tags: string[]; label: string }) {
     })
     const state = { rx: 0, ry: 0, vx: 0, vy: AUTO_SPIN, dragging: false, lastX: 0, lastY: 0, visible: true }
 
+    // Radius is cached and refreshed on resize, so the per-frame draw never reads layout.
+    let radius = root.clientWidth * RADIUS_RATIO
+    const sizer = new ResizeObserver(() => {
+      radius = root.clientWidth * RADIUS_RATIO
+    })
+    sizer.observe(root)
+
     const draw = () => {
-      const radius = root.clientWidth * RADIUS_RATIO
       const [sx, cx, sy, cy] = [Math.sin(state.rx), Math.cos(state.rx), Math.sin(state.ry), Math.cos(state.ry)]
       points.forEach((p, i) => {
         const x1 = p.x * cy + p.z * sy
@@ -44,7 +50,7 @@ export function TagSphere({ tags, label }: { tags: string[]; label: string }) {
     }
 
     const tick = (_: number, deltaMs: number) => {
-      if (!state.visible || prefersReducedMotion) return
+      if (!state.visible || reduceMotion) return
       const dt = deltaMs / MS_PER_SECOND
       if (!state.dragging) {
         state.vx *= FRICTION
@@ -85,6 +91,7 @@ export function TagSphere({ tags, label }: { tags: string[]; label: string }) {
     return () => {
       gsap.ticker.remove(tick)
       observer.disconnect()
+      sizer.disconnect()
       root.removeEventListener('pointerdown', down)
       root.removeEventListener('pointermove', move)
       root.removeEventListener('pointerup', up)

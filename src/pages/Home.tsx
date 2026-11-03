@@ -2,6 +2,7 @@ import { Link } from 'react-router'
 import { home, profile, projectBySlug, skills, type Project } from '../content'
 import { usePageEffects } from '../lib/usePageEffects'
 import { useFocusIndex } from '../lib/useFocusIndex'
+import { openProjectLink, projectHref } from '../lib/projectDialog'
 import { PageHero } from '../components/PageHero'
 import { SectionHead } from '../components/Section'
 import { Terminal } from '../components/Terminal'
@@ -22,7 +23,7 @@ function Layers() {
       <SectionHead eyebrow={home.layers.eyebrow} title={home.layers.title} accent={home.layers.accent} />
       <ol ref={ref} className="layers__list">
         {home.layers.items.map((layer, i) => (
-          <li key={layer.name} data-focus-item className={`layer card ${active === i ? 'is-active' : ''}`} data-swing>
+          <li key={layer.name} id={`layer-${i}`} data-focus-item className={`layer card ${active === i ? 'is-active' : ''}`} data-swing>
             <span className="layer__num">{pad(i + 1)}</span>
             <div>
               <h3>{layer.name}</h3>
@@ -76,8 +77,8 @@ export default function Home() {
       </div>
 
       <section className="section container split">
-        <SectionHead eyebrow={home.terminal.eyebrow} title={home.terminal.title} lead="Every line below is typed by your scroll wheel." />
-        <Terminal host={home.terminal.host} session={home.terminal.session} />
+        <SectionHead eyebrow={home.terminal.eyebrow} title={home.terminal.title} lead={home.terminal.lead} />
+        <Terminal host={home.terminal.host} session={home.terminal.session} welcome={home.terminal.welcome} />
       </section>
 
       {featured.length ? (
@@ -86,7 +87,7 @@ export default function Home() {
           <ul className="feature-cards">
             {featured.map((project, i) => (
               <li key={project.slug} data-fly>
-                <Tilt as={Link} to="/projects" className="card feature-card">
+                <Tilt as="a" href={projectHref(project.slug)} onClick={openProjectLink(project.slug)} className="card feature-card">
                   <span className="feature-card__num">{pad(i + 1)}</span>
                   <span className="chip">{project.category}</span>
                   <h3>{project.title}</h3>

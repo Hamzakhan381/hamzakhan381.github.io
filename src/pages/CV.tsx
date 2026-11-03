@@ -3,7 +3,7 @@ import { Link } from 'react-router'
 import { gsap } from 'gsap'
 import { cv, profile } from '../content'
 import { appLoaded } from '../lib/intro'
-import { prefersReducedMotion } from '../lib/scroll'
+import { reduceMotion } from '../lib/scroll'
 import { usePageEffects } from '../lib/usePageEffects'
 import { PageHero } from '../components/PageHero'
 import { Icon } from '../components/Icon'
@@ -19,7 +19,7 @@ export default function CV() {
 
   useLayoutEffect(() => {
     const el = paper.current
-    if (!el || prefersReducedMotion) return
+    if (!el || reduceMotion) return
     let ctx: gsap.Context | undefined
     let cancelled = false
     gsap.set(el, { opacity: 0 })

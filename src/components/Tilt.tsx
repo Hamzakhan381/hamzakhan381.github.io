@@ -5,7 +5,7 @@ const MAX_TILT_DEG = 10
 const PERCENT = 100
 const canHover = typeof window !== 'undefined' && window.matchMedia('(hover: hover) and (pointer: fine)').matches
 
-type TiltProps = HTMLAttributes<HTMLElement> & { as?: ElementType; max?: number; to?: string; children: ReactNode }
+type TiltProps = HTMLAttributes<HTMLElement> & { as?: ElementType; max?: number; to?: string; href?: string; children: ReactNode }
 
 /** Pointer-driven 3D tilt with a moving glare; inert on touch devices. */
 export function Tilt({ as: Tag = 'div', max = MAX_TILT_DEG, className = '', children, ...rest }: TiltProps) {

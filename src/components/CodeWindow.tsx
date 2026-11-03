@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef } from 'react'
 import { gsap } from 'gsap'
-import { prefersReducedMotion } from '../lib/scroll'
+import { reduceMotion } from '../lib/scroll'
 import motion from '../lib/motion.json'
 
 export type Token = { text: string; kind?: 'kw' | 'key' | 'str' | 'bool' | 'com' | 'fn' | 'type' }
@@ -12,7 +12,7 @@ export function CodeWindow({ filename, lines }: { filename: string; lines: CodeL
 
   useLayoutEffect(() => {
     const el = ref.current
-    if (!el || prefersReducedMotion) return
+    if (!el || reduceMotion) return
     const ctx = gsap.context(() => {
       gsap.fromTo(
         el.querySelectorAll('.code__line'),

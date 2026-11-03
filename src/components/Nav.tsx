@@ -73,7 +73,7 @@ export function Nav() {
 
   useEffect(() => {
     document.documentElement.classList.toggle('menu-open', open)
-    lockScroll(open)
+    lockScroll('menu', open)
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false)
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
