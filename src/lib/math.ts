@@ -9,3 +9,12 @@ export const clamp = (v: number, min: number, max: number) => Math.min(Math.max(
 export const lerp = (a: number, b: number, t: number) => a + (b - a) * t
 /** 0 at the edges, 1 when `x` sits exactly on `centre`, falling off linearly over `width`. */
 export const peak = (x: number, centre: number, width: number) => clamp(1 - Math.abs(x - centre) / width, 0, 1)
+
+const HASH_A = 12.9898
+const HASH_B = 78.233
+const HASH_SCALE = 43758.5453
+/** Deterministic pseudo-random number in [-1, 1) for an (index, channel) pair; stable across renders. */
+export const hash = (index: number, channel: number) => {
+  const s = Math.sin(index * HASH_A + channel * HASH_B) * HASH_SCALE
+  return (s - Math.floor(s)) * DOUBLE - 1
+}

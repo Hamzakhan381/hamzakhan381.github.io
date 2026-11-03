@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useRef, useState, type ComponentType } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { PerformanceMonitor } from '@react-three/drei'
-import { Group, MathUtils, Vector3 } from 'three'
+import { Group, MathUtils, PerspectiveCamera, Vector3 } from 'three'
 import config from './scene.json'
 import { CodeGlyphs } from './glyphs'
 import { ArchitectureStack } from './scenes/ArchitectureStack'
 import { GitGraph } from './scenes/GitGraph'
 import { ServerRack } from './scenes/ServerRack'
 import { NetworkGraph } from './scenes/NetworkGraph'
-import { Globe } from './scenes/Globe'
+import { Developer } from './scenes/Developer'
 import { CodeWindows } from './scenes/CodeWindows'
 import { scrollState } from '../lib/scroll'
 import { normalizePath } from '../lib/paths'
@@ -32,21 +32,32 @@ const scenes: Record<string, ComponentType> = {
   '/services': ServerRack,
   '/projects': NetworkGraph,
   '/cv': CodeWindows,
-  '/contact': Globe,
+  '/contact': Developer,
 }
 const sceneKeyFor = (pathname: string) => {
   const path = normalizePath(pathname)
   return path in scenes ? path : '*'
 }
 
+/** Pointer parallax, plus a scroll-speed "warp": the lens widens, pulls back and rolls while you scroll fast. */
 function CameraRig() {
-  const camera = useThree((s) => s.camera)
+  const camera = useThree((s) => s.camera) as PerspectiveCamera
   const target = useMemo(() => new Vector3(), [])
+  const motion = useRef({ warp: 0, roll: 0 })
   useFrame((_, delta) => {
-    const [px, py] = config.camera.parallax
-    camera.position.x = MathUtils.damp(camera.position.x, scrollState.pointerX * px, config.camera.damping, delta)
-    camera.position.y = MathUtils.damp(camera.position.y, scrollState.pointerY * py, config.camera.damping, delta)
+    const cam = config.camera
+    const [px, py] = cam.parallax
+    const speed = MathUtils.clamp(scrollState.velocity / cam.velocityForFull, -1, 1)
+    const m = motion.current
+    m.warp = MathUtils.damp(m.warp, Math.abs(speed), cam.warpDamping, delta)
+    m.roll = MathUtils.damp(m.roll, speed * cam.roll, cam.warpDamping, delta)
+    camera.position.x = MathUtils.damp(camera.position.x, scrollState.pointerX * px, cam.damping, delta)
+    camera.position.y = MathUtils.damp(camera.position.y, scrollState.pointerY * py, cam.damping, delta)
+    camera.position.z = cam.z + m.warp * cam.dolly
     camera.lookAt(target)
+    camera.rotateZ(m.roll)
+    camera.fov = cam.fov + m.warp * cam.warpFov
+    camera.updateProjectionMatrix()
   })
   return null
 }

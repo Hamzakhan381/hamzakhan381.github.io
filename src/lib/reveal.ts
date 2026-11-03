@@ -1,9 +1,11 @@
 import { gsap } from 'gsap'
 import { prefersReducedMotion } from './scroll'
 import motion from './motion.json'
-import { DOUBLE } from './math'
+import { DOUBLE, HALF, hash } from './math'
 
 const { perspective: PERSPECTIVE, scrub: SCRUB, depth: DEPTH, fly: FLY, swing: SWING, stair: STAIR, intro: INTRO } = motion
+const { heroScatter: SCATTER, exit: EXIT } = motion
+const SCATTER_CHANNELS = ['x', 'y', 'z', 'rotateX', 'rotateY'] as const
 const alternate = (i: number) => (i % DOUBLE ? 1 : -1)
 const all = (root: HTMLElement, selector: string) => Array.from(root.querySelectorAll<HTMLElement>(selector))
 
@@ -41,6 +43,42 @@ export function setupReveals(root: HTMLElement) {
       el,
       { opacity: 0, rotateY: side * SWING.rotateY, z: SWING.z, x: side * SWING.x, transformPerspective: PERSPECTIVE },
       { opacity: 1, rotateY: 0, z: 0, x: 0, ease: 'power3.out', scrollTrigger: scrubbed(el, 'top 100%', 'top 62%') },
+    )
+  })
+
+  // Page titles break apart word by word in 3D as their header scrolls away.
+  all(root, '.page-hero').forEach((hero) => {
+    all(hero, '.split-word').forEach((word, i) => {
+      const [hx, hy, hz, hrx, hry] = SCATTER_CHANNELS.map((_, channel) => hash(i, channel))
+      gsap.to(word, {
+        x: hx * SCATTER.x,
+        y: -(1 + hy) * SCATTER.y,
+        z: SCATTER.z * (HALF + Math.abs(hz)),
+        rotateX: hrx * SCATTER.rotate,
+        rotateY: hry * SCATTER.rotate,
+        opacity: 0,
+        transformPerspective: PERSPECTIVE,
+        ease: 'none',
+        scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: true },
+      })
+    })
+  })
+
+  // Cards tilt back into the screen as they leave the top, so the page scrolls like a turning drum.
+  all(root, '[data-fly], [data-swing], [data-stair]').forEach((el) => {
+    gsap.fromTo(
+      el,
+      { rotateX: 0, z: 0, opacity: 1 },
+      {
+        rotateX: EXIT.rotateX,
+        z: EXIT.z,
+        opacity: EXIT.opacity,
+        transformPerspective: PERSPECTIVE,
+        transformOrigin: '50% 100%',
+        ease: 'none',
+        immediateRender: false,
+        scrollTrigger: scrubbed(el, 'bottom 32%', 'bottom -5%'),
+      },
     )
   })
 

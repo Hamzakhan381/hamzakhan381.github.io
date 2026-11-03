@@ -1,6 +1,6 @@
 import { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { Group } from 'three'
+import { Group, MathUtils, SpriteMaterial } from 'three'
 import config from './scene.json'
 import { labelTexture, useNarrow, usePalette } from './kit'
 import { scrollState } from '../lib/scroll'
@@ -8,13 +8,19 @@ import { HALF } from '../lib/math'
 
 const G = config.glyphs
 const GLYPH_WEIGHT = 500
+const DEPTH_SPREAD = 2
+const FADE_IN = 0.12
 
-/** Background layer on every page: faint code tokens drifting upward with scroll parallax. */
+/**
+ * Background layer on every page: faint code tokens drifting upward. Scrolling flies them
+ * toward the camera; each wraps back to the far plane once it passes, fading in and out.
+ */
 export function CodeGlyphs() {
   const narrow = useNarrow()
   const palette = usePalette()
   const group = useRef<Group>(null)
   const sprites = useRef<(Group | null)[]>([])
+  const materials = useRef<(SpriteMaterial | null)[]>([])
   const count = narrow ? G.mobile : G.desktop
 
   const items = useMemo(
@@ -22,14 +28,13 @@ export function CodeGlyphs() {
       Array.from({ length: count }, (_, i) => {
         const text = G.set[i % G.set.length]
         const { texture, aspect } = labelTexture(text, GLYPH_WEIGHT)
-        const depth = G.near + Math.random() * (G.far - G.near)
         return {
           text,
           texture,
           aspect,
-          x: (Math.random() - HALF) * G.spreadX * (1 - depth / G.far + 1),
+          x: (Math.random() - HALF) * G.spreadX * DEPTH_SPREAD,
           y: (Math.random() - HALF) * G.spreadY * DEPTH_SPREAD,
-          z: depth,
+          phase: Math.random(),
           speed: G.rise * (HALF + Math.random()),
         }
       }),
@@ -37,12 +42,18 @@ export function CodeGlyphs() {
   )
 
   useFrame((_, delta) => {
+    const wrapAt = G.spreadY * DEPTH_SPREAD * HALF
     sprites.current.forEach((_, i) => {
       const sprite = sprites.current[i]
-      if (!sprite) return
-      const wrapAt = G.spreadY * DEPTH_SPREAD * HALF
-      const next = sprite.position.y + delta * items[i].speed
-      sprite.position.y = next > wrapAt ? -wrapAt : next
+      const material = materials.current[i]
+      if (!sprite || !material) return
+      const item = items[i]
+      const nextY = sprite.position.y + delta * item.speed
+      const depth = (item.phase + scrollState.progress * G.travel) % 1
+      sprite.position.set(item.x, nextY > wrapAt ? -wrapAt : nextY, MathUtils.lerp(G.far, G.near, depth))
+      const fadeIn = MathUtils.smoothstep(depth, 0, FADE_IN)
+      const fadeOut = 1 - MathUtils.smoothstep(depth, G.fadeNear, 1)
+      material.opacity = G.opacity * fadeIn * fadeOut
     })
     if (group.current) group.current.position.y = scrollState.progress * G.parallax
   })
@@ -50,14 +61,20 @@ export function CodeGlyphs() {
   return (
     <group ref={group}>
       {items.map((item, i) => (
-        <group key={`${item.text}-${i}`} ref={(el) => void (sprites.current[i] = el)} position={[item.x, item.y, item.z]}>
+        <group key={`${item.text}-${i}`} ref={(el) => void (sprites.current[i] = el)} position={[item.x, item.y, G.far]}>
           <sprite scale={[G.size * item.aspect, G.size, 1]}>
-            <spriteMaterial map={item.texture} color={palette.line} transparent opacity={G.opacity} depthWrite={false} toneMapped={false} />
+            <spriteMaterial
+              ref={(el) => void (materials.current[i] = el)}
+              map={item.texture}
+              color={palette.line}
+              transparent
+              opacity={0}
+              depthWrite={false}
+              toneMapped={false}
+            />
           </sprite>
         </group>
       ))}
     </group>
   )
 }
-
-const DEPTH_SPREAD = 2

@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router'
 import routes from '../lib/routes.json'
 import { profile } from '../content'
@@ -13,6 +14,20 @@ export function Socials() {
       ))}
     </div>
   )
+}
+
+const CLOCK_TICK_MS = 30000
+
+/** Live time where I am, so visitors know whether a quick reply is likely. */
+function LocalTime() {
+  const format = () =>
+    new Intl.DateTimeFormat('en', { hour: 'numeric', minute: '2-digit', timeZone: profile.timeZoneId }).format(new Date())
+  const [time, setTime] = useState(format)
+  useEffect(() => {
+    const id = window.setInterval(() => setTime(format()), CLOCK_TICK_MS)
+    return () => window.clearInterval(id)
+  }, [])
+  return <time>{time}</time>
 }
 
 export function Footer() {
@@ -40,7 +55,7 @@ export function Footer() {
             © {new Date().getFullYear()} {profile.name}. Built with React, Three.js & GSAP.
           </p>
           <p className="footer__copy">
-            <span className="pulse-dot" aria-hidden="true" /> {profile.location} · {profile.timezone}
+            <span className="pulse-dot" aria-hidden="true" /> <LocalTime /> in {profile.location} · {profile.timezone}
           </p>
         </div>
       </div>

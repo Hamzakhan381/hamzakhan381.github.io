@@ -1,0 +1,356 @@
+{
+  "placement": {
+    "x": 0.44,
+    "y": -1.2,
+    "z": 0,
+    "scale": 1.2,
+    "mobileY": 1.15,
+    "mobileScale": 0.6,
+    "tilt": [
+      0.14,
+      -0.42,
+      0
+    ],
+    "turn": 0.8,
+    "pointerTurn": 0.12
+  },
+  "outline": 0.018,
+  "tones": [
+    90,
+    165,
+    255
+  ],
+  "colors": {
+    "skin": "#f2c7a0",
+    "hoodie": "#2d343d",
+    "hood": "#232930",
+    "hair": "#1d1a18",
+    "glasses": "#0f1114",
+    "eye": "#111316",
+    "blush": "#f59e9e",
+    "string": "#e8edf3",
+    "laptop": "#c9ced6",
+    "chair": "#171a1f",
+    "mug": "#f4f6f8",
+    "duck": "#facc15",
+    "beak": "#fb923c"
+  },
+  "desk": {
+    "top": [
+      3.5,
+      0.1,
+      1.7
+    ],
+    "topY": -0.05,
+    "panel": [
+      3.36,
+      1.15,
+      0.06
+    ],
+    "panelY": -0.67,
+    "panelZ": 0.8
+  },
+  "laptop": {
+    "base": [
+      1.34,
+      0.055,
+      0.88
+    ],
+    "baseY": 0.028,
+    "z": 0.18,
+    "lid": [
+      1.34,
+      0.86,
+      0.04
+    ],
+    "open": 0.22,
+    "sticker": 0.15,
+    "stickerY": 0.47,
+    "glow": 1.2,
+    "glowFast": 2.6,
+    "glowPosition": [
+      0,
+      0.75,
+      0
+    ],
+    "glowDistance": 4
+  },
+  "chair": {
+    "back": [
+      1.3,
+      1.5,
+      0.16
+    ],
+    "radius": 0.1,
+    "y": 0.82,
+    "z": -1.3,
+    "stripe": [
+      0.1,
+      1.15,
+      0.02
+    ],
+    "stripeX": 0.32
+  },
+  "body": {
+    "radius": 0.43,
+    "length": 0.42,
+    "y": 0.2,
+    "z": -0.62,
+    "scale": [
+      1.14,
+      1,
+      0.82
+    ],
+    "stringX": 0.09,
+    "stringTop": 0.68,
+    "stringZ": -0.27,
+    "stringLength": 0.3,
+    "stringRadius": 0.014,
+    "tip": 0.025
+  },
+  "head": {
+    "radius": 0.47,
+    "y": 1.3,
+    "z": -0.56,
+    "scale": [
+      1,
+      0.96,
+      0.95
+    ],
+    "bob": 0.02,
+    "bobSpeed": 3.4,
+    "lookX": 0.42,
+    "lookY": 0.22,
+    "formLook": -0.5,
+    "damping": 5
+  },
+  "hood": {
+    "radius": 0.565,
+    "gap": 2.2,
+    "theta": 1.9,
+    "offset": [
+      0,
+      0.05,
+      -0.07
+    ]
+  },
+  "hair": {
+    "radius": 0.485,
+    "theta": 0.95,
+    "tilt": 0.5
+  },
+  "eyes": {
+    "x": 0.165,
+    "y": 0.04,
+    "z": 0.415,
+    "radius": 0.062,
+    "scale": [
+      1,
+      1.3,
+      0.55
+    ],
+    "shine": 0.021,
+    "shineOffset": [
+      0.022,
+      0.035,
+      0.03
+    ],
+    "blinkEvery": 3.8,
+    "blinkFor": 0.14,
+    "closed": 0.1
+  },
+  "brows": {
+    "y": 0.2,
+    "size": [
+      0.13,
+      0.026,
+      0.02
+    ],
+    "tilt": 0.14,
+    "raise": 0.05
+  },
+  "glasses": {
+    "radius": 0.118,
+    "tube": 0.016,
+    "z": 0.452,
+    "bridge": 0.095,
+    "lensOpacity": 0.22
+  },
+  "mouth": {
+    "y": -0.17,
+    "z": 0.44,
+    "radius": 0.07,
+    "tube": 0.016,
+    "arc": 2.3,
+    "cheerScale": 1.5
+  },
+  "blush": {
+    "x": 0.28,
+    "y": -0.08,
+    "z": 0.405,
+    "radius": 0.06,
+    "opacity": 0.5
+  },
+  "phones": {
+    "band": 0.54,
+    "tube": 0.045,
+    "cupRadius": 0.155,
+    "cupDepth": 0.12,
+    "cupX": 0.5,
+    "led": 0.028
+  },
+  "arms": {
+    "shoulder": [
+      0.47,
+      0.66,
+      -0.52
+    ],
+    "hand": [
+      0.28,
+      0.15,
+      0.04
+    ],
+    "radius": 0.105,
+    "handRadius": 0.095,
+    "typeSpeed": 11,
+    "typeSpeedFast": 24,
+    "typeLift": 0.035,
+    "cheer": [
+      0.62,
+      1.8,
+      -0.4
+    ],
+    "cheerShake": 0.04,
+    "cheerSpeed": 12,
+    "wave": [
+      0.8,
+      1.55,
+      -0.25
+    ],
+    "waveSwing": 0.16,
+    "waveSpeed": 9,
+    "damping": 9
+  },
+  "mug": {
+    "position": [
+      1.2,
+      0,
+      0.32
+    ],
+    "radius": 0.13,
+    "height": 0.26,
+    "handle": 0.075,
+    "handleTube": 0.022,
+    "band": 0.05,
+    "steam": 4,
+    "steamSize": 0.035,
+    "rise": 0.6,
+    "speed": 0.4,
+    "taper": 0.88,
+    "steamOpacity": 0.3
+  },
+  "duck": {
+    "position": [
+      -1.22,
+      0,
+      0.38
+    ],
+    "body": 0.16,
+    "bodyScale": [
+      1.25,
+      0.82,
+      1
+    ],
+    "head": 0.105,
+    "headOffset": [
+      0.1,
+      0.18,
+      0
+    ],
+    "beak": [
+      0.045,
+      0.1
+    ],
+    "beakOffset": [
+      0.21,
+      0.16,
+      0
+    ],
+    "eye": 0.018,
+    "eyeOffset": [
+      0.15,
+      0.21,
+      0.07
+    ],
+    "bobSpeed": 2,
+    "bob": 0.12
+  },
+  "holo": {
+    "code": {
+      "position": [
+        1.6,
+        1.5,
+        -0.3
+      ],
+      "rotation": [
+        0,
+        -0.45,
+        0
+      ],
+      "size": [
+        1.4,
+        1
+      ]
+    },
+    "status": {
+      "position": [
+        -1.6,
+        1.85,
+        -0.45
+      ],
+      "rotation": [
+        0,
+        0.45,
+        0
+      ],
+      "size": [
+        1.3,
+        0.42
+      ]
+    },
+    "opacity": 0.08,
+    "lines": 8,
+    "lineHeight": 0.045,
+    "lineGap": 0.11,
+    "margin": 0.12,
+    "speed": 0.22,
+    "speedFast": 0.7,
+    "float": 0.06,
+    "floatSpeed": 1.1,
+    "labelHeight": 0.11,
+    "indentLevels": 3,
+    "accentEvery": 4
+  },
+  "bubble": {
+    "offset": [
+      0.85,
+      0.72,
+      0.25
+    ],
+    "height": 0.13,
+    "padX": 0.24,
+    "padY": 0.13,
+    "damping": 8,
+    "radius": 0.07,
+    "depth": 0.01
+  },
+  "statusEvery": 1.7,
+  "hoverRadius": 0.32,
+  "cheerFor": 2.8,
+  "typingFor": 0.8,
+  "faceOffset": 0.004,
+  "deskColor": {
+    "dark": "#1d2229",
+    "light": "#e4e7eb"
+  }
+}

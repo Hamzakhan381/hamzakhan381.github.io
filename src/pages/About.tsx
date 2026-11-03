@@ -7,6 +7,7 @@ import { CodeWindow, type CodeLine, type Token } from '../components/CodeWindow'
 import { SkillBars } from '../components/SkillBars'
 import { Icon } from '../components/Icon'
 import { Tilt } from '../components/Tilt'
+import { Rail } from '../components/Rail'
 
 const INDEX_DIGITS = 2
 const HASH_LENGTH = 7
@@ -184,17 +185,19 @@ export default function About() {
         </ul>
       </section>
 
-      <section className="section container">
-        <SectionHead eyebrow={about.principles.eyebrow} title={about.principles.title} />
-        <ol className="principles">
+      <section className="section section--flush">
+        <div className="container">
+          <SectionHead eyebrow={about.principles.eyebrow} title={about.principles.title} lead="Keep scrolling: the track moves sideways." />
+        </div>
+        <Rail label={about.principles.title}>
           {about.principles.items.map((p, i) => (
-            <li key={p.title} className="card principle" data-fly>
+            <li key={p.title} className="card principle">
               <span className="principle__num">{pad(i + 1)}</span>
               <h3>{p.title}</h3>
               <p>{p.text}</p>
             </li>
           ))}
-        </ol>
+        </Rail>
       </section>
 
       <section className="section container">

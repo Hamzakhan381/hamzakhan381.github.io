@@ -83,6 +83,18 @@ export function scrollToTop() {
   updateProgress()
 }
 
+export function scrollToTopSmooth() {
+  if (lenis) lenis.scrollTo(0, { duration: ANCHOR_SCROLL_DURATION })
+  else window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' })
+}
+
+/** Freezes page scrolling behind overlays such as the menu and command palette. */
+export function lockScroll(locked: boolean) {
+  if (locked) lenis?.stop()
+  else lenis?.start()
+  document.documentElement.classList.toggle('scroll-locked', locked)
+}
+
 export function scrollToId(id: string) {
   const el = document.getElementById(id)
   if (!el) return

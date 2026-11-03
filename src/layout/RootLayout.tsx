@@ -19,10 +19,31 @@ import { Nav } from '../components/Nav'
 import { Footer } from '../components/Footer'
 import { Loader } from '../components/Loader'
 import { Cursor } from '../components/Cursor'
+import { CommandPalette } from '../components/CommandPalette'
+import { ToTop } from '../components/ToTop'
+import { Toaster } from '../components/Toaster'
 
 const Scene = lazy(() => import('../three/Scene'))
 
-const READY_TIMEOUT_MS = 4000
+const READY_TIMEOUT_MS = 3500
+const SEEN_KEY = 'hk-visited'
+
+/** The branded loader plays once per browser session; later page loads go straight to content. */
+function isFirstVisit() {
+  try {
+    return !sessionStorage.getItem(SEEN_KEY)
+  } catch {
+    return true
+  }
+}
+
+function rememberVisit() {
+  try {
+    sessionStorage.setItem(SEEN_KEY, '1')
+  } catch {
+    /* storage blocked: the loader simply shows again next time */
+  }
+}
 const NOT_FOUND = { title: 'Page not found — Muhammad Hamza Khan', description: routes[0].description }
 
 const hasWebGL = (() => {
@@ -59,6 +80,15 @@ export function RootLayout() {
   const { pathname } = useLocation()
   const [ready, setReady] = useState(!hasWebGL)
   const markReady = useCallback(() => setReady(true), [])
+  const [firstVisit] = useState(isFirstVisit)
+  const onLoaderDone = useCallback(() => {
+    rememberVisit()
+    markAppLoaded()
+  }, [])
+
+  useLayoutEffect(() => {
+    if (!firstVisit) markAppLoaded()
+  }, [firstVisit])
 
   useEffect(() => initScroll(), [])
   useLayoutEffect(() => scrollToTop(), [pathname])
@@ -93,7 +123,7 @@ export function RootLayout() {
         <div className="scene-fallback" aria-hidden="true" />
       )}
       <div className="vignette" aria-hidden="true" />
-      <Loader ready={ready} onDone={markAppLoaded} />
+      {firstVisit ? <Loader ready={ready} onDone={onLoaderDone} /> : null}
       <Cursor />
       <a className="skip-link" href="#main">
         Skip to content
@@ -105,6 +135,9 @@ export function RootLayout() {
           <Footer />
         </main>
       </ViewTransition>
+      <ToTop />
+      <CommandPalette />
+      <Toaster />
     </>
   )
 }

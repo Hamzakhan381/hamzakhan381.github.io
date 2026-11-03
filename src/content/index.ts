@@ -29,6 +29,8 @@ export type Profile = {
   titles: string[]
   location: string
   timezone: string
+  /** IANA zone used for the live local-time clock in the footer, e.g. "Asia/Karachi". */
+  timeZoneId: string
   workMode: string
   email: string
   phone: string
@@ -110,7 +112,15 @@ export type Project = {
 }
 
 export type Projects = { hero: Hero; categories: string[]; items: Project[] }
-export type Contact = { hero: Hero; formTitle: string; subjects: string[] }
+export type Contact = {
+  hero: Hero
+  formTitle: string
+  subjects: string[]
+  messageLimit: number
+  sent: { title: string; text: string }
+  /** Lines for the 3D developer on the contact page: speech bubbles and the floating terminal. */
+  desk: { hello: string; typing: string; sent: string; status: string[]; sentStatus: string }
+}
 
 export type CV = {
   hero: Hero

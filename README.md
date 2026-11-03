@@ -11,7 +11,10 @@ floating code glyphs drift behind every page.
 | Services | Server rack; each service's unit slides out when it's centred   | Process staircase, engagement cards, FAQ |
 | Projects | Live service-mesh network with hopping packets                  | Z-depth featured gallery, FLIP-animated filters, live GitHub ring |
 | CV       | Floating editor windows                                          | Printable paper CV that lands in 3D |
-| Contact  | Dotted globe with arcs pulsing from Multan                       | Topic chips, availability card |
+| Contact  | Cel-shaded cartoon developer at a desk who follows the cursor, waves, types along with the form and cheers when it's sent | Validated form, copy-email, availability card |
+
+Site-wide: scroll-speed camera warp, code glyphs that fly toward you, page titles that break apart on scroll,
+cards that tilt back as they leave, a ⌘K / Ctrl+K command palette, auto-hiding nav and a back-to-top progress ring.
 
 All content is in `src/content/*.json`; see [src/content/README.md](src/content/README.md).
 

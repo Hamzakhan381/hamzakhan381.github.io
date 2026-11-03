@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
 import { Flip } from 'gsap/Flip'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import type { Project } from '../content'
 import { ProjectCard } from './ProjectCards'
 import { prefersReducedMotion } from '../lib/scroll'
@@ -32,6 +33,7 @@ export function FilterGrid({ projects, categories }: { projects: Project[]; cate
       ease: 'power3.inOut',
       absolute: true,
       scale: true,
+      onComplete: () => ScrollTrigger.refresh(),
       onEnter: (els) => gsap.fromTo(els, { opacity: 0, scale: motion.flip.scale }, { opacity: 1, scale: 1, duration: motion.flip.duration }),
       onLeave: (els) => gsap.to(els, { opacity: 0, scale: motion.flip.scale, duration: motion.flip.duration }),
     })

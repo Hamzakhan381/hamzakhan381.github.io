@@ -4,8 +4,11 @@ import { gsap } from 'gsap'
 const DOT_DURATION = 0.08
 const RING_DURATION = 0.45
 const INTERACTIVE = 'a, button, input, textarea, label, .tilt'
+const MAGNETIC = '.btn, .icon-btn, .socials a'
+const MAGNET_PX = 7
+const HALF = 0.5
 
-/** Dot + trailing ring cursor for fine pointers; the ring swells over interactive elements. */
+/** Dot + trailing ring cursor for fine pointers; the ring swells over interactive elements and buttons lean toward it. */
 export function Cursor() {
   const dot = useRef<HTMLDivElement>(null)
   const ring = useRef<HTMLDivElement>(null)
@@ -19,18 +22,35 @@ export function Cursor() {
     const rx = gsap.quickTo(ring.current, 'x', { duration: RING_DURATION, ease: 'power3.out' })
     const ry = gsap.quickTo(ring.current, 'y', { duration: RING_DURATION, ease: 'power3.out' })
     const ringEl = ring.current
+    let magnet: HTMLElement | null = null
+
+    const release = () => {
+      magnet?.style.removeProperty('--mag-x')
+      magnet?.style.removeProperty('--mag-y')
+      magnet = null
+    }
 
     const move = (e: PointerEvent) => {
       dx(e.clientX)
       dy(e.clientY)
       rx(e.clientX)
       ry(e.clientY)
-      const hovering = e.target instanceof Element && e.target.closest(INTERACTIVE)
-      ringEl.classList.toggle('is-hover', Boolean(hovering))
+      const target = e.target instanceof Element ? e.target : null
+      ringEl.classList.toggle('is-hover', Boolean(target?.closest(INTERACTIVE)))
+      const pull = target?.closest<HTMLElement>(MAGNETIC) ?? null
+      if (pull !== magnet) release()
+      if (!pull) return
+      magnet = pull
+      const box = pull.getBoundingClientRect()
+      const ox = (e.clientX - box.left - box.width * HALF) / (box.width * HALF)
+      const oy = (e.clientY - box.top - box.height * HALF) / (box.height * HALF)
+      pull.style.setProperty('--mag-x', `${ox * MAGNET_PX}px`)
+      pull.style.setProperty('--mag-y', `${oy * MAGNET_PX}px`)
     }
     window.addEventListener('pointermove', move, { passive: true })
     return () => {
       window.removeEventListener('pointermove', move)
+      release()
       document.documentElement.classList.remove('has-cursor')
     }
   }, [])

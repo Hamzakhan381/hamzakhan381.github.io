@@ -7,7 +7,12 @@
       0.4,
       0.25
     ],
-    "damping": 2.5
+    "damping": 2.5,
+    "warpFov": 7,
+    "roll": 0.035,
+    "dolly": 0.8,
+    "velocityForFull": 40,
+    "warpDamping": 4
   },
   "background": {
     "dark": "#050607",
@@ -82,7 +87,9 @@
       "::",
       "<T>",
       "λ"
-    ]
+    ],
+    "travel": 2.2,
+    "fadeNear": 0.85
   },
   "stack": {
     "x": 0.44,
@@ -201,72 +208,6 @@
     "spin": 0.05,
     "turn": 1.4,
     "tilt": 0.35
-  },
-  "globe": {
-    "x": 0.5,
-    "y": 0.1,
-    "z": -1,
-    "mobileY": 2,
-    "mobileScale": 0.62,
-    "radius": 2.4,
-    "points": 1800,
-    "mobilePoints": 900,
-    "pointSize": 0.035,
-    "home": [
-      30.16,
-      71.52
-    ],
-    "cities": [
-      [
-        51.5,
-        -0.13
-      ],
-      [
-        40.7,
-        -74
-      ],
-      [
-        25.2,
-        55.3
-      ],
-      [
-        1.35,
-        103.8
-      ],
-      [
-        52.5,
-        13.4
-      ],
-      [
-        43.65,
-        -79.4
-      ],
-      [
-        -33.9,
-        151.2
-      ],
-      [
-        35.7,
-        139.7
-      ],
-      [
-        24.7,
-        46.7
-      ],
-      [
-        37.8,
-        -122.4
-      ]
-    ],
-    "arcLift": 0.45,
-    "arcRadius": 0.012,
-    "arcSegments": 64,
-    "arcSpeed": 0.18,
-    "spin": 0.04,
-    "turn": 1.2,
-    "tilt": 0.42,
-    "markerSize": 0.06,
-    "pulseScale": 2.4
   },
   "windows": {
     "x": 0.5,
