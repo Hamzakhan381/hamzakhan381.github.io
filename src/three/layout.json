@@ -1,0 +1,274 @@
+{
+  "background": "#04050a",
+  "stationSpacing": 42,
+  "camera": {
+    "fov": 42,
+    "distance": 11,
+    "lookAhead": 10,
+    "warpFov": 7,
+    "parallax": [
+      0.7,
+      0.45
+    ],
+    "damping": 3.2,
+    "stationOffsets": [
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        0.6,
+        0.5,
+        0.06
+      ],
+      [
+        0,
+        1.4,
+        -0.05
+      ],
+      [
+        0,
+        0,
+        0.12
+      ],
+      [
+        0,
+        1.2,
+        0
+      ]
+    ]
+  },
+  "fog": {
+    "near": 12,
+    "far": 58
+  },
+  "particles": {
+    "desktop": 4200,
+    "mobile": 1500,
+    "spread": 44,
+    "front": 30,
+    "back": 230,
+    "size": 110
+  },
+  "core": {
+    "position": [
+      3.4,
+      0.1,
+      0
+    ],
+    "mobilePosition": [
+      0,
+      3.1,
+      -4
+    ],
+    "radius": 1.5,
+    "detail": 48,
+    "mobileDetail": 20,
+    "shell": 2.45,
+    "rings": [
+      2.9,
+      3.6
+    ],
+    "ringTube": 0.012,
+    "ringSpeeds": [
+      0.45,
+      -0.3
+    ],
+    "ringTilts": [
+      [
+        0.35,
+        -0.6
+      ],
+      [
+        -0.25,
+        0.7
+      ]
+    ],
+    "screenX": 0.56,
+    "fullSizeAspect": 1.7,
+    "minScale": 0.72
+  },
+  "knot": {
+    "position": [
+      -5.4,
+      1.6,
+      -45
+    ],
+    "mobilePosition": [
+      1.6,
+      3.6,
+      -50
+    ],
+    "radius": 1.35,
+    "tube": 0.38,
+    "cubes": 46,
+    "cubeSpread": 5.5
+  },
+  "shapes": {
+    "position": [
+      0,
+      0.6,
+      -84
+    ],
+    "mobilePosition": [
+      0,
+      0.6,
+      -86
+    ],
+    "radius": 5.2,
+    "mobileRadius": 3.2,
+    "size": 0.72,
+    "colors": [
+      "#00f2fe",
+      "#4facfe",
+      "#8b5cf6",
+      "#22d3ee",
+      "#a78bfa",
+      "#38bdf8"
+    ]
+  },
+  "tunnel": {
+    "z": -126,
+    "count": 34,
+    "mobileCount": 22,
+    "radius": 6.2,
+    "tube": 0.028,
+    "front": 22,
+    "back": 24,
+    "colors": [
+      "#00f2fe",
+      "#8b5cf6"
+    ]
+  },
+  "contact": {
+    "globePosition": [
+      0,
+      2.8,
+      -182
+    ],
+    "mobileGlobePosition": [
+      0,
+      3.4,
+      -184
+    ],
+    "globeRadius": 3.2,
+    "globePoints": 3200,
+    "mobileGlobePoints": 1200,
+    "gridY": -3.4,
+    "gridZ": -178,
+    "gridSize": 90,
+    "gridSegments": 140,
+    "mobileGridSegments": 70
+  },
+  "lights": {
+    "ambient": 0.35,
+    "formers": [
+      {
+        "color": "#00f2fe",
+        "intensity": 4,
+        "position": [
+          0,
+          5,
+          -4
+        ],
+        "scale": [
+          12,
+          2,
+          1
+        ],
+        "rotation": [
+          1.57,
+          0,
+          0
+        ]
+      },
+      {
+        "color": "#8b5cf6",
+        "intensity": 5,
+        "position": [
+          -6,
+          0,
+          2
+        ],
+        "scale": [
+          3,
+          10,
+          1
+        ],
+        "rotation": [
+          0,
+          1.57,
+          0
+        ]
+      },
+      {
+        "color": "#4facfe",
+        "intensity": 3,
+        "position": [
+          6,
+          -1,
+          2
+        ],
+        "scale": [
+          3,
+          8,
+          1
+        ],
+        "rotation": [
+          0,
+          -1.57,
+          0
+        ]
+      },
+      {
+        "color": "#ffffff",
+        "intensity": 1.5,
+        "position": [
+          0,
+          -5,
+          4
+        ],
+        "scale": [
+          10,
+          2,
+          1
+        ],
+        "rotation": [
+          -1.57,
+          0,
+          0
+        ]
+      }
+    ],
+    "points": [
+      {
+        "color": "#00f2fe",
+        "intensity": 60,
+        "position": [
+          2,
+          3,
+          -36
+        ]
+      },
+      {
+        "color": "#8b5cf6",
+        "intensity": 70,
+        "position": [
+          -3,
+          -2,
+          -80
+        ]
+      },
+      {
+        "color": "#4facfe",
+        "intensity": 60,
+        "position": [
+          3,
+          2,
+          -90
+        ]
+      }
+    ]
+  }
+}

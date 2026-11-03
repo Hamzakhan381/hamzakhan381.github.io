@@ -1,0 +1,11 @@
+{
+  "perspective": 1100,
+  "scrub": 0.8,
+  "depth": { "rotateX": 70, "z": -260, "y": 60 },
+  "fly": { "z": -700, "rotateX": 28, "rotateY": 22, "y": 120 },
+  "timeline": { "rotateY": 65, "z": -420, "x": 160 },
+  "heroOut": { "z": -520, "rotateX": 22, "y": -60 },
+  "sectionOut": { "rotateX": 12, "z": -160 },
+  "sectionOutOpacity": 0.2,
+  "intro": { "charRotate": -100, "charStagger": 0.022, "duration": 1.1, "fadeY": 30, "fadeStagger": 0.12, "lineDelay": 0.25 }
+}
