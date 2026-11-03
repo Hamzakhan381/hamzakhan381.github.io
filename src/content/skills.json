@@ -1,0 +1,45 @@
+{
+  "note": "level is 0-100 and drives the bar width on the About page.",
+  "groups": [
+    {
+      "label": "Languages",
+      "items": [
+        { "name": "C++", "level": 85 },
+        { "name": "Python", "level": 80 },
+        { "name": "JavaScript / TypeScript", "level": 80 },
+        { "name": "SQL", "level": 85 },
+        { "name": "PHP", "level": 60 },
+        { "name": "Dart", "level": 65 }
+      ]
+    },
+    {
+      "label": "Frameworks & UI",
+      "items": [
+        { "name": "React / Next.js", "level": 80 },
+        { "name": "Node.js", "level": 75 },
+        { "name": ".NET", "level": 65 },
+        { "name": "Flutter", "level": 65 },
+        { "name": "HTML5 / CSS", "level": 90 }
+      ]
+    },
+    {
+      "label": "Data & Systems",
+      "items": [
+        { "name": "Microsoft SQL Server", "level": 85 },
+        { "name": "MongoDB", "level": 65 },
+        { "name": "Database Design & Normalization", "level": 85 },
+        { "name": "Networking (Cisco)", "level": 70 }
+      ]
+    },
+    {
+      "label": "Engineering",
+      "items": [
+        { "name": "OOP & Design Patterns", "level": 85 },
+        { "name": "Data Structures & Algorithms", "level": 80 },
+        { "name": "Requirements Engineering", "level": 80 },
+        { "name": "UI/UX in Figma", "level": 75 }
+      ]
+    }
+  ],
+  "tools": ["Git & GitHub", "VS Code", "Visual Studio", "Figma", "Android Studio", "Cisco Packet Tracer", "Cursor", "Kiro", "Claude Code", "SFML", "Vercel"]
+}

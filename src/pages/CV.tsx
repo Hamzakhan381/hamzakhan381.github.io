@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef } from 'react'
 import { Link } from 'react-router'
 import { gsap } from 'gsap'
-import { cv, profile } from '../lib/content'
+import { cv, profile } from '../content'
 import { appLoaded } from '../lib/intro'
 import { prefersReducedMotion } from '../lib/scroll'
 import { usePageEffects } from '../lib/usePageEffects'
@@ -12,14 +12,6 @@ import motion from '../lib/motion.json'
 
 const { paperLand: LAND, paperScrollTilt: SCROLL_TILT } = motion
 const PAPER_TILT = 3
-
-const contactLine = [
-  profile.location.split(' · ')[0],
-  profile.email,
-  'linkedin.com/in/hamza-khan-674116278',
-  'github.com/Hamzakhan381',
-  '+92 333 331 7050',
-]
 
 export default function CV() {
   const ref = usePageEffects<HTMLDivElement>()
@@ -56,7 +48,7 @@ export default function CV() {
 
   return (
     <div ref={ref} className="page page--cv">
-      <PageHero eyebrow="CV" lines={['Curriculum', 'vitae.']} accent={1} lead="One page, always current. Save it as a PDF straight from the print dialog.">
+      <PageHero hero={cv.hero}>
         <div className="actions">
           <button type="button" className="btn" onClick={() => window.print()}>
             <Icon name="printer" /> Print / Save PDF
@@ -68,12 +60,20 @@ export default function CV() {
       </PageHero>
 
       <section className="section container cv-stage">
+        <aside className="cv-facts" aria-label="Quick facts">
+          {cv.quickFacts.map((f) => (
+            <div key={f.label} className="cv-fact card" data-fly>
+              <span>{f.label}</span>
+              <strong>{f.value}</strong>
+            </div>
+          ))}
+        </aside>
         <div className="cv-tilt">
           <Tilt className="paper-tilt" max={PAPER_TILT}>
             <div ref={paper} className="paper">
               <header className="paper__head">
                 <h2>{profile.name}</h2>
-                <p>{contactLine.join('  |  ')}</p>
+                <p>{cv.contactLine.join('  |  ')}</p>
               </header>
 
               <section>

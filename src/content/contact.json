@@ -1,0 +1,10 @@
+{
+  "hero": {
+    "eyebrow": "Contact",
+    "lines": ["Let's build", "something great."],
+    "accentLine": 1,
+    "lead": "Have a project, an opportunity, or just want to talk shop? Send a message and I'll reply within 24–48 hours."
+  },
+  "formTitle": "Send a message",
+  "subjects": ["New project", "Job opportunity", "Collaboration", "Just saying hi"]
+}

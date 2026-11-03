@@ -1,0 +1,75 @@
+{
+  "hero": {
+    "eyebrow": "Software Engineer · Full-Stack",
+    "lines": ["I engineer scalable", "systems & sharp", "interfaces."],
+    "accentLine": 2,
+    "lead": "I design backend architecture, data systems and fast, modern frontends, and I care about the details in both."
+  },
+  "marquee": ["React", "Next.js", "TypeScript", "Node.js", "Python", ".NET", "C++", "SQL Server", "MongoDB", "Flutter", "Figma", "Three.js"],
+  "layers": {
+    "eyebrow": "How I build",
+    "title": "Every request crosses five layers.",
+    "accent": "I design all of them.",
+    "items": [
+      {
+        "name": "Client",
+        "tagline": "Interfaces people enjoy using",
+        "text": "Responsive React and Next.js frontends with accessible UI, clean state and fast first paint.",
+        "tech": ["React", "Next.js", "TypeScript", "Tailwind CSS"]
+      },
+      {
+        "name": "API",
+        "tagline": "Clear contracts between systems",
+        "text": "REST APIs with validation, authentication and consistent error handling between users and services.",
+        "tech": ["Node.js", "REST", "Auth", "Validation"]
+      },
+      {
+        "name": "Services",
+        "tagline": "Business logic that stays testable",
+        "text": "Object-oriented, modular services in Python, Node.js, .NET and C++, structured so they're easy to change.",
+        "tech": ["Python", ".NET", "C++", "OOP"]
+      },
+      {
+        "name": "Data",
+        "tagline": "Schemas that scale",
+        "text": "Normalized relational schemas, efficient SQL and the right store for the job.",
+        "tech": ["SQL Server", "MongoDB", "Normalization", "Query tuning"]
+      },
+      {
+        "name": "Infrastructure",
+        "tagline": "Networks and delivery",
+        "text": "Network design, version control and automated deploys that keep everything reachable and repeatable.",
+        "tech": ["Cisco", "VLANs", "Git", "GitHub Actions"]
+      }
+    ]
+  },
+  "terminal": {
+    "eyebrow": "Terminal",
+    "title": "Scroll to run the session.",
+    "host": "hamza@portfolio",
+    "session": [
+      { "cmd": "whoami", "out": ["Muhammad Hamza Khan, Software Engineer"] },
+      { "cmd": "cat focus.txt", "out": ["backend architecture", "database design", "full-stack development"] },
+      { "cmd": "ls ~/projects", "out": ["cashup/  dilkarishta/  network-architecture/  arcade-system/  sql-banking/"] },
+      { "cmd": "git log --oneline -3", "out": ["a1f9c2e  Web Developer @ Arch Technologies", "7be41d0  Internship Trainee @ SPS, Inc.", "3c08aa5  Founder @ BlogWithHamza"] },
+      { "cmd": "echo $STATUS", "out": ["open to work ✓"] }
+    ]
+  },
+  "featured": {
+    "eyebrow": "Selected work",
+    "title": "Things I've built.",
+    "slugs": ["cashup", "network-architecture", "arcade-system"]
+  },
+  "stackSphere": {
+    "eyebrow": "Toolbox",
+    "title": "The tools I reach for.",
+    "lead": "Drag the sphere. Every tag is something I've used in a real project."
+  },
+  "stats": [
+    { "value": 3, "suffix": "+", "label": "Years writing software" },
+    { "value": 14, "suffix": "", "label": "Projects built" },
+    { "value": 3, "suffix": "", "label": "Roles held" },
+    { "value": 6, "suffix": "", "label": "Disciplines" }
+  ],
+  "testimonials": []
+}

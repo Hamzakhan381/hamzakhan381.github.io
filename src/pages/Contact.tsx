@@ -1,10 +1,9 @@
 import { useState, type SyntheticEvent } from 'react'
-import { profile } from '../lib/content'
+import { contact, profile } from '../content'
 import { usePageEffects } from '../lib/usePageEffects'
 import { PageHero } from '../components/PageHero'
 import { Icon, type IconName } from '../components/Icon'
 import { Tilt } from '../components/Tilt'
-import { socials } from '../components/Footer'
 
 type Status = { tone: 'idle' | 'success'; text: string }
 
@@ -14,13 +13,14 @@ const FORM_TILT = 4
 const channels: { icon: IconName; label: string; value: string; href?: string }[] = [
   { icon: 'mail', label: 'Email', value: profile.email, href: `mailto:${profile.email}` },
   { icon: 'phone', label: 'Phone', value: profile.phone, href: profile.phoneHref },
-  { icon: 'pin', label: 'Location', value: profile.location },
+  { icon: 'pin', label: 'Location', value: `${profile.location} · ${profile.workMode}` },
+  { icon: 'clock', label: 'Timezone', value: profile.timezone },
 ]
 
 function composeUrls(form: FormData) {
   const get = (key: string) => String(form.get(key) ?? '').trim()
-  const subject = get('subject') || 'Portfolio inquiry'
-  const body = `Hi Hamza,\n\nName: ${get('name')}\nEmail: ${get('email')}\n\n${get('message')}\n\n— Sent from your portfolio`
+  const subject = [get('topic'), get('subject')].filter(Boolean).join(': ') || 'Portfolio inquiry'
+  const body = `Hi ${profile.firstName},\n\nName: ${get('name')}\nEmail: ${get('email')}\n\n${get('message')}\n\n— Sent from your portfolio`
   const params = new URLSearchParams({ view: 'cm', fs: '1', to: profile.email, su: subject, body })
   return {
     gmail: `https://mail.google.com/mail/?${params}`,
@@ -47,15 +47,19 @@ export default function Contact() {
 
   return (
     <div ref={ref} className="page">
-      <PageHero
-        eyebrow="Contact"
-        lines={["Let's build", 'something great.']}
-        accent={1}
-        lead="Have a project, an opportunity, or just want to talk shop? Send a message and I'll reply within 24–48 hours."
-      />
+      <PageHero hero={contact.hero} />
 
       <section className="section container contact">
         <div className="contact__info">
+          <div className="card availability" data-fly>
+            <p className="status">
+              <span className="pulse-dot" aria-hidden="true" /> {profile.availability.label}
+            </p>
+            <p>{profile.availability.detail}</p>
+            <p className="availability__time">
+              <Icon name="clock" /> {profile.availability.responseTime}
+            </p>
+          </div>
           <ul className="channels">
             {channels.map((c) => (
               <li key={c.label} data-fly>
@@ -69,16 +73,33 @@ export default function Contact() {
               </li>
             ))}
           </ul>
-          <div className="socials" data-fly>
-            {socials.map((s) => (
-              <a key={s.label} href={s.href} target="_blank" rel="noreferrer" aria-label={s.label}>
-                <Icon name={s.icon} />
-              </a>
+          <ul className="social-cards">
+            {profile.socials.map((s) => (
+              <li key={s.label} data-fly>
+                <a className="card social-card" href={s.href} target="_blank" rel="noreferrer">
+                  <Icon name={s.icon} />
+                  <span>
+                    <small>{s.label}</small>
+                    {s.handle}
+                  </span>
+                  <Icon name="arrowUpRight" className="social-card__go" />
+                </a>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
 
         <Tilt as="form" className="card contact__form" max={FORM_TILT} onSubmit={onSubmit} data-fly>
+          <h2 className="contact__title">{contact.formTitle}</h2>
+          <fieldset className="topics">
+            <legend>What's it about?</legend>
+            {contact.subjects.map((s, i) => (
+              <label key={s} className="topic">
+                <input type="radio" name="topic" value={s} defaultChecked={i === 0} />
+                <span>{s}</span>
+              </label>
+            ))}
+          </fieldset>
           <div className="field-row">
             <label className="field">
               <span>Name</span>
@@ -91,7 +112,7 @@ export default function Contact() {
           </div>
           <label className="field">
             <span>Subject</span>
-            <input name="subject" placeholder="What's this about?" />
+            <input name="subject" placeholder="A few words" />
           </label>
           <label className="field">
             <span>Message</span>

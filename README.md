@@ -1,22 +1,24 @@
 # Muhammad Hamza Khan — 3D Portfolio
 
-A multi-page 3D portfolio in a monochrome theme with a sky-blue accent (dark and light modes).
-One persistent particle sculpture (~18k GPU particles) morphs into a new shape on every page,
-scatters when you scroll fast and pushes away from the cursor. Pages swap with 3D view transitions.
+A multi-page 3D portfolio for a software engineer, in a monochrome theme with a sky-blue accent
+(dark and light modes). Each page has its own engineering-themed 3D scene driven by scroll, and
+floating code glyphs drift behind every page.
 
-| Page     | Particle shape    | Page-specific 3D                         |
-| -------- | ----------------- | ---------------------------------------- |
-| Home     | Ringed planet     | 3D marquee ribbon, tilt cards            |
-| About    | DNA helix         | Alternating 3D timeline, keycap skills   |
-| Services | Cube cluster      | Flip cards, 3D process staircase         |
-| Projects | Spiral galaxy     | Draggable cylinder carousel of live repos |
-| CV       | Stack of papers   | Paper sheet that lands in 3D; prints clean |
-| Contact  | The word HELLO    | Tilting form                             |
+| Page     | 3D scene (scroll-driven)                                         | Page widgets |
+| -------- | ---------------------------------------------------------------- | ------------ |
+| Home     | Architecture stack explodes into 5 layers; packets flow through; the centred layer card lights its slab | Terminal that types as you scroll, draggable tech sphere, counters |
+| About    | Git graph that draws each career branch as you scroll           | profile.ts code window, git-log timeline, skill bars, keycap tools |
+| Services | Server rack; each service's unit slides out when it's centred   | Process staircase, engagement cards, FAQ |
+| Projects | Live service-mesh network with hopping packets                  | Z-depth featured gallery, FLIP-animated filters, live GitHub ring |
+| CV       | Floating editor windows                                          | Printable paper CV that lands in 3D |
+| Contact  | Dotted globe with arcs pulsing from Multan                       | Topic chips, availability card |
+
+All content is in `src/content/*.json`; see [src/content/README.md](src/content/README.md).
 
 ## Stack
 
 - **React 19 + TypeScript**, built with **Vite**, routed with **React Router** and React's `<ViewTransition>`
-- **three.js** via **@react-three/fiber** and **@react-three/drei**, with custom GLSL shaders
+- **three.js** via **@react-three/fiber** and **@react-three/drei**
 - **GSAP ScrollTrigger** for scrubbed 3D reveals, **Lenis** for smooth scrolling
 - Tailwind CSS v4 (preflight only) + hand-written CSS
 
@@ -24,7 +26,7 @@ scatters when you scroll fast and pushes away from the cursor. Pages swap with 3
 
 - The whole 3D scene is lazy-loaded, so text and layout paint before three.js downloads.
 - Adaptive pixel ratio (drops to 1x when frame rate dips), fewer particles and lower geometry detail on phones.
-- The whole sculpture is one draw call; morphing runs entirely in the vertex shader.
+- Only the current page's 3D scene is mounted; packets and nodes use instanced meshes.
 - Every route is emitted as its own HTML file at build time, so deep links work on GitHub Pages.
 - Photo served as responsive WebP (36KB / 115KB instead of the 778KB JPG).
 - Respects `prefers-reduced-motion`; falls back to a static gradient without WebGL2.
@@ -36,9 +38,8 @@ npm install
 npm run dev
 ```
 
-`npm run build` outputs to `dist/`. Particle shapes, per-page placement and colors live in
-`src/three/scene.json`; scroll animation tuning lives in `src/lib/motion.json`; all text content
-lives in `src/lib/content.ts`.
+`npm run build` outputs to `dist/`. 3D scene placement, sizes and colours live in `src/three/scene.json`; scroll animation tuning lives
+in `src/lib/motion.json`; all text content lives in `src/content/`.
 
 ## Deploy
 

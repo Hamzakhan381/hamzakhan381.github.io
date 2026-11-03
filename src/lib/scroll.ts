@@ -24,6 +24,8 @@ export const scrollState = {
   pointerY: 0,
   /** Extra spin (radians) that page widgets such as the project carousel feed into the scene. */
   spin: 0,
+  /** Index of the list item currently centred on screen (layers, jobs, services); -1 when none. */
+  focus: -1,
 }
 
 if (import.meta.env.DEV) Object.assign(window, { __scrollState: scrollState })

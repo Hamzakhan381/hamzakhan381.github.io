@@ -1,0 +1,154 @@
+{
+  "hero": {
+    "eyebrow": "Projects",
+    "lines": ["Things I've", "designed & built."],
+    "accentLine": 1,
+    "lead": "Web platforms, systems in C++, databases, networks and UI case studies. Scroll through the featured work, then filter the rest."
+  },
+  "categories": ["Web", "Systems", "Data", "Networking", "Mobile", "Design"],
+  "items": [
+    {
+      "slug": "cashup",
+      "title": "CashUp",
+      "subtitle": "Online transaction web application",
+      "category": "Web",
+      "featured": true,
+      "summary": "A digital payment web application for secure and seamless online transactions.",
+      "highlights": ["Money transfers between users", "Balance management", "Built with a focus on user experience, security and scalability"],
+      "stack": ["Web", "Payments", "Security"],
+      "links": { "github": "https://github.com/Hamzakhan381/CashUp-Online-Transaction-Web-Application" }
+    },
+    {
+      "slug": "network-architecture",
+      "title": "Country-Level Network",
+      "subtitle": "Network architecture & security in Cisco",
+      "category": "Networking",
+      "featured": true,
+      "summary": "A multi-city network designed in Cisco Packet Tracer, connected with WAN links and built to support thousands of users.",
+      "highlights": ["LAN design with VLANs and IP addressing", "WAN links between cities with routing", "Firewall and VPN security"],
+      "stack": ["Cisco Packet Tracer", "VLANs", "Routing", "VPN"],
+      "links": { "github": "https://github.com/Hamzakhan381/Country-Level-Network-Architecture-Security-Cisco-" }
+    },
+    {
+      "slug": "arcade-system",
+      "title": "Arcade Gaming System",
+      "subtitle": "Four classic games in C++ and SFML",
+      "category": "Systems",
+      "featured": true,
+      "summary": "Snake, Tetris, Pac-Man and Connect Four in one arcade built with C++ and SFML.",
+      "highlights": ["Object-oriented design across four games", "Game state management", "AI behaviour for opponents"],
+      "stack": ["C++", "SFML", "OOP"],
+      "links": { "github": "https://github.com/Hamzakhan381/Arcade-Gaming-System-C-SFML-" }
+    },
+    {
+      "slug": "dilkarishta",
+      "title": "DILKARISHTA",
+      "subtitle": "Dil Ka Rishta web platform",
+      "category": "Web",
+      "featured": true,
+      "summary": "A TypeScript web platform, deployed on Vercel.",
+      "highlights": ["Written in TypeScript", "Deployed and live on Vercel"],
+      "stack": ["TypeScript", "Vercel"],
+      "links": { "github": "https://github.com/Hamzakhan381/DILKARISHTA", "live": "https://dilkarishta-five.vercel.app" }
+    },
+    {
+      "slug": "sql-banking",
+      "title": "SQL Banking System",
+      "subtitle": "Banking database in SQL Server",
+      "category": "Data",
+      "featured": true,
+      "summary": "A banking database in Microsoft SQL Server managing customers, accounts and transactions with well-structured tables and queries.",
+      "highlights": ["Customer, account and transaction records", "Well-structured relational tables", "Queries for core banking operations"],
+      "stack": ["SQL Server", "T-SQL"],
+      "links": { "github": "https://github.com/Hamzakhan381/SQL-Based-Banking-System" }
+    },
+    {
+      "slug": "towgo",
+      "title": "TowGo",
+      "subtitle": "Vehicle breakdown assistance platform",
+      "category": "Design",
+      "featured": false,
+      "summary": "Team project: requirements, SRS and full UI/UX for a mobile breakdown-assistance app.",
+      "highlights": ["Stakeholder requirements and SRS", "Personas, user journeys and wireframes", "High-fidelity Figma UI for user, driver and admin roles"],
+      "stack": ["Figma", "Wireframing", "Prototyping", "SDLC"],
+      "links": {}
+    },
+    {
+      "slug": "car-dealership",
+      "title": "Car Dealership Management",
+      "subtitle": "Data structures & algorithms project",
+      "category": "Systems",
+      "featured": false,
+      "summary": "Manages vehicle inventory, customer records and sales using DSA concepts.",
+      "highlights": ["Inventory, customer and sales management", "Searching and sorting for performance"],
+      "stack": ["C++", "DSA"],
+      "links": { "github": "https://github.com/Hamzakhan381/Car-Dealership-Management-System-DSA-Project" }
+    },
+    {
+      "slug": "banking-atm",
+      "title": "Banking ATM System",
+      "subtitle": "OOP simulation in C++",
+      "category": "Systems",
+      "featured": false,
+      "summary": "Simulates ATM operations: login, balance inquiry, deposit, withdrawal and fund transfer.",
+      "highlights": ["Encapsulation and abstraction", "Modular design"],
+      "stack": ["C++", "OOP"],
+      "links": { "github": "https://github.com/Hamzakhan381/Banking-ATM-System-OOP-Based-" }
+    },
+    {
+      "slug": "car-parking",
+      "title": "Automated Car Parking",
+      "subtitle": "Parking flow and slot management prototype",
+      "category": "Systems",
+      "featured": false,
+      "summary": "Academic team project: a prototype system that optimises parking flow and slot management.",
+      "highlights": ["Workflow logic", "Implementation and testing"],
+      "stack": ["System Design", "Testing"],
+      "links": {}
+    },
+    {
+      "slug": "spotify-clone",
+      "title": "Spotify UI Clone",
+      "subtitle": "Flutter mobile app",
+      "category": "Mobile",
+      "featured": false,
+      "summary": "A Spotify-style music app UI in Flutter with smooth navigation and the essential screens.",
+      "highlights": ["Clean, responsive UI", "Smooth navigation between screens"],
+      "stack": ["Flutter", "Dart"],
+      "links": { "github": "https://github.com/Hamzakhan381/Spotify-UI-Clone-using-Flutter" }
+    },
+    {
+      "slug": "travel-booking",
+      "title": "Travel Booking Website",
+      "subtitle": "Destinations and packages",
+      "category": "Web",
+      "featured": false,
+      "summary": "Explore destinations, view travel packages and plan trips in a responsive layout.",
+      "highlights": ["Responsive layout", "User-friendly interface"],
+      "stack": ["HTML", "CSS", "JavaScript"],
+      "links": { "github": "https://github.com/Hamzakhan381/Travel-Booking-Website" }
+    },
+    {
+      "slug": "mobile-shop",
+      "title": "Mobile Shop Website",
+      "subtitle": "First-semester ICT project",
+      "category": "Web",
+      "featured": false,
+      "summary": "An online mobile store with product listings, featured phones and navigation pages.",
+      "highlights": ["Product listings", "Clean browsing experience"],
+      "stack": ["HTML", "CSS"],
+      "links": { "github": "https://github.com/Hamzakhan381/Mobile-Shop-Website-First-Semester-ICT-Project" }
+    },
+    {
+      "slug": "hospital-management",
+      "title": "Hospital Management System",
+      "subtitle": "First-semester C++ project",
+      "category": "Systems",
+      "featured": false,
+      "summary": "Manage patients, doctors and appointments through a console interface.",
+      "highlights": ["Patients, doctors and appointments", "Console-based interface"],
+      "stack": ["C++"],
+      "links": { "github": "https://github.com/Hamzakhan381/Hospital-Management-System-C-" }
+    }
+  ]
+}

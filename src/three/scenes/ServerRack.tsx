@@ -1,0 +1,132 @@
+import { useMemo, useRef, useState } from 'react'
+import { useFrame } from '@react-three/fiber'
+import { Edges } from '@react-three/drei'
+import { Group, MathUtils, MeshBasicMaterial } from 'three'
+import config from '../scene.json'
+import { Label, readTrack, useHalfWidth, useNarrow, usePalette } from '../kit'
+import { services } from '../../content'
+import { scrollState } from '../../lib/scroll'
+import { HALF } from '../../lib/math'
+
+const R = config.rack
+const units = services.items
+const POINTER_TILT = 0.1
+const BLINK_SPEED = 3.2
+const BLINK_SPEED_ACTIVE = 9
+const LED_SPACING = 0.17
+const LED_INSET = 0.3
+const VENT_WIDTH = 0.035
+const VENT_SPACING = 0.11
+const VENT_HEIGHT_RATIO = 0.55
+const VENT_INSET = 0.35
+const LABEL_INSET = 0.9
+const FACE_OFFSET = 0.006
+const UNIT_INSET = 0.12
+const INDEX_DIGITS = 2
+
+/** Services: a server rack with one unit per service. The unit for the service on screen slides out with its LEDs racing. */
+export function ServerRack() {
+  const narrow = useNarrow()
+  const half = useHalfWidth(R.z)
+  const palette = usePalette()
+  const outer = useRef<Group>(null)
+  const unitRefs = useRef<(Group | null)[]>([])
+  const leds = useRef<(MeshBasicMaterial | null)[]>([])
+  const [active, setActive] = useState(-1)
+  const activeRef = useRef(-1)
+
+  const pitch = R.unitHeight + R.unitGap
+  const height = units.length * pitch + R.unitGap
+  const unitWidth = R.width - R.post - UNIT_INSET
+  const unitDepth = R.depth - UNIT_INSET
+  const face = unitDepth * HALF + FACE_OFFSET
+  const unitY = (i: number) => height * HALF - R.unitGap - R.unitHeight * HALF - i * pitch
+
+  const posts = useMemo(
+    () =>
+      [-1, 1].flatMap((sx) => [-1, 1].map((sz): [number, number, number] => [sx * R.width * HALF, 0, sz * R.depth * HALF])),
+    [],
+  )
+
+  useFrame((state, delta) => {
+    const track = readTrack('services', R.z)
+    const focus = scrollState.focus
+    if (focus !== activeRef.current) {
+      activeRef.current = focus
+      setActive(focus)
+    }
+    const t = state.clock.elapsedTime
+    unitRefs.current.forEach((_, i) => {
+      const unit = unitRefs.current[i]
+      if (unit) unit.position.z = MathUtils.damp(unit.position.z, i === focus ? R.slide : 0, R.slideDamping, delta)
+    })
+    leds.current.forEach((_, k) => {
+      const material = leds.current[k]
+      if (!material) return
+      const unit = Math.floor(k / R.leds)
+      const speed = unit === focus ? BLINK_SPEED_ACTIVE : BLINK_SPEED
+      const on = Math.sin(t * speed + k * k) > 0
+      const lit = k % R.leds === 0 ? palette.ok : palette.accent
+      material.color.copy(on ? lit : palette.dim)
+    })
+    if (outer.current) {
+      outer.current.position.set(narrow ? 0 : half * R.x, (narrow ? R.mobileY : 0) + track.y, R.z)
+      outer.current.scale.setScalar(narrow ? R.mobileScale : 1)
+      outer.current.rotation.set(
+        R.tilt[0] + scrollState.pointerY * POINTER_TILT,
+        R.tilt[1] + track.progress * R.turn + scrollState.pointerX * POINTER_TILT,
+        R.tilt[2],
+      )
+    }
+  })
+
+  return (
+    <group ref={outer}>
+      {posts.map((p) => (
+        <mesh key={p.join()} position={p}>
+          <boxGeometry args={[R.post, height + R.post, R.post]} />
+          <meshStandardMaterial color={palette.surface} />
+          <Edges color={palette.line} />
+        </mesh>
+      ))}
+      {[-1, 1].map((side) => (
+        <mesh key={side} position={[0, side * (height + R.post) * HALF, 0]}>
+          <boxGeometry args={[R.width + R.post, R.post, R.depth + R.post]} />
+          <meshStandardMaterial color={palette.surface} />
+          <Edges color={palette.line} />
+        </mesh>
+      ))}
+      {units.map((service, i) => {
+        const on = i === active
+        return (
+          <group key={service.id} ref={(el) => void (unitRefs.current[i] = el)} position={[0, unitY(i), 0]}>
+            <mesh>
+              <boxGeometry args={[unitWidth, R.unitHeight, unitDepth]} />
+              <meshStandardMaterial color={palette.surface} roughness={0.5} />
+              <Edges color={on ? palette.accent : palette.line} />
+            </mesh>
+            {Array.from({ length: R.leds }, (_, k) => (
+              <mesh key={k} position={[-unitWidth * HALF + LED_INSET * HALF + k * LED_SPACING, 0, face]}>
+                <boxGeometry args={[R.ledSize, R.ledSize, R.ledSize]} />
+                <meshBasicMaterial ref={(el) => void (leds.current[i * R.leds + k] = el)} color={palette.dim} toneMapped={false} />
+              </mesh>
+            ))}
+            <Label
+              text={`${String(i + 1).padStart(INDEX_DIGITS, '0')}  ${service.short}`}
+              height={R.labelHeight}
+              color={on ? palette.accent : palette.line}
+              align="left"
+              position={[-unitWidth * HALF + LABEL_INSET, 0, face]}
+            />
+            {Array.from({ length: R.vents }, (_, k) => (
+              <mesh key={`v${k}`} position={[unitWidth * HALF - VENT_INSET - k * VENT_SPACING, 0, face]}>
+                <boxGeometry args={[VENT_WIDTH, R.unitHeight * VENT_HEIGHT_RATIO, FACE_OFFSET]} />
+                <meshBasicMaterial color={on ? palette.accent : palette.dim} />
+              </mesh>
+            ))}
+          </group>
+        )
+      })}
+    </group>
+  )
+}

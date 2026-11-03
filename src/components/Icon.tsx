@@ -27,6 +27,11 @@ const stroke = {
   chevronLeft: 'm15 18-6-6 6-6',
   chevronRight: 'm9 18 6-6-6-6',
   arrowLeft: 'M19 12H5M11 18l-6-6 6-6',
+  check: 'M20 6 9 17l-5-5',
+  plus: 'M12 5v14M5 12h14',
+  terminal: 'm4 17 6-6-6-6M12 19h8',
+  clock: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 6v6l4 2',
+  globe: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20',
 }
 
 const fill = {

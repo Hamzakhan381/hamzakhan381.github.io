@@ -1,15 +1,17 @@
 import { useEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { caseStudies, profile } from '../lib/content'
+import { profile, projects } from '../content'
 import { formatDate, formatRepoName, useRepos, type Repo } from '../lib/github'
 import { flyIn } from '../lib/reveal'
 import { usePageEffects } from '../lib/usePageEffects'
 import { useMediaQuery } from '../lib/useMediaQuery'
 import { PageHero } from '../components/PageHero'
+import { SectionHead } from '../components/Section'
+import { DepthGallery } from '../components/DepthGallery'
+import { FilterGrid } from '../components/FilterGrid'
 import { Carousel3D } from '../components/Carousel3D'
 import { Icon } from '../components/Icon'
-import { Tilt } from '../components/Tilt'
 
 const MAX_TAGS = 3
 const MIN_FOR_CAROUSEL = 3
@@ -26,6 +28,7 @@ const languageColors: Record<string, string> = {
   CSS: '#663399',
   Dart: '#00b4ab',
   PHP: '#4f5d95',
+  TSQL: '#e38c00',
 }
 
 function RepoCard({ repo, active = true }: { repo: Repo; active?: boolean }) {
@@ -70,8 +73,7 @@ function RepoCard({ repo, active = true }: { repo: Repo; active?: boolean }) {
   )
 }
 
-export default function Projects() {
-  const ref = usePageEffects<HTMLDivElement>()
+function LiveRepos() {
   const grid = useRef<HTMLUListElement>(null)
   const state = useRepos(true)
   const wide = useMediaQuery('(min-width: 860px)')
@@ -86,83 +88,79 @@ export default function Projects() {
     return () => ctx.revert()
   }, [state.status, useCarousel])
 
-  const languages = new Set(repos.map((r) => r.language).filter(Boolean)).size
+  return (
+    <section className="section container" aria-busy={state.status === 'loading'}>
+      <SectionHead
+        eyebrow="Live from GitHub"
+        title="Latest pushes."
+        lead={useCarousel ? 'Pulled live from my repositories. Drag the ring or use the arrows.' : 'Pulled live from my repositories.'}
+        center
+      />
+      {state.status === 'error' && (
+        <div className="card empty">
+          <h3>GitHub is taking a break</h3>
+          <p>The live feed couldn't load (GitHub limits anonymous requests). You can still browse everything directly.</p>
+        </div>
+      )}
+      {useCarousel ? (
+        <Carousel3D items={repos} label="GitHub repositories" renderItem={(repo, active) => <RepoCard repo={repo} active={active} />} />
+      ) : (
+        <ul ref={grid} className="repo-grid">
+          {state.status === 'loading'
+            ? Array.from({ length: SKELETONS }, (_, i) => <li key={i} className="card repo repo--skeleton" />)
+            : repos.map((repo) => (
+                <li key={repo.id}>
+                  <RepoCard repo={repo} />
+                </li>
+              ))}
+        </ul>
+      )}
+      <a className="btn btn--ghost center" href={`https://github.com/${profile.githubUser}?tab=repositories`} target="_blank" rel="noreferrer">
+        <Icon name="github" /> View all repositories <Icon name="arrow" />
+      </a>
+    </section>
+  )
+}
+
+export default function Projects() {
+  const ref = usePageEffects<HTMLDivElement>()
+  const featured = projects.items.filter((p) => p.featured)
+  const categories = new Set(projects.items.map((p) => p.category)).size
 
   return (
     <div ref={ref} className="page">
-      <PageHero
-        eyebrow="Projects"
-        lines={['Straight from', 'my GitHub.']}
-        accent={1}
-        lead={`Pulled live from my repositories.${useCarousel ? ' Drag the ring, use the arrows, or let it drift.' : ''}`}
-        className="page-hero--center"
-      >
+      <PageHero hero={projects.hero}>
         <dl className="metrics">
           <div>
-            <dt>Repos shown</dt>
-            <dd>{repos.length || '—'}</dd>
+            <dt>Projects</dt>
+            <dd>{projects.items.length}</dd>
           </div>
           <div>
-            <dt>Languages</dt>
-            <dd>{languages || '—'}</dd>
+            <dt>Featured</dt>
+            <dd>{featured.length}</dd>
           </div>
           <div>
-            <dt>Latest update</dt>
-            <dd>{repos[0] ? formatDate(repos[0].updated_at) : '—'}</dd>
+            <dt>Categories</dt>
+            <dd>{categories}</dd>
           </div>
         </dl>
       </PageHero>
 
-      <section className="section container" aria-live="polite" aria-busy={state.status === 'loading'}>
-        {state.status === 'error' && (
-          <div className="card empty">
-            <h2>GitHub is taking a break</h2>
-            <p>The live repo feed couldn't load (GitHub limits anonymous requests). You can still browse everything directly.</p>
+      {featured.length ? (
+        <section className="section section--flush">
+          <div className="container">
+            <SectionHead eyebrow="Featured" title="Fly through" accent="the highlights." lead="Keep scrolling: each project comes at you out of the depth." />
           </div>
-        )}
-        {useCarousel ? (
-          <Carousel3D items={repos} label="GitHub repositories" renderItem={(repo, active) => <RepoCard repo={repo} active={active} />} />
-        ) : (
-          <ul ref={grid} className="repo-grid">
-            {state.status === 'loading'
-              ? Array.from({ length: SKELETONS }, (_, i) => <li key={i} className="card repo repo--skeleton" />)
-              : repos.map((repo) => (
-                  <li key={repo.id}>
-                    <RepoCard repo={repo} />
-                  </li>
-                ))}
-          </ul>
-        )}
-        <a className="btn btn--ghost center" href={`${profile.links.github}?tab=repositories`} target="_blank" rel="noreferrer">
-          <Icon name="github" /> View all repositories <Icon name="arrow" />
-        </a>
-      </section>
+          <DepthGallery projects={featured} />
+        </section>
+      ) : null}
 
       <section className="section container">
-        <header className="section-head">
-          <p className="eyebrow" data-reveal>
-            Case studies
-          </p>
-          <h2 className="heading" data-reveal>
-            Beyond <span className="accent">the code.</span>
-          </h2>
-        </header>
-        <div className="cases">
-          {caseStudies.map((c) => (
-            <Tilt key={c.title} className="card case" data-swing>
-              <span className="chip">{c.kind}</span>
-              <h3>{c.title}</h3>
-              <p className="case__sub">{c.subtitle}</p>
-              <p>{c.text}</p>
-              <ul className="tags">
-                {c.tags.map((t) => (
-                  <li key={t}>{t}</li>
-                ))}
-              </ul>
-            </Tilt>
-          ))}
-        </div>
+        <SectionHead eyebrow="Archive" title="Everything," accent="filterable." />
+        <FilterGrid projects={projects.items} categories={projects.categories} />
       </section>
+
+      <LiveRepos />
     </div>
   )
 }

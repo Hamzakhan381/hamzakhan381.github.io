@@ -1,0 +1,39 @@
+{
+  "hero": {
+    "eyebrow": "About",
+    "lines": ["Hello, I'm Hamza.", "I build software", "that lasts."],
+    "accentLine": 2,
+    "lead": "My goal is not just to write code, but to design systems that endure, scale, and deliver real-world impact."
+  },
+  "bio": [
+    "I'm a Software Engineering student at Air University, Multan, and I love building scalable, high-performance systems. My focus is backend architecture, database design, and full-stack development: turning complex problems into clean, efficient solutions.",
+    "I build structured, secure applications with Python, Node.js, SQL and .NET. From banking management systems to full-stack web platforms, I engineer software that is reliable, optimized, and built for growth."
+  ],
+  "highlights": [
+    { "value": "3+", "label": "Years building" },
+    { "value": "3", "label": "Roles held" },
+    { "value": "3.4", "label": "GPA / 4.0" }
+  ],
+  "principles": {
+    "eyebrow": "Principles",
+    "title": "How I work.",
+    "items": [
+      { "title": "Design before code", "text": "Requirements, data model and architecture get written down and reviewed before implementation starts." },
+      { "title": "Readable over clever", "text": "Code is read far more often than it's written, so I optimise for the next person who opens the file." },
+      { "title": "Secure by default", "text": "Validation, least privilege and safe data handling are part of the first version, not a later patch." },
+      { "title": "Measure, then optimise", "text": "Performance work starts from a measurement, so effort goes where it actually matters." },
+      { "title": "Ship in small steps", "text": "Small, reviewable changes keep risk low and make progress visible every week." },
+      { "title": "Document for handover", "text": "Clear SDD documentation means the system outlives the sprint that built it." }
+    ]
+  },
+  "now": {
+    "eyebrow": "Right now",
+    "title": "What I'm focused on.",
+    "items": [
+      { "label": "Working", "text": "Building client web platforms as a Web Developer at Arch Technologies." },
+      { "label": "Studying", "text": "BS Software Engineering at Air University, Multan (2024 – 2028)." },
+      { "label": "Building", "text": "DILKARISHTA, a TypeScript web platform, and this portfolio in React and Three.js." }
+    ]
+  },
+  "certifications": []
+}

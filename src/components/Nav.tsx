@@ -1,7 +1,7 @@
 import { useEffect, useState, type CSSProperties, type MouseEvent } from 'react'
 import { Link, NavLink, useLocation } from 'react-router'
 import routes from '../lib/routes.json'
-import { profile } from '../lib/content'
+import { profile } from '../content'
 import { toggleTheme, useTheme } from '../lib/theme'
 import { Icon } from './Icon'
 

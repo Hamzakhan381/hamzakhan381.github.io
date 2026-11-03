@@ -40,5 +40,29 @@
   "paperScrollTilt": {
     "start": 6,
     "end": -5
+  },
+  "code": {
+    "x": 40,
+    "rotateY": 25,
+    "stagger": 0.08
+  },
+  "counter": {
+    "duration": 1.8
+  },
+  "bars": {
+    "duration": 1.4,
+    "stagger": 0.08
+  },
+  "gallery": {
+    "depth": 1100,
+    "rotateY": 14,
+    "shiftX": 120,
+    "fadeAhead": 0.45,
+    "fadePast": 1.6,
+    "screens": 0.9
+  },
+  "flip": {
+    "duration": 0.6,
+    "scale": 0.85
   }
 }

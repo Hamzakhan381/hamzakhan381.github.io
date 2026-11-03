@@ -1,0 +1,31 @@
+{
+  "name": "Muhammad Hamza Khan",
+  "shortName": "Hamza Khan",
+  "firstName": "Hamza",
+  "initials": "HK",
+  "role": "Software Engineer",
+  "titles": ["Full-Stack Developer", "Backend Engineer", "System Designer"],
+  "location": "Multan, Pakistan",
+  "timezone": "PKT (UTC+5)",
+  "workMode": "Remote or on-site",
+  "email": "hamza.best81@gmail.com",
+  "phone": "+92-333-3317050",
+  "phoneHref": "tel:+923333317050",
+  "githubUser": "Hamzakhan381",
+  "availability": {
+    "open": true,
+    "label": "Available for new projects",
+    "detail": "Open to freelance projects, internships and full-time roles.",
+    "responseTime": "Replies within 24–48 hours"
+  },
+  "photo": {
+    "small": "/mypic-480.webp",
+    "large": "/mypic-960.webp",
+    "alt": "Portrait of Muhammad Hamza Khan"
+  },
+  "socials": [
+    { "label": "GitHub", "icon": "github", "href": "https://github.com/Hamzakhan381", "handle": "@Hamzakhan381" },
+    { "label": "LinkedIn", "icon": "linkedin", "href": "https://www.linkedin.com/in/hamza-khan-674116278/", "handle": "hamza-khan-674116278" },
+    { "label": "Instagram", "icon": "instagram", "href": "https://www.instagram.com/hamza_khan17050", "handle": "@hamza_khan17050" }
+  ]
+}

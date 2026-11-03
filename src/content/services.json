@@ -1,0 +1,93 @@
+{
+  "hero": {
+    "eyebrow": "Services",
+    "lines": ["What I can", "build for you."],
+    "accentLine": 1,
+    "lead": "Six disciplines, one goal: software that's reliable on day one and still easy to change on day one thousand."
+  },
+  "items": [
+    {
+      "id": "full-stack",
+      "title": "Full-Stack Development",
+      "short": "FULL-STACK",
+      "icon": "code",
+      "summary": "Complete, scalable web applications from front to back, with seamless integration between intuitive interfaces and powerful backend systems.",
+      "deliverables": ["Responsive web app (React / Next.js)", "REST API with authentication", "Database schema and migrations", "Deployment and handover docs"],
+      "stack": ["React", "Next.js", "Node.js", "SQL"]
+    },
+    {
+      "id": "architecture",
+      "title": "Software Design & Architecture",
+      "short": "ARCHITECTURE",
+      "icon": "diagram",
+      "summary": "Scalable, maintainable and secure architectures with proper SDD documentation, built to be portable, interoperable and future-ready.",
+      "deliverables": ["Software Design Document (SDD)", "Component and data-flow diagrams", "Technology recommendations", "Security and scalability review"],
+      "stack": ["UML", "OOP", "Design Patterns"]
+    },
+    {
+      "id": "ui-ux",
+      "title": "UI/UX & Design",
+      "short": "UI / UX",
+      "icon": "design",
+      "summary": "Turning raw ideas into intuitive experiences: seamless user journeys, elegant wireframes, and modern aesthetics.",
+      "deliverables": ["Personas and user journeys", "Low-fidelity wireframes", "High-fidelity Figma prototypes", "Design handoff for developers"],
+      "stack": ["Figma", "Prototyping", "Wireframing"]
+    },
+    {
+      "id": "cloud",
+      "title": "Cloud & DevOps",
+      "short": "CLOUD / DEVOPS",
+      "icon": "cloud",
+      "summary": "Automated deployments, managed cloud infrastructure, and reliable delivery pipelines with modern DevOps practice.",
+      "deliverables": ["CI/CD pipeline", "Automated deploys on every push", "Environment configuration", "Deployment runbook"],
+      "stack": ["GitHub Actions", "Vercel", "Git"]
+    },
+    {
+      "id": "data",
+      "title": "Data Engineering",
+      "short": "DATA",
+      "icon": "database",
+      "summary": "Data pipelines, ETL systems, and analytics-ready architectures that keep business data clean, accessible and actionable.",
+      "deliverables": ["Normalized relational schema", "Stored procedures and queries", "ETL and data clean-up", "Reporting-ready views"],
+      "stack": ["SQL Server", "MongoDB", "T-SQL"]
+    },
+    {
+      "id": "network",
+      "title": "Network Engineering",
+      "short": "NETWORK",
+      "icon": "network",
+      "summary": "Reliable network infrastructure: configuration, security and optimization for high availability and efficient data flow.",
+      "deliverables": ["LAN / WAN topology design", "VLANs and IP addressing plan", "Routing configuration", "Firewall and VPN setup"],
+      "stack": ["Cisco Packet Tracer", "VLANs", "VPN"]
+    }
+  ],
+  "process": {
+    "eyebrow": "Process",
+    "title": "Four steps, no surprises.",
+    "items": [
+      { "title": "Discover", "text": "Requirements, stakeholders and constraints, written down in an SRS before any code." },
+      { "title": "Design", "text": "Architecture, data model and wireframes that the whole team can review." },
+      { "title": "Build", "text": "Small, tested increments with clean, documented code and regular demos." },
+      { "title": "Ship", "text": "Automated deploys, a handover document, and support while it settles." }
+    ]
+  },
+  "engagements": {
+    "eyebrow": "Ways to work together",
+    "title": "Pick the shape that fits.",
+    "items": [
+      { "title": "Project", "text": "A defined scope with a clear deliverable, from a landing page to a full web app.", "points": ["Fixed scope", "Milestone demos", "Handover docs"] },
+      { "title": "Contract", "text": "Extra engineering capacity for your team, working inside your tools and process.", "points": ["Your stack and repo", "Sprint-based", "Async friendly"] },
+      { "title": "Full-time / Internship", "text": "A long-term role where I can grow with the product and the team.", "points": ["Remote or on-site", "Backend or full-stack", "Available now"] }
+    ]
+  },
+  "faq": {
+    "eyebrow": "FAQ",
+    "title": "Questions people ask.",
+    "items": [
+      { "q": "Which technologies do you work with?", "a": "Mostly React and Next.js on the frontend, Node.js, Python, .NET and C++ on the backend, and SQL Server or MongoDB for data. The full list is on the About page." },
+      { "q": "Do you work remotely?", "a": "Yes. I'm based in Multan, Pakistan (PKT, UTC+5) and work remotely or on-site." },
+      { "q": "How do we start?", "a": "Send a message through the contact page with a short description of the project. I'll reply within 24–48 hours to set up a call." },
+      { "q": "Can you take over an existing codebase?", "a": "Yes. I start by reading the code and documenting how it works, then make small, safe changes from there." }
+    ]
+  }
+}

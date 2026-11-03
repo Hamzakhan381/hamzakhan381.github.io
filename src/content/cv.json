@@ -1,0 +1,78 @@
+{
+  "hero": {
+    "eyebrow": "CV",
+    "lines": ["Curriculum", "vitae."],
+    "accentLine": 1,
+    "lead": "One page, always current. Save it as a PDF straight from the print dialog."
+  },
+  "contactLine": ["Multan, Pakistan", "hamza.best81@gmail.com", "linkedin.com/in/hamza-khan-674116278", "github.com/Hamzakhan381", "+92 333 331 7050"],
+  "summary": "Motivated Software Engineering student with a strong foundation in programming, database systems, and problem-solving. Passionate about building efficient, user-friendly applications and continuously improving technical skills. Seeking opportunities to apply knowledge in real-world software development.",
+  "experience": [
+    {
+      "org": "Atch Technologies",
+      "place": "Multan, Pakistan",
+      "role": "Web Development Intern",
+      "period": "2025",
+      "points": [
+        "Assisted in developing responsive web applications using modern web technologies",
+        "Gained hands-on experience in frontend and backend integration",
+        "Collaborated with team members to improve user interface and functionality"
+      ]
+    },
+    {
+      "org": "SPSS Technologies",
+      "place": "Multan, Pakistan",
+      "role": "Web Development Intern",
+      "period": "2025",
+      "points": [
+        "Contributed to web development projects, focusing on clean and maintainable code",
+        "Worked with databases and basic backend logic",
+        "Strengthened understanding of real-world software development practices"
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "name": "TowGo — Vehicle Breakdown Assistance Platform",
+      "stack": "Figma, Wireframing, Prototyping, SDLC",
+      "kind": "Team Project",
+      "role": "Software Engineering & UI/UX Designer",
+      "points": [
+        "Gathered stakeholder requirements and wrote an SRS to define core features, user flows, and system scope for the mobile application.",
+        "Designed personas, user journeys, low-fidelity wireframes, and high-fidelity Figma interfaces for 3 role-based experiences: user, driver, and admin."
+      ]
+    },
+    {
+      "name": "Automated Car Parking System",
+      "stack": "System Design, Workflow Logic, Team Collaboration",
+      "kind": "Academic Project",
+      "role": "Software Engineering Team Project",
+      "points": [
+        "Designed and developed a prototype automated car parking system to optimize parking flow and slot management.",
+        "Contributed to workflow logic, implementation, and testing with focus on efficiency and real-world usability."
+      ]
+    }
+  ],
+  "skills": [
+    { "label": "Languages", "items": ["C++", "Python", "JavaScript", "PHP", "HTML5", "CSS", "Dart"] },
+    { "label": "Frameworks", "items": ["Flutter", "Android Studio"] },
+    { "label": "Databases", "items": ["Microsoft SQL Server", "MongoDB", "Database Design & Normalization", "Query Writing (SQL)"] },
+    {
+      "label": "Concepts",
+      "items": ["OOP", "Software Design & Architecture", "Requirements Engineering", "SQA", "Data Structures & Algorithms", "Problem Solving", "System Thinking", "Agile Fundamentals", "API Basics"]
+    },
+    { "label": "Tools", "items": ["Git & GitHub", "Figma (UI/UX)", "VS Code", "Visual Studio", "Cursor", "Kiro", "Claude Code"] }
+  ],
+  "education": {
+    "school": "Air University, Multan",
+    "place": "Multan, Pakistan",
+    "degree": "Bachelor of Science in Software Engineering",
+    "detail": "GPA: 3.4 / 4.0 · Expected Graduation: 2024 – 2028"
+  },
+  "quickFacts": [
+    { "label": "Based in", "value": "Multan, Pakistan" },
+    { "label": "Degree", "value": "BS Software Engineering" },
+    { "label": "Focus", "value": "Backend & full-stack" },
+    { "label": "Status", "value": "Open to work" }
+  ]
+}

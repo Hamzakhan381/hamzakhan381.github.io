@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { profile } from './content'
+import { profile } from '../content'
 import { MS_PER_SECOND } from './math'
 
 export type Repo = {

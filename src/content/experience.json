@@ -1,0 +1,41 @@
+[
+  {
+    "role": "Web Developer",
+    "org": "Arch Technologies",
+    "period": "Dec 2025 – Present",
+    "type": "Full-time",
+    "summary": "Designing and delivering scalable web solutions for real-world clients.",
+    "highlights": [
+      "Architecting modern frontend interfaces with React and Next.js",
+      "Optimising backend performance for client applications",
+      "Driving measurable growth in client digital presence"
+    ],
+    "stack": ["React", "Next.js", "TypeScript"]
+  },
+  {
+    "role": "Internship Trainee",
+    "org": "SPS, Inc.",
+    "period": "Oct 2025 – Jan 2026",
+    "type": "Internship",
+    "summary": "Hands-on industry exposure to enterprise software workflows.",
+    "highlights": [
+      "Contributed to structured team sprints",
+      "Maintained and improved an existing codebase",
+      "Bridged academic knowledge and professional engineering practice"
+    ],
+    "stack": ["Git", "Agile"]
+  },
+  {
+    "role": "Founder & Technical Writer",
+    "org": "BlogWithHamza",
+    "period": "Mar 2025 – Oct 2025",
+    "type": "Self-employed",
+    "summary": "Founded and grew a technical blog that simplifies backend systems for developers.",
+    "highlights": [
+      "Wrote in-depth guides on backend systems, database design and software architecture",
+      "Broke complex concepts into tutorials for developers worldwide",
+      "Built a loyal readership of engineering enthusiasts"
+    ],
+    "stack": ["Backend", "Databases", "Architecture"]
+  }
+]
