@@ -1,0 +1,238 @@
+{
+  "narrowAspect": 0.85,
+  "camera": {
+    "fov": 40,
+    "z": 9,
+    "parallax": [
+      0.45,
+      0.3
+    ],
+    "damping": 2.5
+  },
+  "background": {
+    "dark": "#050607",
+    "light": "#f3f4f6"
+  },
+  "palette": {
+    "dark": {
+      "base": "#e8edf3",
+      "accent": "#38bdf8"
+    },
+    "light": {
+      "base": "#0b0d10",
+      "accent": "#0284c7"
+    }
+  },
+  "particles": {
+    "desktop": 18000,
+    "mobile": 8000,
+    "size": 30,
+    "accentRatio": 0.2,
+    "pointerRadius": 1.2,
+    "pointerForce": 0.7,
+    "velocityForFullScatter": 45,
+    "maxScatter": 0.9,
+    "idleScatter": 0.03,
+    "morphSwirl": 1.4,
+    "morphDuration": 2.1,
+    "layoutDuration": 1.6,
+    "idleSpin": 0.08
+  },
+  "dust": {
+    "desktop": 1400,
+    "mobile": 500,
+    "spread": 24,
+    "depth": 30,
+    "size": 16,
+    "rise": 6
+  },
+  "scroll": {
+    "turn": 2.4,
+    "rise": 1.8,
+    "fade": 0.6,
+    "mobileFade": 0.75
+  },
+  "pages": {
+    "/": {
+      "shape": "planet",
+      "x": 0.56,
+      "y": 0,
+      "z": 0,
+      "scale": 0.82,
+      "tilt": [
+        0.32,
+        0,
+        -0.18
+      ],
+      "mobile": {
+        "x": 0,
+        "y": 1.9,
+        "z": -2,
+        "scale": 0.72
+      }
+    },
+    "/about": {
+      "shape": "helix",
+      "x": 0.52,
+      "y": 0,
+      "z": -0.5,
+      "scale": 1,
+      "tilt": [
+        0,
+        0,
+        0.42
+      ],
+      "mobile": {
+        "x": 0,
+        "y": 1.6,
+        "z": -2,
+        "scale": 0.7
+      }
+    },
+    "/services": {
+      "shape": "cubes",
+      "x": 0.5,
+      "y": 0.1,
+      "z": -0.5,
+      "scale": 1,
+      "tilt": [
+        0.5,
+        0.65,
+        0
+      ],
+      "mobile": {
+        "x": 0,
+        "y": 1.7,
+        "z": -2,
+        "scale": 0.72
+      }
+    },
+    "/projects": {
+      "shape": "galaxy",
+      "x": 0,
+      "y": -0.6,
+      "z": -3,
+      "scale": 1.35,
+      "tilt": [
+        1.12,
+        0,
+        0
+      ],
+      "mobile": {
+        "x": 0,
+        "y": 0.4,
+        "z": -3,
+        "scale": 0.95
+      }
+    },
+    "/cv": {
+      "shape": "document",
+      "x": 0.56,
+      "y": 0,
+      "z": -1,
+      "scale": 1,
+      "tilt": [
+        0.1,
+        -0.5,
+        0.06
+      ],
+      "mobile": {
+        "x": 0,
+        "y": 1.6,
+        "z": -2,
+        "scale": 0.7
+      }
+    },
+    "/contact": {
+      "shape": "hello",
+      "x": 0.6,
+      "y": 1.9,
+      "z": -0.5,
+      "scale": 0.75,
+      "tilt": [
+        0,
+        -0.25,
+        0
+      ],
+      "mobile": {
+        "x": 0,
+        "y": 2.1,
+        "z": -2,
+        "scale": 0.5
+      }
+    },
+    "*": {
+      "shape": "scatter",
+      "x": 0,
+      "y": 0,
+      "z": -2,
+      "scale": 1,
+      "tilt": [
+        0,
+        0,
+        0
+      ],
+      "mobile": {
+        "x": 0,
+        "y": 0,
+        "z": -2,
+        "scale": 1
+      }
+    }
+  },
+  "shapes": {
+    "planet": {
+      "radius": 1.85,
+      "ringShare": 0.32,
+      "ringInner": 2.5,
+      "ringOuter": 3.5,
+      "ringThickness": 0.06,
+      "shell": 0.07
+    },
+    "helix": {
+      "height": 5.6,
+      "radius": 1.05,
+      "turns": 2.25,
+      "rungs": 28,
+      "rungShare": 0.26,
+      "jitter": 0.07
+    },
+    "cubes": {
+      "grid": 3,
+      "size": 0.74,
+      "spacing": 1.06
+    },
+    "galaxy": {
+      "arms": 3,
+      "radius": 4.2,
+      "twist": 2.6,
+      "spread": 0.42,
+      "thickness": 0.22,
+      "coreShare": 0.16,
+      "coreRadius": 0.6
+    },
+    "document": {
+      "sheets": 3,
+      "width": 2.4,
+      "height": 3.2,
+      "gap": 0.42,
+      "lineGap": 0.17,
+      "margin": 0.24,
+      "outlineShare": 0.16,
+      "headerShare": 0.1,
+      "drift": 0.16
+    },
+    "hello": {
+      "label": "HELLO",
+      "width": 5.4,
+      "depth": 0.32,
+      "canvasWidth": 1024,
+      "canvasHeight": 256,
+      "fontSize": 200,
+      "step": 2
+    },
+    "scatter": {
+      "radius": 7
+    }
+  }
+}

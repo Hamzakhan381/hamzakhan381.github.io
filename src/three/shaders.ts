@@ -47,118 +47,80 @@ float snoise(vec3 v){
 }
 `
 
-export const coreVertex = /* glsl */ `
-uniform float uTime;
-uniform float uAmp;
-uniform float uFreq;
-varying vec3 vNormal;
-varying vec3 vView;
-varying float vNoise;
-${noise3d}
-void main() {
-  float n = snoise(position * uFreq + vec3(uTime * 0.22));
-  float detail = snoise(position * uFreq * 2.4 - vec3(uTime * 0.35)) * 0.35;
-  vec3 displaced = position + normal * (n + detail) * uAmp;
-  vNoise = n * 0.5 + 0.5;
-  vec4 mv = modelViewMatrix * vec4(displaced, 1.0);
-  vView = normalize(-mv.xyz);
-  vNormal = normalize(normalMatrix * normal);
-  gl_Position = projectionMatrix * mv;
-}
-`
-
-export const coreFragment = /* glsl */ `
-uniform vec3 uColorA;
-uniform vec3 uColorB;
-uniform vec3 uRim;
-uniform float uTime;
-uniform float uOpacity;
-varying vec3 vNormal;
-varying vec3 vView;
-varying float vNoise;
-void main() {
-  float fresnel = pow(1.0 - max(dot(vNormal, vView), 0.0), 2.4);
-  vec3 col = mix(uColorA, uColorB, smoothstep(0.15, 0.85, vNoise));
-  float contour = smoothstep(0.9, 1.0, sin(vNoise * 70.0 - uTime * 1.6));
-  col += contour * 0.22 * uColorB;
-  col = mix(col, uRim, fresnel);
-  col += fresnel * 0.55;
-  gl_FragColor = vec4(col, uOpacity);
-}
-`
-
-export const particleVertex = /* glsl */ `
-attribute float aScale;
+export const sculptureVertex = /* glsl */ `
+attribute vec3 aTo;
+attribute float aDelay;
 attribute float aSeed;
+uniform float uProgress;
 uniform float uTime;
 uniform float uSize;
 uniform float uPixelRatio;
-uniform float uWarp;
-uniform float uFogNear;
-uniform float uFogFar;
+uniform float uScatter;
+uniform float uSwirl;
+uniform float uOpacity;
+uniform vec3 uPointer;
+uniform float uPointerRadius;
+uniform float uPointerForce;
 varying float vSeed;
 varying float vAlpha;
+${noise3d}
 void main() {
-  vec4 mv = modelViewMatrix * vec4(position, 1.0);
+  float stagger = 0.4;
+  float p = clamp((uProgress - aDelay * stagger) / (1.0 - stagger), 0.0, 1.0);
+  p = p * p * (3.0 - 2.0 * p);
+  vec3 pos = mix(position, aTo, p);
+  vec3 q = pos * 0.55 + vec3(uTime * 0.18);
+  vec3 swirl = vec3(snoise(q), snoise(q + 17.3), snoise(q + 41.7));
+  pos += swirl * (sin(p * 3.14159265) * uSwirl + uScatter);
+  vec3 away = pos - uPointer;
+  float dist = length(away) + 0.0001;
+  pos += (away / dist) * smoothstep(uPointerRadius, 0.0, dist) * uPointerForce;
+  vec4 mv = modelViewMatrix * vec4(pos, 1.0);
   gl_Position = projectionMatrix * mv;
-  float twinkle = 0.55 + 0.45 * sin(uTime * 1.4 + aSeed * 40.0);
-  gl_PointSize = uSize * aScale * uPixelRatio * (1.0 + uWarp) / -mv.z;
+  gl_PointSize = uSize * (0.45 + aSeed * 0.9) * uPixelRatio / -mv.z;
   vSeed = aSeed;
-  vAlpha = twinkle * smoothstep(uFogFar, uFogNear, -mv.z);
+  vAlpha = uOpacity * (0.6 + 0.4 * sin(uTime * 1.7 + aSeed * 60.0));
 }
 `
 
-export const particleFragment = /* glsl */ `
-uniform vec3 uColorA;
-uniform vec3 uColorB;
+export const sculptureFragment = /* glsl */ `
+uniform vec3 uBase;
+uniform vec3 uAccent;
+uniform float uAccentRatio;
 varying float vSeed;
 varying float vAlpha;
 void main() {
   float d = length(gl_PointCoord - 0.5);
-  float a = smoothstep(0.5, 0.0, d);
-  vec3 col = mix(uColorA, uColorB, vSeed);
-  col = mix(col, vec3(1.0), step(0.92, vSeed));
-  gl_FragColor = vec4(col, a * a * vAlpha);
+  if (d > 0.5) discard;
+  float a = smoothstep(0.5, 0.08, d);
+  vec3 col = mix(uBase, uAccent, step(1.0 - uAccentRatio, vSeed));
+  gl_FragColor = vec4(col, a * vAlpha);
 }
 `
 
-export const gridVertex = /* glsl */ `
+export const dustVertex = /* glsl */ `
+attribute float aSeed;
 uniform float uTime;
-varying vec2 vUv;
-varying float vHeight;
-varying float vDepth;
-${noise3d}
+uniform float uSize;
+uniform float uPixelRatio;
+varying float vAlpha;
 void main() {
   vec3 p = position;
-  float h = sin(p.x * 0.17 + uTime * 0.55) * 0.55
-          + cos(p.y * 0.21 + uTime * 0.4) * 0.55
-          + snoise(vec3(p.xy * 0.07, uTime * 0.08)) * 1.6;
-  float valley = smoothstep(3.0, 16.0, abs(p.x));
-  p.z += h * valley;
-  vHeight = h * valley;
-  vUv = uv;
+  p.y += sin(uTime * 0.2 + aSeed * 20.0) * 0.3;
   vec4 mv = modelViewMatrix * vec4(p, 1.0);
-  vDepth = -mv.z;
   gl_Position = projectionMatrix * mv;
+  gl_PointSize = uSize * (0.3 + aSeed) * uPixelRatio / -mv.z;
+  vAlpha = (0.25 + 0.35 * sin(uTime * 0.9 + aSeed * 40.0)) * smoothstep(40.0, 6.0, -mv.z);
 }
 `
 
-export const gridFragment = /* glsl */ `
-uniform vec3 uColorA;
-uniform vec3 uColorB;
-uniform float uCells;
-uniform float uFogNear;
-uniform float uFogFar;
+export const dustFragment = /* glsl */ `
+uniform vec3 uColor;
 uniform float uOpacity;
-varying vec2 vUv;
-varying float vHeight;
-varying float vDepth;
+varying float vAlpha;
 void main() {
-  vec2 g = vUv * uCells;
-  vec2 w = abs(fract(g - 0.5) - 0.5) / fwidth(g);
-  float line = 1.0 - min(min(w.x, w.y), 1.0);
-  vec3 col = mix(uColorA, uColorB, clamp(vHeight * 0.35 + 0.5, 0.0, 1.0));
-  float fade = smoothstep(uFogFar, uFogNear, vDepth);
-  gl_FragColor = vec4(col * (line * 1.5 + 0.06), (line * 0.85 + 0.04) * fade * uOpacity);
+  float d = length(gl_PointCoord - 0.5);
+  if (d > 0.5) discard;
+  gl_FragColor = vec4(uColor, smoothstep(0.5, 0.0, d) * vAlpha * uOpacity);
 }
 `

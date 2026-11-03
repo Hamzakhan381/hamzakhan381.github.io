@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
-import { profile } from '../lib/content'
 
 const PERCENT = 100
 const CREEP_LIMIT = 86
@@ -43,7 +42,7 @@ export function Loader({ ready, onDone }: { ready: boolean; onDone: () => void }
             <span key={face} className={`loader__face loader__face--${face}`} />
           ))}
         </div>
-        <p className="loader__name">{profile.short}</p>
+        <p className="loader__name">HAMZA KHAN</p>
         <div className="loader__bar">
           <span style={{ transform: `scaleX(${progress / PERCENT})` }} />
         </div>

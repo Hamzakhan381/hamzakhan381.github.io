@@ -22,7 +22,7 @@ export type RepoState =
   | { status: 'error' }
   | { status: 'ready'; repos: Repo[] }
 
-const SHOWN = 6
+const SHOWN = 8
 const PER_PAGE = 30
 const SECONDS_PER_HOUR = 3600
 const CACHE_TTL_MS = SECONDS_PER_HOUR * MS_PER_SECOND

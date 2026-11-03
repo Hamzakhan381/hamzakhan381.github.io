@@ -1,11 +1,44 @@
 {
   "perspective": 1100,
   "scrub": 0.8,
-  "depth": { "rotateX": 70, "z": -260, "y": 60 },
-  "fly": { "z": -700, "rotateX": 28, "rotateY": 22, "y": 120 },
-  "timeline": { "rotateY": 65, "z": -420, "x": 160 },
-  "heroOut": { "z": -520, "rotateX": 22, "y": -60 },
-  "sectionOut": { "rotateX": 12, "z": -160 },
-  "sectionOutOpacity": 0.2,
-  "intro": { "charRotate": -100, "charStagger": 0.022, "duration": 1.1, "fadeY": 30, "fadeStagger": 0.12, "lineDelay": 0.25 }
+  "depth": {
+    "rotateX": 70,
+    "z": -260,
+    "y": 60
+  },
+  "fly": {
+    "z": -700,
+    "rotateX": 28,
+    "rotateY": 22,
+    "y": 120
+  },
+  "swing": {
+    "rotateY": 65,
+    "z": -420,
+    "x": 160
+  },
+  "stair": {
+    "rotateX": 55,
+    "z": -500,
+    "y": 160
+  },
+  "intro": {
+    "charRotate": -100,
+    "charStagger": 0.02,
+    "duration": 1.1,
+    "fadeY": 30,
+    "fadeStagger": 0.1,
+    "lineDelay": 0.18
+  },
+  "paperLand": {
+    "rotateX": 62,
+    "z": -500,
+    "y": 220,
+    "duration": 1.6,
+    "delay": 0.35
+  },
+  "paperScrollTilt": {
+    "start": 6,
+    "end": -5
+  }
 }

@@ -1,0 +1,38 @@
+[
+  {
+    "path": "/",
+    "label": "Home",
+    "title": "Muhammad Hamza Khan — Full-Stack Engineer",
+    "description": "Portfolio of Muhammad Hamza Khan, a full-stack engineer focused on scalable systems, backend architecture and modern web interfaces."
+  },
+  {
+    "path": "/about",
+    "label": "About",
+    "title": "About — Muhammad Hamza Khan",
+    "description": "Background, career trajectory and skills of Muhammad Hamza Khan, Software Engineering student at Air University, Multan."
+  },
+  {
+    "path": "/services",
+    "label": "Services",
+    "title": "Services — Muhammad Hamza Khan",
+    "description": "Full-stack development, software architecture, UI/UX, cloud, data and network engineering services."
+  },
+  {
+    "path": "/projects",
+    "label": "Projects",
+    "title": "Projects — Muhammad Hamza Khan",
+    "description": "Live GitHub repositories and case studies by Muhammad Hamza Khan."
+  },
+  {
+    "path": "/cv",
+    "label": "CV",
+    "title": "CV — Muhammad Hamza Khan",
+    "description": "Printable CV of Muhammad Hamza Khan: experience, projects, technical skills and education."
+  },
+  {
+    "path": "/contact",
+    "label": "Contact",
+    "title": "Contact — Muhammad Hamza Khan",
+    "description": "Get in touch with Muhammad Hamza Khan for projects, roles and collaborations."
+  }
+]

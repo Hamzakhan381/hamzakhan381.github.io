@@ -4,7 +4,7 @@ import { Fragment } from 'react'
 export function SplitText({ text, className = '' }: { text: string; className?: string }) {
   const words = text.split(' ')
   return (
-    <span className={className} aria-label={text} role="text">
+    <span className={`split-line ${className}`} aria-label={text} role="text">
       {words.map((word, w) => (
         <Fragment key={`${word}-${w}`}>
           <span className="split-word" aria-hidden="true">
