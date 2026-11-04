@@ -7,13 +7,13 @@ missing or misspelled, the build fails and tells you which one.
 | File | What it controls |
 | --- | --- |
 | `profile.json` | Name, role, email, phone, location, availability badge, photo, social links |
-| `home.json` | Home hero, tech marquee, the five architecture layers, terminal session (plus the line it prints when a visitor clicks in to type commands), featured project slugs, stats, testimonials |
+| `home.json` | The Home journey: intro terminal lines and pitch, main tech stack, the about paragraph (words in [brackets] light up in the accent colour), terminal session (plus the line it prints when a visitor clicks in to type commands), stats, git log heading, featured project slugs for the card deck, the closing section, testimonials |
 | `about.json` | About hero, bio paragraphs, highlight numbers, principles, "Right now", certifications |
 | `experience.json` | Jobs shown in the git log (newest first); each one also gets a glowing band in the 3D code DNA helix on the About page |
 | `education.json` | Degrees and focus areas |
 | `skills.json` | Skill bars (`level` is 0–100) and the tools list |
 | `services.json` | Services (one rack unit each), process, ways to work together, FAQ |
-| `projects.json` | Every project. `featured: true` puts it in the 3D depth gallery; `category` must be one of `categories` |
+| `projects.json` | Projects page hero and headings, plus every project (each one gets a case-study card and a dialog); `category` must be one of `categories`. The Home deck shows the slugs listed in `home.json` |
 | `contact.json` | Contact hero, form title and topic chips |
 | `cv.json` | Everything on the printable CV page |
 

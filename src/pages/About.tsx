@@ -1,61 +1,18 @@
-import { about, education, experience, home, profile, skills } from '../content'
+import { about, education, experience, profile, skills } from '../content'
 import { usePageEffects } from '../lib/usePageEffects'
 import { useFocusIndex } from '../lib/useFocusIndex'
+import { branchSlug, fakeHash } from '../lib/commit'
+import { profileCode, profileFile } from '../lib/profileCode'
 import { PageHero } from '../components/PageHero'
 import { SectionHead } from '../components/Section'
-import { CodeWindow, type CodeLine, type Token } from '../components/CodeWindow'
+import { CodeWindow } from '../components/CodeWindow'
 import { SkillBars } from '../components/SkillBars'
 import { Icon } from '../components/Icon'
 import { Tilt } from '../components/Tilt'
 import { Rail } from '../components/Rail'
 
 const INDEX_DIGITS = 2
-const HASH_LENGTH = 7
-const HASH_SEED = 7
-const HASH_MULTIPLIER = 31
-const HEX = 16
-const STACK_IN_CODE = 4
 const pad = (n: number) => String(n).padStart(INDEX_DIGITS, '0')
-
-/** Short stable pseudo commit hash for decoration, derived from the text. */
-const fakeHash = (text: string) =>
-  Array.from(text)
-    .reduce((h, ch) => (h * HASH_MULTIPLIER + ch.charCodeAt(0)) >>> 0, HASH_SEED)
-    .toString(HEX)
-    .padStart(HASH_LENGTH, '0')
-    .slice(0, HASH_LENGTH)
-
-const slug = (text: string) => text.toLowerCase().split(' ').filter(Boolean).join('-').replaceAll(',', '').replaceAll('.', '')
-
-const str = (value: string): Token => ({ text: `'${value}'`, kind: 'str' })
-const field = (key: string, value: Token[]): CodeLine => [{ text: '  ' }, { text: key, kind: 'key' }, { text: ': ' }, ...value, { text: ',' }]
-const list = (values: string[]): Token[] => [
-  { text: '[' },
-  ...values.flatMap((v, i) => (i ? [{ text: ', ' }, str(v)] : [str(v)])),
-  { text: ']' },
-]
-
-const school = education[0]
-const profileCode: CodeLine[] = [
-  [{ text: `// ${profile.firstName.toLowerCase()}.ts`, kind: 'com' }],
-  [{ text: 'import', kind: 'kw' }, { text: ' type ' }, { text: '{ Engineer }', kind: 'type' }, { text: ' from ' }, str('./humans')],
-  [],
-  [
-    { text: 'export const', kind: 'kw' },
-    { text: ` ${profile.firstName.toLowerCase()}` },
-    { text: ': ' },
-    { text: 'Engineer', kind: 'type' },
-    { text: ' = {' },
-  ],
-  field('name', [str(profile.name)]),
-  field('role', [str(profile.role)]),
-  field('based', [str(profile.location)]),
-  ...(school ? [field('studying', [str(`${school.degree} @ ${school.school}`)])] : []),
-  field('focus', list(profile.titles)),
-  field('stack', list(home.marquee.slice(0, STACK_IN_CODE))),
-  field('openToWork', [{ text: String(profile.availability.open), kind: 'bool' }]),
-  [{ text: '}' }],
-]
 
 function Experience() {
   const { ref, active } = useFocusIndex<HTMLOListElement>()
@@ -68,7 +25,7 @@ function Experience() {
             <Tilt className="card gitlog__card" data-swing>
               <p className="gitlog__meta">
                 <span className="gitlog__hash">commit {fakeHash(job.org + job.role)}</span>
-                <span className="gitlog__branch">feat/{slug(job.org)}</span>
+                <span className="gitlog__branch">feat/{branchSlug(job.org)}</span>
               </p>
               <p className="gitlog__date">
                 {job.period} · {job.type}
@@ -145,7 +102,7 @@ export default function About() {
 
       <section className="section container split">
         <SectionHead eyebrow="In code" title="The short version," accent="typed." lead="Same facts, different syntax." />
-        <CodeWindow filename={`${profile.firstName.toLowerCase()}.ts`} lines={profileCode} />
+        <CodeWindow filename={profileFile} lines={profileCode} />
       </section>
 
       <Experience />

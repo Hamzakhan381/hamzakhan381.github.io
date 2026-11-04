@@ -696,8 +696,8 @@ html[data-quality='low'] .to-top {
 }
 
 html[data-quality='low'] .pulse-dot,
-html[data-quality='low'] .marquee__track,
-html[data-quality='low'] .scroll-hint {
+html[data-quality='low'] .caret,
+html[data-quality='low'] .jhero__mouse::after {
   animation: none;
 }
 
@@ -969,122 +969,661 @@ html[data-quality='low'] .scroll-hint {
   font-size: clamp(2.4rem, 5vw, 4.4rem);
 }
 
-/* ---------- Home ---------- */
+/* ---------- Home: the scroll journey ---------- */
 
-.home-hero {
+/* 0 · Boot. The intro is pinned while the name flies apart and the laptop opens. */
+.jdive__stage {
   position: relative;
-  min-height: 100svh;
+  height: 100svh;
+  min-height: 560px;
+  overflow: hidden;
 }
 
-.home-hero .page-hero {
-  min-height: 100svh;
+.jhero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  padding-top: 96px;
   padding-bottom: 150px;
 }
 
-.marquee {
+.jhero__hud {
   position: absolute;
-  inset: auto 0 64px;
-  overflow: hidden;
-  padding: 14px 0;
-  transform: perspective(900px) rotateX(28deg) rotateZ(-2deg);
-  mask-image: linear-gradient(90deg, transparent, #000 15%, #000 85%, transparent);
-  border-block: 1px solid var(--border);
-  background: color-mix(in srgb, var(--bg) 55%, transparent);
+  top: 116px;
+  right: var(--gutter);
+  font: 500 0.72rem/1.9 var(--font-mono);
+  color: var(--faint);
+  text-align: right;
 }
 
-.marquee__track {
-  display: flex;
-  gap: 44px;
-  width: max-content;
-  animation: marquee 34s linear infinite;
-  font: 500 0.95rem var(--font-mono);
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.marquee__track span::after {
-  content: '✦';
-  margin-left: 44px;
-  color: var(--accent-bright);
-}
-
-@keyframes marquee {
-  to {
-    transform: translateX(-50%);
-  }
-}
-
-.scroll-hint {
-  position: absolute;
-  left: 50%;
-  bottom: 18px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
+.jhero__hud p {
   margin: 0;
-  transform: translateX(-50%);
-  font: 500 0.72rem var(--font-mono);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--muted);
-  animation: hint 2.4s ease-in-out infinite;
 }
 
-@keyframes hint {
-  50% {
-    transform: translate(-50%, 6px);
-    opacity: 0.6;
-  }
-}
-
-.layers__list {
-  display: grid;
-  gap: 22vh;
-  max-width: min(600px, 55%);
-  margin: 0;
-  padding: 0 0 18vh;
-  list-style: none;
-  perspective: 1400px;
-}
-
-.layer {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 20px;
-  padding: 28px;
-  transition:
-    border-color 0.4s,
-    transform 0.4s var(--ease-out);
-}
-
-.layer.is-active {
-  border-color: var(--accent);
-  box-shadow:
-    0 0 0 1px var(--accent),
-    var(--card-shadow-hover);
-}
-
-.layer__num {
-  font: 500 0.85rem var(--font-mono);
+.jhero__hud p:last-child {
   color: var(--accent);
 }
 
-.layer h3 {
+.jhero__copy {
+  max-width: min(780px, 64%);
+}
+
+.jhero__eyebrow {
+  margin-bottom: 18px;
+}
+
+.jhero__name {
   margin: 0;
-  font: 600 1.7rem/1.1 var(--font-display);
-  letter-spacing: -0.04em;
+  font: 700 clamp(3rem, 8.6vw, 8.2rem) / 0.92 var(--font-display);
+  letter-spacing: -0.05em;
+  text-transform: uppercase;
 }
 
-.layer__tagline {
-  margin: 4px 0 12px;
-  font: 500 0.82rem var(--font-mono);
+/* Decrypting letters: the real letter keeps the width, a glyph is drawn over it until it settles. */
+.dx-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.dx {
+  position: relative;
+  display: inline-block;
+  color: transparent;
+}
+
+.dx::after {
+  content: attr(data-g);
+  position: absolute;
+  inset: 0;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-weight: 500;
+  text-align: center;
+}
+
+.dx.is-done {
+  color: inherit;
+}
+
+.dx.is-done::after {
+  content: none;
+}
+
+.jhero__intro {
+  max-width: 580px;
+}
+
+.jhero__role {
+  margin: 22px 0 0;
+  font: 500 clamp(1rem, 1.6vw, 1.25rem) var(--font-mono);
+  color: var(--accent);
+}
+
+.jhero__prompt {
+  color: var(--faint);
+}
+
+.type-cycle {
+  white-space: nowrap;
+}
+
+.caret {
+  display: inline-block;
+  width: 0.55em;
+  height: 1.1em;
+  margin-left: 3px;
+  vertical-align: -0.2em;
+  background: currentColor;
+  animation: caret 1s steps(1) infinite;
+}
+
+@keyframes caret {
+  50% {
+    opacity: 0;
+  }
+}
+
+.jhero__lead {
+  max-width: 52ch;
+  margin: 16px 0 28px;
+  font-size: clamp(1rem, 1.3vw, 1.12rem);
   color: var(--muted);
 }
 
-.layer p:not(.layer__tagline) {
-  margin: 0 0 16px;
+.jhero__hint {
+  position: absolute;
+  inset: auto 0 26px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: max-content;
+  margin: 0 auto;
+  font: 500 0.72rem var(--font-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   color: var(--muted);
+}
+
+.jhero__mouse {
+  position: relative;
+  width: 22px;
+  height: 34px;
+  border: 1.5px solid var(--border-strong);
+  border-radius: 12px;
+}
+
+.jhero__mouse::after {
+  content: '';
+  position: absolute;
+  top: 7px;
+  left: 50%;
+  width: 3px;
+  height: 7px;
+  margin-left: -1.5px;
+  border-radius: 2px;
+  background: var(--accent);
+  animation: wheel 1.6s ease-in-out infinite;
+}
+
+@keyframes wheel {
+  70% {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* The laptop: CSS 3D planes. The body is tipped towards you so you look down on the keyboard; the lid swings on
+   its bottom edge, with the editor on its front face and the logo on its back. */
+.laptop {
+  --w: min(760px, 86vw);
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: var(--w);
+  margin-inline: auto;
+  perspective: 1600px;
+  pointer-events: none;
+  transform-origin: 50% 50%;
+}
+
+.laptop__body {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10.4;
+  transform: rotateX(-20deg);
+  transform-style: preserve-3d;
+}
+
+.laptop__lid {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 100%;
+  transform-style: preserve-3d;
+}
+
+.laptop__screen,
+.laptop__cover {
+  position: absolute;
+  inset: 0;
+  border-radius: 16px 16px 6px 6px;
+  backface-visibility: hidden;
+}
+
+.laptop__screen {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: calc(var(--w) * 0.014) solid #1a1d22;
+  background: var(--editor-bg);
+  box-shadow: 0 0 90px -12px rgba(56, 189, 248, 0.35);
+  font-size: calc(var(--w) * 0.0175);
+}
+
+.laptop__cover {
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(160deg, #2a3037, #121519);
+  transform: rotateY(180deg);
+}
+
+.laptop__logo {
+  font: 700 calc(var(--w) * 0.07) var(--font-mono);
+  color: var(--accent);
+  text-shadow: 0 0 26px rgba(56, 189, 248, 0.75);
+}
+
+.laptop__bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.7em 1em;
+  border-bottom: 1px solid var(--editor-border);
+  background: var(--editor-bar);
+}
+
+.laptop__tab {
+  margin-left: 0.8em;
+  font: 500 0.85em var(--font-mono);
+  color: var(--editor-muted);
+}
+
+.laptop__code {
+  flex: 1;
+  margin: 0;
+  padding: 1em 1.2em;
+  overflow: hidden;
+  font: 400 1em/1.75 var(--font-mono);
+  color: var(--editor-fg);
+  white-space: pre;
+}
+
+.laptop__num {
+  display: inline-block;
+  width: 2.2em;
+  color: var(--editor-faint);
+}
+
+.laptop__status {
+  display: flex;
+  gap: 1.6em;
+  padding: 0.45em 1em;
+  background: #0b3a55;
+  font: 500 0.72em var(--font-mono);
+  color: #cbeafc;
+}
+
+.laptop__base {
+  position: absolute;
+  top: 100%;
+  right: -4%;
+  left: -4%;
+  height: calc(var(--w) * 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0 0 18px 18px;
+  background: linear-gradient(180deg, #252a31, #14171b);
+  transform: rotateX(90deg);
+  transform-origin: 50% 0;
+}
+
+.laptop__keys {
+  position: absolute;
+  top: 9%;
+  right: 8%;
+  left: 8%;
+  height: 46%;
+  border-radius: 8px;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 calc(100% / 14 - 3px), #0c0e11 calc(100% / 14 - 3px) calc(100% / 14)),
+    repeating-linear-gradient(0deg, transparent 0 calc(100% / 5 - 3px), #0c0e11 calc(100% / 5 - 3px) calc(100% / 5)),
+    #2e343c;
+}
+
+.laptop__pad {
+  position: absolute;
+  top: 62%;
+  right: 34%;
+  left: 34%;
+  height: 28%;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  background: #1c2025;
+}
+
+/* 1 · About: the paragraph lights up word by word beside the terminal. */
+.jabout__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: clamp(28px, 5vw, 72px);
+  align-items: start;
+  margin-bottom: clamp(48px, 8vw, 96px);
+}
+
+.words {
+  margin: 0;
+  font: 600 clamp(1.6rem, 3.2vw, 2.7rem) / 1.25 var(--font-display);
+  letter-spacing: -0.03em;
+}
+
+.word--hot {
+  color: var(--accent);
+}
+
+.jabout__term {
+  position: sticky;
+  top: 120px;
+}
+
+.jabout__hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 0;
+  font: 500 0.78rem var(--font-mono);
+  color: var(--muted);
+}
+
+/* 2 · Experience: a beam runs down the git log and lights each commit it reaches. */
+.beam {
+  --track: clamp(10px, 2vw, 22px);
+  --gap: clamp(36px, 6vw, 72px);
+  position: relative;
+  padding-left: var(--gap);
+}
+
+.beam__track {
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: var(--track);
+  width: 2px;
+  border-radius: 2px;
+  background: var(--border);
+}
+
+.beam__fill {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent, var(--accent) 10%, var(--accent));
+  box-shadow: 0 0 12px var(--accent);
+  transform-origin: 50% 0;
+}
+
+.beam__runner {
+  position: absolute;
+  inset: 0;
+}
+
+.beam__head {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  margin: 0 0 -6px -6px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow:
+    0 0 0 4px rgba(56, 189, 248, 0.35),
+    0 0 26px 8px rgba(56, 189, 248, 0.55);
+}
+
+.beam__list {
+  display: grid;
+  gap: clamp(28px, 7vh, 72px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.beam__item {
+  position: relative;
+}
+
+.beam__node {
+  position: absolute;
+  top: 30px;
+  left: calc(var(--track) - var(--gap) - 6px);
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--border-strong);
+  border-radius: 50%;
+  background: var(--bg);
+  transition:
+    background 0.4s,
+    border-color 0.4s,
+    box-shadow 0.4s;
+}
+
+.beam__item.is-lit .beam__node {
+  border-color: var(--accent);
+  background: var(--accent);
+  box-shadow:
+    0 0 0 5px var(--accent-soft),
+    0 0 18px var(--accent);
+}
+
+.beam__card {
+  padding: clamp(22px, 3vw, 32px);
+  transition: border-color 0.4s;
+}
+
+.beam__item.is-lit .beam__card {
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+}
+
+.beam__card h3 {
+  margin: 6px 0 10px;
+  font: 600 clamp(1.3rem, 2.2vw, 1.7rem) / 1.15 var(--font-display);
+  letter-spacing: -0.03em;
+}
+
+.beam__card > p:not(.gitlog__meta):not(.gitlog__date) {
+  margin: 0 0 14px;
+  color: var(--muted);
+}
+
+.beam.is-static .beam__runner {
+  display: none;
+}
+
+/* 3 · Projects: a deck. Each card sticks a little lower than the last; the scroll timeline adds the depth. */
+.cstack {
+  --stack-top: 104px;
+  --stack-step: 22px;
+  margin: 0 0 clamp(40px, 8vh, 80px);
+  padding: 0;
+  list-style: none;
+}
+
+.cstack__item {
+  position: sticky;
+  top: calc(var(--stack-top) + var(--i) * var(--stack-step));
+  margin-bottom: 14vh;
+}
+
+.cstack__item:last-child {
+  margin-bottom: 0;
+}
+
+.cstack__card {
+  position: relative;
+  border-radius: var(--radius);
+}
+
+.cstack__card .featured {
+  background: var(--bg-soft);
+  box-shadow:
+    0 -24px 60px -30px rgba(0, 0, 0, 0.9),
+    var(--card-shadow);
+}
+
+.cstack__dim {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.featured__total {
+  color: var(--faint);
+}
+
+/* 4 · Contact: the closing headline rolls up while the portal gathers again behind it. */
+.jfinale {
+  display: grid;
+  place-items: center;
+  min-height: 100svh;
+  padding: 120px 0;
+  text-align: center;
+}
+
+.jfinale__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.jfinale__title {
+  margin: 0;
+  font: 700 clamp(3rem, 10vw, 9rem) / 0.95 var(--font-display);
+  letter-spacing: -0.05em;
+}
+
+.roll-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.roll-char {
+  display: inline-block;
+}
+
+.jfinale__prompt {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: clamp(28px, 5vh, 48px) 0 18px;
+  padding: 14px 22px;
+  border: 1px solid var(--editor-border);
+  border-radius: 14px;
+  background: var(--editor-bg);
+  font: 500 clamp(0.95rem, 1.6vw, 1.2rem) var(--font-mono);
+  color: var(--editor-fg);
+  text-decoration: none;
+  transition:
+    border-color 0.3s,
+    box-shadow 0.3s,
+    transform 0.3s var(--ease-out);
+}
+
+.jfinale__prompt:hover,
+.jfinale__prompt:focus-visible {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+  transform: translateY(-2px);
+}
+
+.jfinale__ps1 {
+  color: var(--editor-green);
+}
+
+.jfinale__prompt .caret {
+  color: var(--accent);
+}
+
+.jfinale__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 28px;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+.jfinale__actions {
+  justify-content: center;
+}
+
+.footer__top--quiet {
+  justify-content: flex-end;
+}
+
+/* The readout in the left margin: the current step, read bottom to top, above a progress line for the page. It
+   runs vertically so it fits in the page gutter instead of sitting on top of the content. */
+.jhud {
+  position: fixed;
+  bottom: 28px;
+  left: 14px;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font: 500 0.7rem var(--font-mono);
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  pointer-events: none;
+}
+
+.jhud__count strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.jhud__label {
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.jhud__bar {
+  position: relative;
+  width: 2px;
+  height: 90px;
+  overflow: hidden;
+  background: var(--border);
+}
+
+.jhud__bar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+  transform: scaleY(var(--p, 0));
+  transform-origin: 50% 0;
+}
+
+/* Reduced motion: no pinned dive, so the laptop (which only exists for it) stays out of the way. */
+.journey.is-still .laptop {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .jabout__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .jabout__term {
+    position: static;
+  }
+
+  .jhud {
+    display: none;
+  }
+
+  .jhero__copy {
+    max-width: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .jhero {
+    justify-content: flex-start;
+    padding-top: 22svh;
+  }
+
+  .jhero__hud {
+    display: none;
+  }
+
+  .cstack {
+    --stack-top: 84px;
+    --stack-step: 14px;
+  }
+
+  .cstack .featured__screen {
+    display: none;
+  }
 }
 
 /* Terminal */
@@ -1266,111 +1805,6 @@ html[data-quality='low'] .scroll-hint {
   clip-path: inset(50%);
   white-space: nowrap;
   border: 0;
-}
-
-/* Featured cards */
-.feature-cards {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  perspective: 1400px;
-}
-
-.feature-card {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 12px;
-  height: 100%;
-  min-height: 320px;
-  padding: 28px;
-}
-
-.feature-card__num {
-  font: 500 0.8rem var(--font-mono);
-  color: var(--muted);
-}
-
-.feature-card h3 {
-  margin: 8px 0 0;
-  font: 600 1.8rem/1.05 var(--font-display);
-  letter-spacing: -0.04em;
-  transform: translateZ(40px);
-}
-
-.feature-card p {
-  flex: 1;
-  margin: 0;
-  color: var(--muted);
-  font-size: 0.95rem;
-}
-
-.feature-card__go {
-  align-self: flex-end;
-  display: grid;
-  place-items: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  border: 1px solid var(--border-strong);
-  font-size: 1.2rem;
-  transform: translateZ(60px);
-  transition:
-    background 0.3s,
-    color 0.3s,
-    transform 0.5s var(--ease-out);
-}
-
-.feature-card:hover .feature-card__go {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--on-accent);
-  transform: translateZ(60px) rotate(45deg);
-}
-
-/* Tag sphere */
-.sphere {
-  position: relative;
-  width: min(100%, 520px);
-  aspect-ratio: 1;
-  margin-inline: auto;
-  cursor: grab;
-  touch-action: pan-y;
-  user-select: none;
-}
-
-.sphere:active {
-  cursor: grabbing;
-}
-
-.sphere__tag {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  padding: 6px 12px;
-  border-radius: 999px;
-  border: 1px solid var(--border-strong);
-  background: var(--surface-strong);
-  font: 500 0.82rem var(--font-mono);
-  white-space: nowrap;
-  will-change: transform;
-  transition:
-    color 0.4s,
-    border-color 0.4s;
-}
-
-.sphere__tag:nth-child(5n + 1) {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-/* Tags on the far side recede into the muted colour (still readable) rather than fading out. */
-.sphere__tag.is-back {
-  border-color: var(--border);
-  color: var(--muted);
 }
 
 .quotes {
@@ -2058,37 +2492,7 @@ html[data-quality='low'] .scroll-hint {
   letter-spacing: -0.03em;
 }
 
-/* Depth gallery: panels fly along z inside a pinned stage. */
-.gallery__stage {
-  display: grid;
-  gap: 28px;
-  width: min(1200px, 100% - var(--gutter) * 2);
-  margin-inline: auto;
-}
-
-.gallery--pinned {
-  height: calc(var(--screens) * 100vh);
-}
-
-.gallery--pinned .gallery__stage {
-  position: sticky;
-  top: 0;
-  display: block;
-  width: 100%;
-  height: 100vh;
-  overflow: hidden;
-  perspective: 1400px;
-}
-
-.gallery--pinned .gallery__panel {
-  position: absolute;
-  top: 54%;
-  left: 50%;
-  width: min(1100px, 100% - var(--gutter) * 2);
-  will-change: transform, opacity;
-}
-
-.gallery--pinned .featured {
+.featured {
   background: var(--bg-soft);
 }
 
@@ -2157,14 +2561,6 @@ html[data-quality='low'] .scroll-hint {
   gap: 10px;
 }
 
-/* Filterable grid */
-.filter__chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 28px;
-}
-
 .filter__chip {
   display: inline-flex;
   align-items: center;
@@ -2197,59 +2593,50 @@ html[data-quality='low'] .scroll-hint {
   opacity: 0.6;
 }
 
-.filter__grid {
+/* Case studies: every project as a tilting card, two to a row. */
+.cases {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
+  perspective: 1400px;
 }
 
-.filter__grid li[hidden] {
-  display: none;
+.case {
+  padding: 32px;
 }
 
-.pcard {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding: 26px;
+.case h3 {
+  margin: 16px 0 2px;
+  font: 600 2rem/1.05 var(--font-display);
+  letter-spacing: -0.04em;
 }
 
-.pcard__top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 14px;
+.case__link {
+  color: inherit;
+  text-decoration: none;
 }
 
-.pcard__star {
-  font: 500 0.72rem var(--font-mono);
+.case__link:hover,
+.case__link:focus-visible {
   color: var(--accent);
 }
 
-.pcard h3 {
-  margin: 0;
-  font: 600 1.35rem/1.15 var(--font-display);
-  letter-spacing: -0.03em;
+.case__sub {
+  margin: 0 0 14px;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--accent);
 }
 
-.pcard__sub {
-  margin: 4px 0 12px;
-  font: 400 0.8rem var(--font-mono);
+.case p:not(.case__sub) {
+  margin: 0 0 20px;
   color: var(--muted);
 }
 
-.pcard > p:not(.pcard__sub) {
-  flex: 1;
-  margin: 0 0 16px;
-  color: var(--muted);
-  font-size: 0.93rem;
-}
-
-.pcard .tags {
-  margin-bottom: 16px;
+@media (max-width: 900px) {
+  .cases {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Live repos carousel */
@@ -3748,7 +4135,6 @@ html[data-quality='low'] .palette {
 /* ---------- Responsive ---------- */
 
 @media (max-width: 1100px) {
-  .feature-cards,
   .principles,
   .plans {
     grid-template-columns: repeat(2, 1fr);
@@ -3820,7 +4206,6 @@ html[data-quality='low'] .palette {
   }
 
   /* On phones the 3D scene sits above the text, so lists span the full width and need less scroll room. */
-  .layers__list,
   .gitlog,
   .svc {
     max-width: none;
@@ -3842,7 +4227,6 @@ html[data-quality='low'] .palette {
 }
 
 @media (max-width: 600px) {
-  .feature-cards,
   .principles,
   .plans,
   .stairs,
@@ -3877,15 +4261,6 @@ html[data-quality='low'] .palette {
 
   .actions .btn {
     flex: 1 1 auto;
-  }
-
-  .marquee {
-    bottom: 48px;
-  }
-
-  .layer {
-    grid-template-columns: 1fr;
-    gap: 8px;
   }
 
   .term__body,

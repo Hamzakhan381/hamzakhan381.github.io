@@ -41,20 +41,27 @@ export type Profile = {
   socials: Social[]
 }
 
-export type Layer = { name: string; tagline: string; text: string; tech: string[] }
 export type TerminalStep = { cmd: string; out: string[] }
 export type Stat = { value: number; suffix: string; label: string }
 export type Testimonial = { quote: string; name: string; role: string }
+/** A section heading with an accent phrase after the title, e.g. "git log" + "--career". */
+export type AccentHead = SectionHead & { accent: string }
 
+/** The Home page is one scroll journey: intro, about, experience, projects and a closing call to action. */
 export type Home = {
-  hero: Hero
-  marquee: string[]
-  layers: SectionHead & { accent: string; items: Layer[] }
+  /** The intro: terminal lines in the corner, a one-line pitch and the "scroll to enter" hint. */
+  hero: { hud: string[]; lead: string; hint: string }
+  /** Main technologies, shown in the profile code on the laptop screen and the About page. */
+  stack: string[]
+  /** Words in [brackets] light up in the accent colour as the paragraph reveals. */
+  about: AccentHead & { text: string }
   /** `welcome` is printed when a visitor clicks into the terminal; the commands live in src/lib/shell.ts. */
-  terminal: SectionHead & { lead: string; welcome: string; host: string; session: TerminalStep[] }
-  featured: SectionHead & { slugs: string[] }
-  stackSphere: SectionHead & { lead: string }
+  terminal: { welcome: string; host: string; hint: string; session: TerminalStep[] }
   stats: Stat[]
+  log: AccentHead & { lead: string }
+  featured: AccentHead & { lead: string; slugs: string[] }
+  /** The closing section: a big headline and a terminal prompt that leads to the contact page. */
+  finale: AccentHead & { prompt: string; cta: string }
   testimonials: Testimonial[]
   /** Speech bubble of the developer in the first-visit intro (the intro itself is drawn in index.html). */
   boot: { hello: string; line: string }
@@ -114,7 +121,14 @@ export type Project = {
   links: { github?: string; live?: string }
 }
 
-export type Projects = { hero: Hero; categories: string[]; items: Project[] }
+/** `ringHint` is added to the hero lead on wide screens, where the live repos sit on a draggable ring. */
+export type Projects = {
+  hero: Hero
+  ringHint: string
+  caseStudies: AccentHead
+  categories: string[]
+  items: Project[]
+}
 export type Contact = {
   hero: Hero
   formTitle: string

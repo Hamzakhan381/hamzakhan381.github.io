@@ -1,10 +1,12 @@
 {
   "hero": {
     "eyebrow": "Projects",
-    "lines": ["Things I've", "designed & built."],
+    "lines": ["Straight from", "my GitHub."],
     "accentLine": 1,
-    "lead": "Web platforms, systems in C++, databases, networks and UI case studies. Scroll through the featured work, then filter the rest."
+    "lead": "Pulled live from my repositories."
   },
+  "ringHint": "Drag the ring, use the arrows, or let it drift.",
+  "caseStudies": { "eyebrow": "Case studies", "title": "Beyond", "accent": "the code." },
   "categories": ["Web", "Systems", "Data", "Networking", "Mobile", "Design"],
   "items": [
     {

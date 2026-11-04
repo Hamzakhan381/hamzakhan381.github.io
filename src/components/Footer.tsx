@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router'
+import { Link, useLocation } from 'react-router'
 import routes from '../lib/routes.json'
+import { normalizePath } from '../lib/paths'
 import { profile } from '../content'
 import { Icon } from './Icon'
 import { SocialCube } from './SocialCube'
@@ -32,16 +33,20 @@ function LocalTime() {
 }
 
 export function Footer() {
+  // Home ends with its own "let's build" section, so the footer's call to action would only repeat it there.
+  const home = normalizePath(useLocation().pathname) === '/'
   return (
     <footer className="footer">
       <div className="container">
-        <div className="footer__top">
-          <Link to="/contact" className="footer__cta" data-reveal>
-            <span className="footer__cta-small">Have a project in mind?</span>
-            <span className="footer__cta-big">
-              Let's talk <Icon name="arrowUpRight" />
-            </span>
-          </Link>
+        <div className={`footer__top ${home ? 'footer__top--quiet' : ''}`}>
+          {home ? null : (
+            <Link to="/contact" className="footer__cta" data-reveal>
+              <span className="footer__cta-small">Have a project in mind?</span>
+              <span className="footer__cta-big">
+                Let's talk <Icon name="arrowUpRight" />
+              </span>
+            </Link>
+          )}
           <SocialCube />
         </div>
         <div className="footer__row">

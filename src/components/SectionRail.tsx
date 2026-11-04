@@ -22,7 +22,7 @@ const slug = (text: string) =>
 
 /** Every section on the page that has a heading eyebrow, labelled by it; sections without an id get one. */
 function findSections(): Target[] {
-  const hero = document.querySelector<HTMLElement>('#main .page-hero')
+  const hero = document.querySelector<HTMLElement>('#main .page-hero, #main [data-rail-intro]')
   const sections = Array.from(document.querySelectorAll<HTMLElement>('#main .section-head .eyebrow')).flatMap((eyebrow) => {
     const el = eyebrow.closest<HTMLElement>('section')
     const label = eyebrow.textContent?.trim() ?? ''

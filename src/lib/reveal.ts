@@ -115,10 +115,12 @@ export function playIntro(root: HTMLElement) {
       i * INTRO.lineDelay,
     )
   })
-  tl.fromTo(
-    rest,
-    { opacity: 0, y: INTRO.fadeY },
-    { opacity: 1, y: 0, duration: INTRO.duration, stagger: INTRO.fadeStagger, clearProps: 'transform' },
-    INTRO.lineDelay,
-  )
+  // Pages without fade-in extras (Home runs its own intro) would hand GSAP an empty list and a console warning.
+  if (rest.length)
+    tl.fromTo(
+      rest,
+      { opacity: 0, y: INTRO.fadeY },
+      { opacity: 1, y: 0, duration: INTRO.duration, stagger: INTRO.fadeStagger, clearProps: 'transform' },
+      INTRO.lineDelay,
+    )
 }

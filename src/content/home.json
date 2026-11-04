@@ -1,54 +1,20 @@
 {
   "hero": {
-    "eyebrow": "Software Engineer · Full-Stack",
-    "lines": ["I engineer scalable", "systems & sharp", "interfaces."],
-    "accentLine": 2,
-    "lead": "I design backend architecture, data systems and fast, modern frontends, and I care about the details in both."
+    "hud": ["> sys.boot --portfolio", "> loading modules: react, node, sql ... ok", "> session ready"],
+    "lead": "I design backend architecture, data systems and fast, modern frontends, and I care about the details in both.",
+    "hint": "scroll to enter"
   },
-  "marquee": ["React", "Next.js", "TypeScript", "Node.js", "Python", ".NET", "C++", "SQL Server", "MongoDB", "Flutter", "Figma", "Three.js"],
-  "layers": {
-    "eyebrow": "How I build",
-    "title": "Every request crosses five layers.",
-    "accent": "I design all of them.",
-    "items": [
-      {
-        "name": "Client",
-        "tagline": "Interfaces people enjoy using",
-        "text": "Responsive React and Next.js frontends with accessible UI, clean state and fast first paint.",
-        "tech": ["React", "Next.js", "TypeScript", "Tailwind CSS"]
-      },
-      {
-        "name": "API",
-        "tagline": "Clear contracts between systems",
-        "text": "REST APIs with validation, authentication and consistent error handling between users and services.",
-        "tech": ["Node.js", "REST", "Auth", "Validation"]
-      },
-      {
-        "name": "Services",
-        "tagline": "Business logic that stays testable",
-        "text": "Object-oriented, modular services in Python, Node.js, .NET and C++, structured so they're easy to change.",
-        "tech": ["Python", ".NET", "C++", "OOP"]
-      },
-      {
-        "name": "Data",
-        "tagline": "Schemas that scale",
-        "text": "Normalized relational schemas, efficient SQL and the right store for the job.",
-        "tech": ["SQL Server", "MongoDB", "Normalization", "Query tuning"]
-      },
-      {
-        "name": "Infrastructure",
-        "tagline": "Networks and delivery",
-        "text": "Network design, version control and automated deploys that keep everything reachable and repeatable.",
-        "tech": ["Cisco", "VLANs", "Git", "GitHub Actions"]
-      }
-    ]
+  "stack": ["React", "Next.js", "TypeScript", "Node.js", "Python", ".NET", "C++", "SQL Server", "MongoDB", "Flutter", "Figma", "Three.js"],
+  "about": {
+    "eyebrow": "01 / about",
+    "title": "Who's",
+    "accent": "compiling?",
+    "text": "I build fast, reliable [web apps] and the [systems] behind them, from [database schemas] and APIs to the [interfaces] people click. I like clean architecture, measurable performance and code the next developer can read."
   },
   "terminal": {
-    "eyebrow": "Terminal",
-    "title": "Scroll to run the session.",
-    "lead": "Scroll and it types itself. Then it's your turn: click it and try help.",
     "welcome": "Interactive mode. Type help and press Enter.",
     "host": "hamza@portfolio",
+    "hint": "Scroll and it types itself. Then click it and try help.",
     "session": [
       { "cmd": "whoami", "out": ["Muhammad Hamza Khan, Software Engineer"] },
       { "cmd": "cat focus.txt", "out": ["backend architecture", "database design", "full-stack development"] },
@@ -57,22 +23,32 @@
       { "cmd": "echo $STATUS", "out": ["open to work ✓"] }
     ]
   },
-  "featured": {
-    "eyebrow": "Selected work",
-    "title": "Things I've built.",
-    "slugs": ["cashup", "network-architecture", "arcade-system"]
-  },
-  "stackSphere": {
-    "eyebrow": "Toolbox",
-    "title": "The tools I reach for.",
-    "lead": "Drag the sphere. Every tag is something I've used in a real project."
-  },
   "stats": [
     { "value": 3, "suffix": "+", "label": "Years writing software" },
     { "value": 14, "suffix": "", "label": "Projects built" },
     { "value": 3, "suffix": "", "label": "Roles held" },
     { "value": 6, "suffix": "", "label": "Disciplines" }
   ],
+  "log": {
+    "eyebrow": "02 / experience",
+    "title": "git log",
+    "accent": "--career",
+    "lead": "Scroll down the history: the beam lights up each role as it reaches it."
+  },
+  "featured": {
+    "eyebrow": "03 / projects",
+    "title": "Things I've",
+    "accent": "shipped.",
+    "lead": "Keep scrolling: each project stacks on top of the last.",
+    "slugs": ["cashup", "network-architecture", "arcade-system", "dilkarishta", "sql-banking"]
+  },
+  "finale": {
+    "eyebrow": "04 / contact",
+    "title": "Let's build",
+    "accent": "something.",
+    "prompt": "sudo hire hamza",
+    "cta": "Start a project"
+  },
   "testimonials": [],
   "boot": {
     "hello": "Hi! 👋",

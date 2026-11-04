@@ -6,10 +6,10 @@ floating code glyphs drift behind every page.
 
 | Page     | 3D scene (scroll-driven)                                         | Page widgets |
 | -------- | ---------------------------------------------------------------- | ------------ |
-| Home     | Architecture stack explodes into 5 layers; packets flow through; click a slab to jump to its card | Terminal that types as you scroll, then takes real commands (`help`, `projects`, `open cashup`, `sudo hire hamza`…); draggable tech sphere, counters |
+| Home     | One scroll journey: a portal of code glyphs swirls beside your name, the camera dives down it into a laptop screen, then it fades out and gathers again behind the closing call to action | Name that decrypts itself, a laptop that opens and types its code as you scroll, a bio that lights up word by word, a beam down the git log, project cards that stack into a deck, a terminal that types itself and then takes real commands (`help`, `open cashup`, `sudo hire hamza`…), and a step readout in the margin |
 | About    | Code DNA: a turning double helix of rungs with code symbols on each strand; it zips together as you reach the experience, each role is a band of rungs, and the band you are reading glows while a scanner ring slides to it; click a band to jump to that job | profile.ts code window, git-log timeline, skill bars, keycap tools |
 | Services | Server rack; each service's unit slides out when it's centred or hovered; click to jump to it | Process staircase, engagement cards, FAQ |
-| Projects | Live service-mesh network with hopping packets                  | Z-depth featured gallery, FLIP-animated filters, live GitHub ring, case-study dialog |
+| Projects | Particle galaxy that gathers out of a cloud, spins as you scroll, scatters when you scroll fast and parts around the cursor | "Straight from my GitHub": live repos on a draggable 3D ring, every project as a case-study card, case-study dialog |
 | CV       | Floating editor windows                                          | Printable paper CV that lands as it scrolls into view, gets a scanner sweep and an availability stamp, and writes each section in as you reach it |
 | Contact  | Cel-shaded cartoon developer at a desk who follows the cursor, waves, types along with the form and cheers when it's sent; poke him or the rubber duck | Validated form, copy-email, availability card |
 

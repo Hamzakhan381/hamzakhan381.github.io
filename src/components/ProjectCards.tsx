@@ -60,12 +60,15 @@ export function StackTree({ project }: { project: Project }) {
 }
 
 /** Large case-study panel: details on the left, a faux terminal "cloning" the repo on the right. */
-export function FeaturedProject({ project, index }: { project: Project; index: number }) {
+export function FeaturedProject({ project, index, total }: { project: Project; index: number; total?: number }) {
   return (
     <article className="featured card">
       <div className="featured__info">
         <p className="featured__meta">
-          <span>{pad(index + 1)}</span>
+          <span>
+            {pad(index + 1)}
+            {total ? <span className="featured__total"> / {pad(total)}</span> : null}
+          </span>
           <span className="chip">{project.category}</span>
         </p>
         <h3>{project.title}</h3>
@@ -86,27 +89,6 @@ export function FeaturedProject({ project, index }: { project: Project; index: n
         <ProjectLinks project={project} />
       </div>
       <StackTree project={project} />
-    </article>
-  )
-}
-
-/** Compact project card used by the filterable grid. */
-export function ProjectCard({ project }: { project: Project }) {
-  return (
-    <article className="pcard card">
-      <div className="pcard__top">
-        <span className="chip">{project.category}</span>
-        {project.featured ? <span className="pcard__star">Featured</span> : null}
-      </div>
-      <h3>{project.title}</h3>
-      <p className="pcard__sub">{project.subtitle}</p>
-      <p>{project.summary}</p>
-      <ul className="tags">
-        {project.stack.map((s) => (
-          <li key={s}>{s}</li>
-        ))}
-      </ul>
-      <ProjectLinks project={project} />
     </article>
   )
 }

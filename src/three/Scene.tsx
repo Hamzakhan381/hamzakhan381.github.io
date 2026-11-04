@@ -4,10 +4,10 @@ import { PerformanceMonitor } from '@react-three/drei'
 import { Group, MathUtils, PerspectiveCamera, Vector3 } from 'three'
 import config from './scene.json'
 import { CodeGlyphs } from './glyphs'
-import { ArchitectureStack } from './scenes/ArchitectureStack'
+import { CodePortal } from './scenes/CodePortal'
 import { CodeHelix } from './scenes/CodeHelix'
 import { ServerRack } from './scenes/ServerRack'
-import { NetworkGraph } from './scenes/NetworkGraph'
+import { Galaxy } from './scenes/Galaxy'
 import { Developer } from './scenes/Developer'
 import { CodeWindows } from './scenes/CodeWindows'
 import { scrollState, useScrollLocked } from '../lib/scroll'
@@ -28,10 +28,10 @@ const Q = config.quality
 
 /** Which 3D scene belongs to which route; anything unknown (404) gets the code windows. */
 const scenes: Record<string, ComponentType> = {
-  '/': ArchitectureStack,
+  '/': CodePortal,
   '/about': CodeHelix,
   '/services': ServerRack,
-  '/projects': NetworkGraph,
+  '/projects': Galaxy,
   '/cv': CodeWindows,
   '/contact': Developer,
 }

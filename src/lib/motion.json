@@ -48,18 +48,6 @@
     "duration": 1.4,
     "stagger": 0.08
   },
-  "gallery": {
-    "depth": 1100,
-    "rotateY": 14,
-    "shiftX": 120,
-    "fadeAhead": 0.45,
-    "fadePast": 1.6,
-    "screens": 0.9
-  },
-  "flip": {
-    "duration": 0.6,
-    "scale": 0.85
-  },
   "exit": {
     "rotateX": -22,
     "z": -180,
@@ -83,5 +71,100 @@
     "wave": 0.95,
     "exit": 0.62,
     "skipExit": 0.27
+  },
+  "journey": {
+    "decrypt": {
+      "stagger": 0.07,
+      "jitter": 0.35,
+      "flickerMs": 55,
+      "delay": 0.2
+    },
+    "type": {
+      "typeMs": 70,
+      "eraseMs": 34,
+      "holdMs": 1700
+    },
+    "intro": {
+      "duration": 0.9,
+      "stagger": 0.08,
+      "y": 24
+    },
+    "dive": {
+      "screens": 1.9,
+      "mobileScreens": 1.4,
+      "scrub": 0.6,
+      "scatter": {
+        "x": 560,
+        "y": 420,
+        "z": 900,
+        "rotate": 180,
+        "end": 0.32,
+        "spread": 0.006
+      },
+      "fade": {
+        "y": -60,
+        "end": 0.22
+      },
+      "rise": {
+        "from": 72,
+        "scale": 0.7,
+        "at": 0.06,
+        "duration": 0.36
+      },
+      "lid": {
+        "closed": -88,
+        "open": 6,
+        "at": 0.2,
+        "duration": 0.3
+      },
+      "code": {
+        "at": 0.42,
+        "stagger": 0.016,
+        "duration": 0.06
+      },
+      "zoom": {
+        "at": 0.6,
+        "duration": 0.32,
+        "cover": 1.04,
+        "max": 2.2,
+        "mobileMax": 1.8
+      },
+      "out": {
+        "at": 0.9,
+        "duration": 0.1
+      }
+    },
+    "words": {
+      "from": 0.14,
+      "stagger": 0.6,
+      "start": "top 82%",
+      "end": "bottom 45%"
+    },
+    "beam": {
+      "start": "top 62%",
+      "end": "bottom 62%",
+      "lit": "top 62%",
+      "x": 60,
+      "cardStart": "top 92%",
+      "cardEnd": "top 62%"
+    },
+    "stack": {
+      "scale": 0.92,
+      "tilt": 7,
+      "dim": 0.55
+    },
+    "finale": {
+      "start": "top bottom",
+      "end": "center center",
+      "roll": -95,
+      "lift": 60,
+      "stagger": 0.035,
+      "titleStart": "top 88%",
+      "titleEnd": "top 50%"
+    },
+    "hud": {
+      "line": "top 55%",
+      "decimals": 3
+    }
   }
 }
