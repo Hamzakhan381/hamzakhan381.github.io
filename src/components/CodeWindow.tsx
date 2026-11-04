@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { reduceMotion } from '../lib/scroll'
 import motion from '../lib/motion.json'
@@ -10,7 +10,9 @@ export type CodeLine = Token[]
 export function CodeWindow({ filename, lines }: { filename: string; lines: CodeLine[] }) {
   const ref = useRef<HTMLDivElement>(null)
 
-  useLayoutEffect(() => {
+  // Set up just after the first paint (not inside the commit), so it never holds up a page switch: this sits
+  // below the fold when a page opens.
+  useEffect(() => {
     const el = ref.current
     if (!el || reduceMotion) return
     const ctx = gsap.context(() => {

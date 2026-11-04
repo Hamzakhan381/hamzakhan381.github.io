@@ -130,7 +130,7 @@ function Mug() {
       <mesh position={[M.radius + M.handle * HALF, M.height * HALF, 0]}>
         <torusGeometry args={[M.handle, M.handleTube, LOW, LOW * DOUBLE]} />
         <Toon color={C.mug} />
-        <Ink />
+        <Ink smooth />
       </mesh>
       {Array.from({ length: M.steam }, (_, i) => (
         <mesh key={i} ref={(el) => void (steam.current[i] = el)}>
@@ -178,12 +178,12 @@ function Duck({ fill, ink }: { fill: Color; ink: Color }) {
       <mesh position={[0, K.body * K.bodyScale[1], 0]} scale={v3(K.bodyScale)}>
         <sphereGeometry args={[K.body, SMOOTH, SMOOTH]} />
         <Toon color={C.duck} />
-        <Ink />
+        <Ink smooth />
       </mesh>
       <mesh position={v3(K.headOffset)}>
         <sphereGeometry args={[K.head, SMOOTH, SMOOTH]} />
         <Toon color={C.duck} />
-        <Ink />
+        <Ink smooth />
       </mesh>
       <mesh position={v3(K.beakOffset)} rotation-z={-HALF_PI}>
         <coneGeometry args={[K.beak[0], K.beak[1], LOW]} />
@@ -402,7 +402,7 @@ export function Developer() {
           <mesh>
             <capsuleGeometry args={[D.body.radius, D.body.length, CAPSULE_CAPS, SMOOTH]} />
             <Toon color={C.hoodie} />
-            <Ink />
+            <Ink smooth />
           </mesh>
         </group>
         {MIRROR.map((side) => (
@@ -424,12 +424,12 @@ export function Developer() {
             <mesh ref={(el) => void (arms.current[i] = el)}>
               <capsuleGeometry args={[D.arms.radius, 1, CAPSULE_CAPS, SMOOTH]} />
               <Toon color={C.hoodie} />
-              <Ink />
+              <Ink smooth />
             </mesh>
             <mesh ref={(el) => void (hands.current[i] = el)}>
               <sphereGeometry args={[D.arms.handRadius, SMOOTH, SMOOTH]} />
               <Toon color={C.skin} />
-              <Ink />
+              <Ink smooth />
             </mesh>
           </group>
         ))}
@@ -438,7 +438,7 @@ export function Developer() {
           <mesh scale={v3(H.scale)}>
             <sphereGeometry args={[H.radius, SMOOTH * DOUBLE, SMOOTH]} />
             <Toon color={C.skin} />
-            <Ink />
+            <Ink smooth />
           </mesh>
           {/* Hood: a sphere shell open at the front */}
           <mesh position={v3(D.hood.offset)}>
@@ -508,7 +508,7 @@ export function Developer() {
           <mesh>
             <torusGeometry args={[D.phones.band, D.phones.tube, LOW, SMOOTH * DOUBLE, Math.PI]} />
             <Toon color={C.hood} />
-            <Ink />
+            <Ink smooth />
           </mesh>
           {MIRROR.map((side) => (
             <group key={side} position={[side * D.phones.cupX, 0, 0]}>

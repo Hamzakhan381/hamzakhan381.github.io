@@ -405,7 +405,7 @@ main {
   gap: 12px;
 }
 
-/* Glass card with 3D tilt. --rx/--ry come from the Tilt component. */
+/* Glass card; the Tilt component adds the 3D hover tilt (see .tilt). */
 .card {
   position: relative;
   border-radius: var(--radius);
@@ -419,15 +419,16 @@ main {
     box-shadow 0.45s var(--ease-out);
 }
 
+/* The hover tilt uses the individual `rotate` property (an axis and angle from the Tilt component), so it stacks on
+   the `transform` that GSAP animates on the same card as you scroll, instead of being overridden by it. Only the tilt
+   eases: a transition on `transform` restarted on every scroll frame, which made cards lag behind the scroll and kept
+   the browser restyling them constantly. Perspective comes from the section. */
 .tilt {
-  --rx: 0deg;
-  --ry: 0deg;
   --mx: 50%;
   --my: 50%;
   display: block;
-  transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry));
-  transform-style: preserve-3d;
-  transition: transform 0.5s var(--ease-out);
+  rotate: var(--tilt, 0 0 1 0deg);
+  transition: rotate 0.5s var(--ease-out);
 }
 
 .tilt:hover {

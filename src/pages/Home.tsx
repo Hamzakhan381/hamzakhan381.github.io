@@ -7,6 +7,7 @@ import { usePageEffects } from '../lib/usePageEffects'
 import { journey, resetJourney } from '../lib/journey'
 import { reduceMotion } from '../lib/scroll'
 import { appLoaded } from '../lib/intro'
+import { dropTransforms } from '../lib/reveal'
 import { HALF, hash } from '../lib/math'
 import { profileCode, profileFile } from '../lib/profileCode'
 import motion from '../lib/motion.json'
@@ -56,12 +57,10 @@ function useJourneyMotion(ref: RefObject<HTMLDivElement | null>) {
     const coverScale = () => (laptop ? Math.min(Math.max(window.innerWidth / laptop.offsetWidth, window.innerHeight / laptop.offsetHeight) * DV.zoom.cover, zoomCap) : 1)
     const centreShift = () => (stage && laptop ? stage.clientHeight * HALF - (laptop.offsetTop + laptop.offsetHeight * HALF) : 0)
     const ctx = gsap.context(() => {
-      const intro = gsap.timeline({ paused: true })
-      intro.fromTo(
-        root.querySelectorAll('.jhero__hud p, .jhero__eyebrow, .jhero__intro > *'),
-        { opacity: 0, y: J.intro.y },
-        { opacity: 1, y: 0, duration: J.intro.duration, stagger: J.intro.stagger, ease: 'expo.out', clearProps: 'transform' },
-      )
+      // Leftover transforms are dropped in one pass at the end (see dropTransforms), not per element by GSAP.
+      const introItems = Array.from(root.querySelectorAll<HTMLElement>('.jhero__hud p, .jhero__eyebrow, .jhero__intro > *'))
+      const intro = gsap.timeline({ paused: true, onComplete: () => dropTransforms(introItems) })
+      intro.fromTo(introItems, { opacity: 0, y: J.intro.y }, { opacity: 1, y: 0, duration: J.intro.duration, stagger: J.intro.stagger, ease: 'expo.out' })
       const playIntro = async () => {
         await appLoaded
         intro.play()

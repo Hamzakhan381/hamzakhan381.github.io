@@ -87,29 +87,54 @@ function canvasOf(w: number, h: number) {
  * away inside it, never inside the solid area, so his shirt's white checks stay), feathered, and set on a soft
  * studio backdrop that any keying leftovers simply vanish into. `width` is the photo's size on the texture.
  */
-export async function loadIdPhoto(url: string, width: number): Promise<Photo> {
+/** The photo decoded off the main thread where the browser can (an ImageBitmap), else as a decoded image. */
+async function decodePhoto(url: string): Promise<ImageBitmap | HTMLImageElement> {
+  if (typeof createImageBitmap === 'function') {
+    const response = await fetch(url)
+    return createImageBitmap(await response.blob())
+  }
   const image = new Image()
   image.decoding = 'async'
   image.src = url
   await image.decode()
-  const iw = image.naturalWidth
-  const ih = image.naturalHeight
+  return image
+}
+
+/** A crop of `source` already scaled to `w` × `h`, made off the main thread when the source is an ImageBitmap. */
+async function cropOf(source: ImageBitmap | HTMLImageElement, sx: number, sy: number, sw: number, sh: number, w: number, h: number) {
+  if (source instanceof ImageBitmap) return createImageBitmap(source, sx, sy, sw, sh, { resizeWidth: w, resizeHeight: h, resizeQuality: 'high' })
+  const canvas = canvasOf(w, h)
+  canvas.getContext('2d')?.drawImage(source, sx, sy, sw, sh, 0, 0, w, h)
+  return canvas
+}
+
+export async function loadIdPhoto(url: string, width: number): Promise<Photo> {
+  // Decoded, cropped and resized off the main thread: drawing the full photo into a canvas made the browser decode
+  // it on the main thread, a long task right as the page opened.
+  const source = await decodePhoto(url)
+  const iw = source instanceof ImageBitmap ? source.width : source.naturalWidth
+  const ih = source instanceof ImageBitmap ? source.height : source.naturalHeight
   const height = Math.round((width * F.photo.h) / F.photo.w)
   const [x0, y0, x1] = PH.crop
   const crop = { x: x0, y: y0, w: x1 - x0, h: ((x1 - x0) * iw * height) / (width * ih) }
-  const person = canvasOf(width, height)
-  const pc = person.getContext('2d')
   // The cut-out mask is worked out at a fraction of the size (it is feathered anyway), which keeps the per-pixel
-  // keying to a few milliseconds instead of a long task while the page is running.
+  // keying to a few milliseconds.
   const mw = Math.round(width * PH.maskScale)
   const mh = Math.round(height * PH.maskScale)
+  const [sx, sy, sw, sh] = [crop.x * iw, crop.y * ih, crop.w * iw, crop.h * ih]
+  const [full, reduced] = await Promise.all([cropOf(source, sx, sy, sw, sh, width, height), cropOf(source, sx, sy, sw, sh, mw, mh)])
+  if (source instanceof ImageBitmap) source.close()
+  const person = canvasOf(width, height)
+  const pc = person.getContext('2d')
   const small = canvasOf(mw, mh)
   const mask = canvasOf(mw, mh)
   const sc = small.getContext('2d', { willReadFrequently: true })
   const mc = mask.getContext('2d', { willReadFrequently: true })
   if (!pc || !sc || !mc) return null
-  pc.drawImage(image, crop.x * iw, crop.y * ih, crop.w * iw, crop.h * ih, 0, 0, width, height)
-  sc.drawImage(image, crop.x * iw, crop.y * ih, crop.w * iw, crop.h * ih, 0, 0, mw, mh)
+  pc.drawImage(full, 0, 0)
+  sc.drawImage(reduced, 0, 0)
+  if (full instanceof ImageBitmap) full.close()
+  if (reduced instanceof ImageBitmap) reduced.close()
   mc.fillStyle = '#fff'
   mc.fill(pathOf(PH.solid, crop, mw, mh))
   const solid = mc.getImageData(0, 0, mw, mh).data
@@ -276,13 +301,23 @@ function fitLine(pen: Pen, text: string, weight: number, size: number, family: s
 /** The biggest size (within the layout's range) at which `text` fits in the allowed lines; sets that font. */
 function fitBig(pen: Pen, text: string) {
   const B = F.big
-  const sizes = Array.from({ length: Math.floor((B.max - B.min) / B.step) + 1 }, (_, k) => B.max - k * B.step)
   const fits = (size: number) => {
     pen.font(HEAVY, size, DISPLAY)
     const lines = wrap(pen, text, F.width)
     return lines.length <= B.lines && lines.every((line) => pen.width(line) <= F.width)
   }
-  const size = sizes.find(fits) ?? B.min
+  // A binary search over the allowed sizes (a handful of measurements instead of trying every step from the top).
+  const steps = Math.floor((B.max - B.min) / B.step)
+  const rounds = Math.ceil(Math.log2(steps + 1))
+  const found = Array.from({ length: rounds }).reduce<{ lo: number; hi: number }>(
+    ({ lo, hi }) => {
+      if (lo >= hi) return { lo, hi }
+      const mid = Math.ceil((lo + hi) / DOUBLE)
+      return fits(B.min + mid * B.step) ? { lo: mid, hi } : { lo, hi: mid - 1 }
+    },
+    { lo: 0, hi: steps },
+  )
+  const size = B.min + found.lo * B.step
   pen.font(HEAVY, size, DISPLAY)
   return { size, lines: wrap(pen, text, F.width).slice(0, B.lines) }
 }

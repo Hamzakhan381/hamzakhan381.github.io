@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, type CSSProperties } from 'react'
+import { useEffect, useRef, type CSSProperties } from 'react'
 import { gsap } from 'gsap'
 import type { Project } from '../content'
 import { reduceMotion } from '../lib/scroll'
@@ -15,7 +15,9 @@ const S = motion.journey.stack
 export function CardStack({ projects }: { projects: Project[] }) {
   const ref = useRef<HTMLOListElement>(null)
 
-  useLayoutEffect(() => {
+  // Set up just after the first paint (not inside the commit), so it never holds up a page switch: this sits
+  // below the fold when a page opens.
+  useEffect(() => {
     const root = ref.current
     if (!root || reduceMotion) return
     const items = Array.from(root.querySelectorAll<HTMLElement>('.cstack__item'))

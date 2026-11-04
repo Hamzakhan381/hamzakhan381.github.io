@@ -1,4 +1,4 @@
-import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type SubmitEvent } from 'react'
+import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type SubmitEvent } from 'react'
 import { useNavigate } from 'react-router'
 import { gsap } from 'gsap'
 import { reduceMotion } from '../lib/scroll'
@@ -45,7 +45,9 @@ export function Terminal({ host, session, welcome }: { host: string; session: Te
   )
   const total = starts[starts.length - 1]
 
-  useLayoutEffect(() => {
+  // Set up just after the first paint (not inside the commit), so it never holds up a page switch: this sits
+  // below the fold when a page opens.
+  useEffect(() => {
     const el = ref.current
     if (!el || cleared) return
     const rows = Array.from(el.querySelectorAll<HTMLElement>('[data-row]'))

@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { reduceMotion } from '../lib/scroll'
 import motion from '../lib/motion.json'
@@ -7,7 +7,9 @@ import motion from '../lib/motion.json'
 export function Counter({ value, suffix = '' }: { value: number; suffix?: string }) {
   const ref = useRef<HTMLSpanElement>(null)
 
-  useLayoutEffect(() => {
+  // Set up just after the first paint (not inside the commit), so it never holds up a page switch: this sits
+  // below the fold when a page opens.
+  useEffect(() => {
     const el = ref.current
     if (!el || reduceMotion) return
     const counter = { n: 0 }

@@ -1,6 +1,7 @@
-import { useLayoutEffect, useRef, type CSSProperties } from 'react'
+import { useEffect, useRef, type CSSProperties } from 'react'
 import { gsap } from 'gsap'
 import { reduceMotion } from '../lib/scroll'
+import { primeTransforms } from '../lib/reveal'
 import motion from '../lib/motion.json'
 import type { Skills } from '../content'
 
@@ -10,9 +11,12 @@ const PERCENT = 100
 export function SkillBars({ groups }: { groups: Skills['groups'] }) {
   const ref = useRef<HTMLDivElement>(null)
 
-  useLayoutEffect(() => {
+  // Set up just after the first paint (not inside the commit), so it never holds up a page switch: this sits
+  // below the fold when a page opens.
+  useEffect(() => {
     const el = ref.current
     if (!el || reduceMotion) return
+    primeTransforms(Array.from(el.querySelectorAll('.bars__fill')))
     const ctx = gsap.context(() => {
       Array.from(el.querySelectorAll<HTMLElement>('.bars__group')).forEach((group) => {
         gsap.from(group.querySelectorAll('.bars__fill'), {

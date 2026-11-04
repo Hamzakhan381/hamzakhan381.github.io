@@ -63,6 +63,18 @@ function CameraRig() {
   return null
 }
 
+/**
+ * Reading a shader's error log makes the driver finish compiling it on the spot, so production skips the check:
+ * each new scene's shaders then compile in the background instead of freezing the page switch.
+ */
+function ShaderChecks() {
+  const gl = useThree((s) => s.gl)
+  useEffect(() => {
+    gl.debug.checkShaderErrors = import.meta.env.DEV
+  }, [gl])
+  return null
+}
+
 /** Grows a scene in from below when its page opens and lifts it away when the page closes. */
 function Slot({ leaving, children }: { leaving: boolean; children: React.ReactNode }) {
   const group = useRef<Group>(null)
@@ -230,6 +242,7 @@ export default function Scene({ pathname }: { pathname: string }) {
       eventPrefix="client"
       aria-hidden="true"
     >
+      <ShaderChecks />
       <ambientLight intensity={L.ambient} />
       <directionalLight intensity={L.key} position={L.keyPosition as [number, number, number]} />
       <directionalLight intensity={L.rim} position={L.rimPosition as [number, number, number]} />

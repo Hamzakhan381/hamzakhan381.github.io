@@ -17,6 +17,10 @@ const MIN_OPACITY = 0.12
 const SCENE_SPIN_PER_DEG = Math.PI / HALF_TURN
 const CLICK_SLOP_PX = 6
 const COUNTER_DIGITS = 2
+/** Card opacity is written in steps of 1/50. */
+const OPACITY_STEPS = 50
+/** Starts turning a little before the carousel scrolls into view. */
+const VISIBLE_MARGIN = '200px 0px'
 
 const wrap = (deg: number) => ((((deg + HALF_TURN) % FULL_TURN) + FULL_TURN) % FULL_TURN) - HALF_TURN
 
@@ -32,6 +36,11 @@ export function Carousel3D<T>({ items, label, renderItem }: Props<T>) {
   const angle = useRef({ value: 0 })
   const drag = useRef({ active: false, startX: 0, lastX: 0, velocity: 0, moved: 0 })
   const paused = useRef(false)
+  /** False while the carousel is scrolled out of view: it stops turning so the page isn't restyled for nothing. */
+  const visible = useRef(true)
+  const root = useRef<HTMLDivElement>(null)
+  /** The opacity and pointer state last written to each card, so unchanged values are never written again. */
+  const written = useRef<{ opacity: number[]; blocked: boolean[] }>({ opacity: [], blocked: [] })
   const [active, setActive] = useState(0)
   const activeRef = useRef(0)
 
@@ -39,12 +48,23 @@ export function Carousel3D<T>({ items, label, renderItem }: Props<T>) {
     const value = angle.current.value
     if (ring.current) ring.current.style.transform = `translateZ(${-radius}px) rotateY(${value}deg)`
     scrollState.spin = value * SCENE_SPIN_PER_DEG
+    const last = written.current
     cards.current.forEach((_, i) => {
       const card = cards.current[i]
       if (!card) return
       const facing = Math.abs(wrap(i * step + value))
-      card.style.opacity = String(Math.max(MIN_OPACITY, 1 - facing / HALF_TURN))
-      card.style.pointerEvents = facing > QUARTER_TURN ? 'none' : ''
+      // Rounded to small steps and written only when it changes: rewriting every card's style on every frame kept
+      // the browser recalculating styles (and restarting each card's fade) the whole time the page was open.
+      const opacity = Math.round(Math.max(MIN_OPACITY, 1 - facing / HALF_TURN) * OPACITY_STEPS) / OPACITY_STEPS
+      if (last.opacity[i] !== opacity) {
+        last.opacity[i] = opacity
+        card.style.opacity = String(opacity)
+      }
+      const blocked = facing > QUARTER_TURN
+      if (last.blocked[i] !== blocked) {
+        last.blocked[i] = blocked
+        card.style.pointerEvents = blocked ? 'none' : ''
+      }
     })
     const front = ((Math.round(-value / step) % count) + count) % count
     if (front !== activeRef.current) {
@@ -77,9 +97,22 @@ export function Carousel3D<T>({ items, label, renderItem }: Props<T>) {
   const nudge = (direction: number) => rotateTo(Math.round(angle.current.value / step) * step - direction * step)
 
   useEffect(() => {
+    const el = root.current
+    if (!el) return undefined
+    const watcher = new IntersectionObserver(
+      (entries) => {
+        visible.current = entries.some((entry) => entry.isIntersecting)
+      },
+      { rootMargin: VISIBLE_MARGIN },
+    )
+    watcher.observe(el)
+    return () => watcher.disconnect()
+  }, [])
+
+  useEffect(() => {
     apply()
     const tick = (_: number, deltaMs: number) => {
-      if (paused.current || drag.current.active || reduceMotion || gsap.isTweening(angle.current)) return
+      if (!visible.current || paused.current || drag.current.active || reduceMotion || gsap.isTweening(angle.current)) return
       angle.current.value -= (AUTO_DEG_PER_SECOND * deltaMs) / MS_PER_SECOND
       apply()
     }
@@ -120,6 +153,7 @@ export function Carousel3D<T>({ items, label, renderItem }: Props<T>) {
 
   return (
     <div
+      ref={root}
       className="carousel"
       role="region"
       aria-roledescription="carousel"

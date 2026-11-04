@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import type { Job } from '../content'
@@ -17,7 +17,9 @@ const RUNNER_START = -100
 export function BeamTimeline({ jobs }: { jobs: Job[] }) {
   const ref = useRef<HTMLDivElement>(null)
 
-  useLayoutEffect(() => {
+  // Set up just after the first paint (not inside the commit), so it never holds up a page switch: this sits
+  // below the fold when a page opens.
+  useEffect(() => {
     const root = ref.current
     if (!root) return
     const items = Array.from(root.querySelectorAll<HTMLElement>('.beam__item'))

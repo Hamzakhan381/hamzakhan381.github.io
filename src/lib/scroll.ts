@@ -63,13 +63,22 @@ export function initScroll() {
   window.addEventListener('pointermove', onPointer, { passive: true })
 
   // The page height changes many times while it loads (fonts, images, the 3D scene, lazy sections). A refresh
-  // re-measures every trigger, so do it once things settle rather than on every change.
+  // re-measures every trigger, so do it once things settle rather than on every change, and skip it when something
+  // already refreshed since the change (a newly opened page refreshes itself right after it mounts).
   let refreshTimer = 0
+  const refreshed = { at: 0 }
+  const noteRefresh = () => {
+    refreshed.at = performance.now()
+  }
+  ScrollTrigger.addEventListener('refresh', noteRefresh)
   const ro = new ResizeObserver(() => {
     measureMaxScroll()
     updateProgress()
+    const changedAt = performance.now()
     window.clearTimeout(refreshTimer)
-    refreshTimer = window.setTimeout(() => ScrollTrigger.refresh(), REFRESH_SETTLE_MS)
+    refreshTimer = window.setTimeout(() => {
+      if (refreshed.at < changedAt) ScrollTrigger.refresh()
+    }, REFRESH_SETTLE_MS)
   })
   ro.observe(document.body)
 
@@ -96,6 +105,7 @@ export function initScroll() {
     window.removeEventListener('pointermove', onPointer)
     window.clearTimeout(refreshTimer)
     ro.disconnect()
+    ScrollTrigger.removeEventListener('refresh', noteRefresh)
     gsap.ticker.remove(tick)
     lenis?.destroy()
     lenis = null

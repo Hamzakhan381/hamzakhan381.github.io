@@ -136,19 +136,21 @@
     "smoothB": 2
   },
   "pass": {
-    "card": { "width": 2.75, "height": 3.9, "depth": 0.05, "radius": 0.14, "segments": 4, "printInset": 0.02, "printRadius": 0.13, "printLift": 0.002, "curveSegments": 16 },
-    "texture": { "high": 1024, "medium": 768 },
+    "card": { "width": 2.75, "height": 3.9, "depth": 0.05, "radius": 0.14, "segments": 2, "printInset": 0.02, "printRadius": 0.13, "printLift": 0.002, "curveSegments": 16 },
+    "texture": { "high": 768, "medium": 640 },
     "body": { "color": "#0b1a2b", "roughness": 0.35, "clearcoat": 1, "clearcoatRoughness": 0.2 },
-    "print": { "emissive": 0.16, "roughness": 0.55, "clearcoat": 0.25, "clearcoatRoughness": 0.4, "env": 0.28 },
-    "metal": { "color": "#dfe8ef", "roughness": 0.18 },
-    "env": { "blur": 0.04, "intensity": 0.6, "metal": 1 },
+    "print": { "emissive": 0.3, "roughness": 0.6 },
+    "metal": {
+      "color": "#e6edf3",
+      "matcap": { "px": 128, "highlight": [0.36, 0.3], "stopAt": [0, 0.22, 0.55, 0.82, 1], "stopColor": ["#ffffff", "#e3e9ee", "#98a4b0", "#55606c", "#2b333c"] }
+    },
     "clip": {
       "plate": [0.6, 0.4, 0.11],
       "hole": [0, 0.07, 0.3, 0.085, 0.04],
       "depth": 0.05,
       "bevel": 0.02,
-      "bevelSegments": 4,
-      "curveSegments": 16,
+      "bevelSegments": 2,
+      "curveSegments": 6,
       "y": 0.1,
       "z": 0.035,
       "jaw": [0.44, 0.13, 0.025, 0.01],
@@ -192,6 +194,7 @@
     "sweep": 0.36,
     "faces": ["id", "id", "job", "skills", "principles", "now", "id"],
     "skillsSplit": 0.5,
+    "prepaintCalm": 0.5,
     "swing": { "period": 2.1, "pitchPeriod": 1.7, "damping": 0.09, "scroll": 0.006, "maxPitch": 0.5, "flipKick": 0.9 },
     "yaw": { "period": 0.95, "damping": 0.42, "settled": 0.02 },
     "drop": { "from": 7, "period": 1.15, "damping": 0.3, "delay": 0.25 },

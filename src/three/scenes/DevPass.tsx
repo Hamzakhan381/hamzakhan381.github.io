@@ -10,11 +10,10 @@ import {
   Group,
   MathUtils,
   Mesh,
-  MeshPhysicalMaterial,
+  MeshMatcapMaterial,
   MeshStandardMaterial,
   Path,
   Plane,
-  PMREMGenerator,
   Raycaster,
   RepeatWrapping,
   Shape,
@@ -25,7 +24,6 @@ import {
   Vector3,
 } from 'three'
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js'
-import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import config from '../scene.json'
 import face from '../passFace.json'
 import { faceHeight, loadIdPhoto, paintFace, type Photo } from '../passFaces'
@@ -168,6 +166,26 @@ function strapTexture() {
   return { texture, aspect: canvas.width / STRAP.copies / canvas.height }
 }
 
+/** A lit metal ball (bright highlight up and to the left, falling off to a dark rim), for the clip's matcap. */
+function matcapTexture() {
+  const M = P.metal.matcap
+  const canvas = document.createElement('canvas')
+  canvas.width = M.px
+  canvas.height = M.px
+  const ctx = canvas.getContext('2d')
+  if (ctx) {
+    const c = M.px * HALF
+    const [hx, hy] = M.highlight
+    const gradient = ctx.createRadialGradient(M.px * hx, M.px * hy, 0, c, c, c)
+    M.stopAt.forEach((at, i) => gradient.addColorStop(at, M.stopColor[i]))
+    ctx.fillStyle = gradient
+    ctx.fillRect(0, 0, M.px, M.px)
+  }
+  const texture = new CanvasTexture(canvas)
+  texture.colorSpace = SRGBColorSpace
+  return texture
+}
+
 function glowTexture() {
   const canvas = document.createElement('canvas')
   canvas.width = GLOW_PX
@@ -194,9 +212,11 @@ function starGeometry() {
 }
 
 const IDLE_TIMEOUT_MS = 600
+/** Painting ahead can wait much longer for a quiet moment: it only has to be done before the next chapter. */
+const PREPAINT_TIMEOUT_MS = 2500
 const hasIdle = typeof window !== 'undefined' && typeof window.requestIdleCallback === 'function'
-/** Runs `fn` when the browser is idle (or soon, where idle callbacks don't exist). */
-const idle = (fn: () => void) => (hasIdle ? window.requestIdleCallback(fn, { timeout: IDLE_TIMEOUT_MS }) : window.setTimeout(fn, IDLE_TIMEOUT_MS))
+/** Runs `fn` when the browser is idle (or after `timeout` ms at the latest, or soon where idle callbacks don't exist). */
+const idle = (fn: () => void, timeout = IDLE_TIMEOUT_MS) => (hasIdle ? window.requestIdleCallback(fn, { timeout }) : window.setTimeout(fn, timeout))
 const cancelIdle = (handle: number) => (hasIdle ? window.cancelIdleCallback(handle) : window.clearTimeout(handle))
 
 /** The faces in reading order, so the pass can paint the next one on its hidden side before it's needed. */
@@ -277,16 +297,9 @@ export function DevPass() {
     [faceWidth],
   )
 
-  // A soft studio reflection for the gloss on the card and the shine on the metal, built once from three's room
-  // environment and given to these materials only (the rest of the site's scenes keep their own lighting).
-  const env = useMemo(() => {
-    const pmrem = new PMREMGenerator(gl)
-    const room = new RoomEnvironment()
-    const texture = pmrem.fromScene(room, P.env.blur).texture
-    room.dispose()
-    pmrem.dispose()
-    return texture
-  }, [gl])
+  // The clip's shine comes from a tiny painted matcap (a lit metal ball) rather than a reflection map: building one
+  // meant an extra render pass and shader compiles the moment the page opened, which froze integrated graphics.
+  const shine = useMemo(matcapTexture, [])
 
   // Redrawn when web fonts arrive, so the lanyard is printed in the site's mono face.
   const strapPrint = useMemo(() => strapTexture(), [fonts])
@@ -306,24 +319,20 @@ export function DevPass() {
   }, [])
   const materials = useMemo(
     () => ({
-      // The body only shows at the card's edges, so it skips the clear coat.
-      body: new MeshStandardMaterial({ color: P.body.color, roughness: P.body.roughness, envMap: env, envMapIntensity: P.env.intensity }),
-      // The print gets a glossy clear coat on capable devices; mid-range ones get the same print without it.
-      prints: sides.map(({ texture }) => {
-        const print = {
-          map: texture,
-          emissiveMap: texture,
-          emissive: WHITE,
-          emissiveIntensity: P.print.emissive,
-          roughness: P.print.roughness,
-          envMap: env,
-          // Kept low, with only a faint glow of its own and a thin satin coat: the print should read like ink on
-          // a card, not a lit screen, so the photo keeps its true tones instead of washing out to white.
-          envMapIntensity: P.print.env,
-        }
-        return tier === 'high' ? new MeshPhysicalMaterial({ ...print, clearcoat: P.print.clearcoat, clearcoatRoughness: P.print.clearcoatRoughness }) : new MeshStandardMaterial(print)
-      }),
-      metal: new MeshStandardMaterial({ color: P.metal.color, metalness: 1, roughness: P.metal.roughness, envMap: env, envMapIntensity: P.env.metal }),
+      body: new MeshStandardMaterial({ color: P.body.color, roughness: P.body.roughness }),
+      // Lit like ink on a card, with a faint glow of its own so it reads at any angle: not a lit screen, so the
+      // photo keeps its true tones instead of washing out to white.
+      prints: sides.map(
+        ({ texture }) =>
+          new MeshStandardMaterial({
+            map: texture,
+            emissiveMap: texture,
+            emissive: WHITE,
+            emissiveIntensity: P.print.emissive,
+            roughness: P.print.roughness,
+          }),
+      ),
+      metal: new MeshMatcapMaterial({ matcap: shine, color: P.metal.color }),
       strap: new MeshStandardMaterial({
         map: strapMap,
         emissiveMap: strapMap,
@@ -335,7 +344,7 @@ export function DevPass() {
         side: DoubleSide,
       }),
     }),
-    [env, sides, strapMap, tier],
+    [sides, strapMap, shine],
   )
   const glow = useMemo(glowTexture, [])
 
@@ -343,10 +352,10 @@ export function DevPass() {
     () => () => {
       Object.values(geometries).forEach((geometry) => geometry.dispose())
       glow.dispose()
+      shine.dispose()
     },
-    [geometries, glow],
+    [geometries, glow, shine],
   )
-  useEffect(() => () => env.dispose(), [env])
   useEffect(() => () => strapMap.dispose(), [strapMap])
   useEffect(
     () => () =>
@@ -365,26 +374,38 @@ export function DevPass() {
     [materials],
   )
 
-  /** Paints face `key` onto printed side `side` (0 front, 1 back) and uploads it. */
+  /** Idle callbacks still waiting to upload a freshly painted side. */
+  const uploads = useRef<number[]>([])
+  useEffect(
+    () => () => {
+      uploads.current.forEach(cancelIdle)
+    },
+    [],
+  )
+
+  /**
+   * Paints face `key` onto printed side `side` (0 front, 1 back). The upload follows in its own idle moment, so the
+   * painting and the upload never land in the same task (if the side is needed sooner, the next frame uploads it).
+   */
   const paint = (side: number, key: string) => {
     const target = sides[side]
     paintFace(target.canvas, key, photoRef.current)
     target.texture.needsUpdate = true
-    // Upload right away (usually inside an idle callback) rather than in the middle of the next frame's render.
-    gl.initTexture(target.texture)
     painted.current[side] = key
+    uploads.current = [...uploads.current, idle(() => gl.initTexture(target.texture))]
   }
 
-  // The photo is cut out once at the size it's printed at.
+  // The photo is cut out once, at the size it's printed at, in an idle moment after the page has opened.
   useEffect(() => {
     let live = true
     const load = async () => {
       const cut = await loadIdPhoto(profile.photo.large, Math.round((face.photo.w / FACE_W) * faceWidth))
       if (live) setPhoto(cut)
     }
-    void load()
+    const start = idle(() => void load())
     return () => {
       live = false
+      cancelIdle(start)
     }
   }, [faceWidth])
 
@@ -609,16 +630,17 @@ export function DevPass() {
     if (s.age > P.drop.delay) s.drop = settle(s.drop, reduceMotion ? 0 : reeled, P.drop.period, P.drop.damping, h, steps)
     s.hover = MathUtils.damp(s.hover, hovered.current || dragging ? 1 : 0, P.hover.damping, dt)
 
-    // Once a flip has settled, paint the face you'll most likely reach next onto the hidden side in an idle moment,
-    // so the next flip only has to turn.
+    // Once a flip has settled and the page is at rest, paint the face you'll most likely reach next onto the hidden
+    // side in an idle moment, so the next flip only has to turn (and the painting never lands mid-scroll).
     const settled = Math.abs(s.flip.x - s.yawTarget) < P.yaw.settled && Math.abs(s.flip.v) < P.yaw.settled
+    const calm = Math.abs(scrollState.velocity) < P.prepaintCalm
     const next = upcoming(shown.current, ch)
     const hidden = Math.cos(s.flip.x) > 0 ? BACK : FRONT
-    if (settled && !prepaint.current && !reduceMotion && next && painted.current[hidden] !== next) {
+    if (settled && calm && !prepaint.current && !reduceMotion && next && painted.current[hidden] !== next) {
       prepaint.current = idle(() => {
         prepaint.current = 0
         if ((Math.cos(sim.current.flip.x) > 0 ? BACK : FRONT) === hidden) paint(hidden, next)
-      })
+      }, PREPAINT_TIMEOUT_MS)
     }
 
     // Hang the card along the swing from the pivot; its own yaw is the chapter's pose, a slow turn as you read

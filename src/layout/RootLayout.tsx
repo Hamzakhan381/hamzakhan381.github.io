@@ -78,10 +78,19 @@ function usePageMeta(pathname: string) {
  * Page transitions switch on once the app has loaded. Before that they would only snapshot a page nobody sees yet
  * (costly while booting), and the snapshots are drawn above everything, including the boot intro. Its own component
  * so the switch re-renders just this boundary, not the page inside it.
+ *
+ * Keyed by the page's path, it animates only when one page leaves and the next arrives. Any other update is left
+ * alone: the first visit to a page commits a "loading" state first (the menu link turns pending), and animating
+ * that played the whole out-and-in on the old page and made the new page wait a full second behind it.
  */
-function PageTransitions({ children }: { children: ReactNode }) {
+function PageTransitions({ pathname, children }: { pathname: string; children: ReactNode }) {
   const loaded = useAppLoaded()
-  return <ViewTransition default={loaded ? 'page-swap' : 'none'}>{children}</ViewTransition>
+  const swap = loaded ? 'page-swap' : 'none'
+  return (
+    <ViewTransition key={normalizePath(pathname)} enter={swap} exit={swap} default="none">
+      {children}
+    </ViewTransition>
+  )
 }
 
 /** Opens the project named in `?project=` once the intro has lifted, and again after every navigation. */
@@ -153,7 +162,7 @@ export function RootLayout() {
       </a>
       <Nav />
       <SectionRail />
-      <PageTransitions>
+      <PageTransitions pathname={pathname}>
         <main id="main">
           <Outlet />
           <Footer />

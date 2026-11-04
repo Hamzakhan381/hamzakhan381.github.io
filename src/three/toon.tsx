@@ -15,9 +15,14 @@ export function Toon({ color, side, map }: { color: Color | string; side?: typeo
   return <meshToonMaterial color={color} gradientMap={look?.gradient} side={side} map={map ?? null} />
 }
 
-export function Ink() {
+/**
+ * The ink outline. `smooth` is for shapes whose normals are already smooth (spheres, capsules, tori): drei would
+ * otherwise rebuild each one's normals with a crease pass when the scene opens (most of the cartoon's start-up cost),
+ * which only boxes and cylinders need to keep their outlines closed at the corners.
+ */
+export function Ink({ smooth = false }: { smooth?: boolean }) {
   const look = useContext(LookContext)
-  return <Outlines thickness={look?.outline ?? 0} color={look?.ink} />
+  return <Outlines thickness={look?.outline ?? 0} color={look?.ink} angle={smooth ? 0 : Math.PI} />
 }
 
 /** A 1×N tone ramp; nearest filtering keeps the steps hard, which is what makes it read as cel shading. */

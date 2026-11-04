@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { gsap } from 'gsap'
 import { reduceMotion } from '../lib/scroll'
 import motion from '../lib/motion.json'
@@ -27,7 +27,9 @@ export function WordReveal({ text, className = '' }: { text: string; className?:
   const ref = useRef<HTMLParagraphElement>(null)
   const words = useMemo(() => parse(text), [text])
 
-  useLayoutEffect(() => {
+  // Set up just after the first paint (not inside the commit), so it never holds up a page switch: this sits
+  // below the fold when a page opens.
+  useEffect(() => {
     const el = ref.current
     if (!el || reduceMotion) return
     const ctx = gsap.context(() => {
