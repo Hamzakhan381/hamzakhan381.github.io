@@ -30,7 +30,12 @@ export function ProjectDialog() {
     if (!el) return
     // An unknown slug in a shared link: drop it from the address bar instead of showing nothing.
     if (slug && !project) closeProject()
-    if (project && !el.open) el.showModal()
+    if (project && !el.open) {
+      el.showModal()
+      // Start on the title (screen readers announce it) rather than the first button, which the Enter press
+      // that opened the dialog (from the palette or terminal) could otherwise go on to activate.
+      title.current?.focus({ preventScroll: true })
+    }
     if (!project && el.open) el.close()
     lockScroll('project', Boolean(project))
   }, [slug, project])

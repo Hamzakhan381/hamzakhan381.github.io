@@ -136,7 +136,11 @@ export function CommandPalette() {
       const step = e.key === 'ArrowDown' ? 1 : -1
       setIndex((i) => (i + step + results.length) % Math.max(results.length, 1))
     }
-    if (e.key === 'Enter') run(results[index])
+    if (e.key === 'Enter') {
+      // Consume the key: whatever the command focuses next (a dialog's first button) must not receive it too.
+      e.preventDefault()
+      run(results[index])
+    }
   }
 
   return (
