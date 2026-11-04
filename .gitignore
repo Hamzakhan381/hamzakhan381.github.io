@@ -5,3 +5,5 @@ desktop.ini
 .claude/
 .kiro/
 .vscode/
+
+*.tsbuildinfo
