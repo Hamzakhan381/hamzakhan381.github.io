@@ -9,7 +9,7 @@ missing or misspelled, the build fails and tells you which one.
 | `profile.json` | Name, role, email, phone, location, availability badge, photo, social links |
 | `home.json` | Home hero, tech marquee, the five architecture layers, terminal session (plus the line it prints when a visitor clicks in to type commands), featured project slugs, stats, testimonials |
 | `about.json` | About hero, bio paragraphs, highlight numbers, principles, "Right now", certifications |
-| `experience.json` | Jobs shown in the git log (newest first); each one also draws a branch in the 3D git graph |
+| `experience.json` | Jobs shown in the git log (newest first); each one also gets a pillar in the 3D career chart on the About page |
 | `education.json` | Degrees and focus areas |
 | `skills.json` | Skill bars (`level` is 0–100) and the tools list |
 | `services.json` | Services (one rack unit each), process, ways to work together, FAQ |
@@ -24,7 +24,7 @@ Page titles and descriptions for search engines are in `src/lib/routes.json`.
 - **Testimonials**: add `{ "quote": "...", "name": "...", "role": "..." }` to `testimonials` in `home.json`. The section appears automatically.
 - **Certifications**: add `{ "name": "...", "issuer": "...", "date": "...", "href": "https://..." }` to `certifications` in `about.json`.
 - **A project**: copy any entry in `projects.json`, give it a unique `slug`, and set `links.github` / `links.live` if it has them.
-- **A job or service**: add an entry; the 3D git graph and server rack grow to match.
+- **A job or service**: add an entry; the 3D career chart and server rack grow to match.
 
 ## Placeholders to check
 

@@ -19,7 +19,6 @@ import { Label, fromEmptySpace, labelTexture, readTrack, setPointer3D, useFontsV
 import { contact } from '../../content'
 import { deskMood, now } from '../../lib/deskMood'
 import { scrollState } from '../../lib/scroll'
-import { useTheme } from '../../lib/theme'
 import { DOUBLE, HALF, HALF_PI, TAU } from '../../lib/math'
 
 type Vec3 = [number, number, number]
@@ -303,8 +302,7 @@ export function Developer() {
   const camera = useThree((s) => s.camera)
   const gradient = useGradient()
   const look = useMemo(() => ({ gradient, ink: palette.line }), [gradient, palette.line])
-  const theme = useTheme()
-  const deskColor = useMemo(() => new Color(D.deskColor[theme]), [theme])
+  const deskColor = useMemo(() => new Color(D.deskColor), [])
 
   const outer = useRef<Group>(null)
   const head = useRef<Group>(null)

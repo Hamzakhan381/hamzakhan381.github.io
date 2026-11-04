@@ -358,10 +358,7 @@
   "cheerFor": 2.8,
   "typingFor": 0.8,
   "faceOffset": 0.004,
-  "deskColor": {
-    "dark": "#1d2229",
-    "light": "#e4e7eb"
-  },
+  "deskColor": "#1d2229",
   "pokeFor": 2.4,
   "hitBox": {
     "size": [

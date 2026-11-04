@@ -1,20 +1,20 @@
 # Muhammad Hamza Khan — 3D Portfolio
 
-A multi-page 3D portfolio for a software engineer, in a monochrome theme with a sky-blue accent
-(dark and light modes). Each page has its own engineering-themed 3D scene driven by scroll, and
+A multi-page 3D portfolio for a software engineer, in a dark monochrome theme with a sky-blue
+accent. Each page has its own engineering-themed 3D scene driven by scroll, and
 floating code glyphs drift behind every page.
 
 | Page     | 3D scene (scroll-driven)                                         | Page widgets |
 | -------- | ---------------------------------------------------------------- | ------------ |
 | Home     | Architecture stack explodes into 5 layers; packets flow through; click a slab to jump to its card | Terminal that types as you scroll, then takes real commands (`help`, `projects`, `open cashup`, `sudo hire hamza`…); draggable tech sphere, counters |
-| About    | Git graph that draws each career branch as you scroll; click a branch label to jump to that job | profile.ts code window, git-log timeline, skill bars, keycap tools |
+| About    | Career growth chart: one glowing pillar per role, rising in turn with a trend line across their tops; the role you are reading lifts and streams data; click a pillar to jump to that job | profile.ts code window, git-log timeline, skill bars, keycap tools |
 | Services | Server rack; each service's unit slides out when it's centred or hovered; click to jump to it | Process staircase, engagement cards, FAQ |
 | Projects | Live service-mesh network with hopping packets                  | Z-depth featured gallery, FLIP-animated filters, live GitHub ring, case-study dialog |
-| CV       | Floating editor windows                                          | Printable paper CV that lands in 3D |
+| CV       | Floating editor windows                                          | Printable paper CV that lands as it scrolls into view, gets a scanner sweep and an availability stamp, and writes each section in as you reach it |
 | Contact  | Cel-shaded cartoon developer at a desk who follows the cursor, waves, types along with the form and cheers when it's sent; poke him or the rubber duck | Validated form, copy-email, availability card |
 
 Site-wide: scroll-speed camera warp, code glyphs that fly toward you, page headers that recede into depth on scroll,
-cards that tilt back as they leave, a ⌘K / Ctrl+K command palette (pages, projects, theme, lite mode), auto-hiding nav,
+cards that tilt back as they leave, a ⌘K / Ctrl+K command palette (pages, projects, lite mode), auto-hiding nav,
 a back-to-top progress ring, an "on this page" section rail on wide screens, pointer parallax on page titles, a cursor
 spotlight on the dot grid, and a 3D contact cube in the footer.
 

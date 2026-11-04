@@ -32,15 +32,9 @@
     "lineDelay": 0.18
   },
   "paperLand": {
-    "rotateX": 62,
-    "z": -500,
-    "y": 220,
-    "duration": 1.6,
-    "delay": 0.35
-  },
-  "paperScrollTilt": {
-    "start": 6,
-    "end": -5
+    "landMargin": "0px 0px -18% 0px",
+    "printAtMs": 650,
+    "revealMargin": "0px 0px -12% 0px"
   },
   "code": {
     "x": 40,

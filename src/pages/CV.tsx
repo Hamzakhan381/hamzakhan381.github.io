@@ -1,50 +1,77 @@
-import { useLayoutEffect, useRef } from 'react'
+import { useEffect, useRef, type CSSProperties } from 'react'
 import { Link } from 'react-router'
-import { gsap } from 'gsap'
 import { cv, profile } from '../content'
 import { appLoaded } from '../lib/intro'
 import { reduceMotion } from '../lib/scroll'
 import { usePageEffects } from '../lib/usePageEffects'
 import { PageHero } from '../components/PageHero'
 import { Icon } from '../components/Icon'
-import { Tilt } from '../components/Tilt'
 import motion from '../lib/motion.json'
 
-const { paperLand: LAND, paperScrollTilt: SCROLL_TILT } = motion
-const PAPER_TILT = 3
+const LAND = motion.paperLand
+
+/** One line of a paper section: it fades up in its turn (`--i` per entry, `--j` per bullet) once the section is reached. */
+const line = (i: number, j = 0) => ({ 'data-line': '', style: { '--i': i, '--j': j } as CSSProperties })
+
+/**
+ * When the paper scrolls into view it lands (a CSS transition, so it ends with no lingering 3D layer), a scanner
+ * light sweeps down it, an availability stamp lands on the corner, and each section writes itself in as you reach
+ * it. All of it is transforms and opacity on small elements, so the page stays smooth on modest GPUs.
+ */
+function usePrintedPaper() {
+  const paper = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const el = paper.current
+    if (!el) return
+    const sections = Array.from(el.querySelectorAll<HTMLElement>('[data-paper-section]'))
+    if (reduceMotion) {
+      el.classList.add('is-landed', 'is-printed')
+      sections.forEach((section) => section.classList.add('is-in'))
+      return
+    }
+    const sectionWatch = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return
+          entry.target.classList.add('is-in')
+          sectionWatch.unobserve(entry.target)
+        }),
+      { rootMargin: LAND.revealMargin },
+    )
+    let printTimer = 0
+    const paperWatch = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return
+        paperWatch.disconnect()
+        el.classList.add('is-landed')
+        printTimer = window.setTimeout(() => {
+          el.classList.add('is-printed')
+          sections.forEach((section) => sectionWatch.observe(section))
+        }, LAND.printAtMs)
+      },
+      { rootMargin: LAND.landMargin },
+    )
+    let cancelled = false
+    const watch = async () => {
+      await appLoaded
+      if (!cancelled) paperWatch.observe(el)
+    }
+    void watch()
+    return () => {
+      cancelled = true
+      window.clearTimeout(printTimer)
+      paperWatch.disconnect()
+      sectionWatch.disconnect()
+    }
+  }, [])
+
+  return paper
+}
 
 export default function CV() {
   const ref = usePageEffects<HTMLDivElement>()
-  const paper = useRef<HTMLDivElement>(null)
-
-  useLayoutEffect(() => {
-    const el = paper.current
-    if (!el || reduceMotion) return
-    let ctx: gsap.Context | undefined
-    let cancelled = false
-    gsap.set(el, { opacity: 0 })
-    const land = async () => {
-      await appLoaded
-      if (cancelled) return
-      ctx = gsap.context(() => {
-        gsap.fromTo(
-          el,
-          { opacity: 0, rotateX: LAND.rotateX, z: LAND.z, y: LAND.y, transformPerspective: motion.perspective, transformOrigin: '50% 0%' },
-          { opacity: 1, rotateX: 0, z: 0, y: 0, duration: LAND.duration, delay: LAND.delay, ease: 'expo.out' },
-        )
-        gsap.fromTo(
-          el.parentElement,
-          { rotateX: SCROLL_TILT.start, transformPerspective: motion.perspective },
-          { rotateX: SCROLL_TILT.end, ease: 'none', scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: true } },
-        )
-      })
-    }
-    void land()
-    return () => {
-      cancelled = true
-      ctx?.revert()
-    }
-  }, [])
+  const paper = usePrintedPaper()
 
   return (
     <div ref={ref} className="page page--cv">
@@ -68,88 +95,94 @@ export default function CV() {
             </div>
           ))}
         </aside>
-        <div className="cv-tilt">
-          <Tilt className="paper-tilt" max={PAPER_TILT}>
-            <div ref={paper} className="paper">
-              <header className="paper__head">
-                <h2>{profile.name}</h2>
-                <p>{cv.contactLine.join('  |  ')}</p>
-              </header>
+        <div className="paper-wrap">
+          <div ref={paper} className="paper">
+            <span className="paper__scan" aria-hidden="true" />
+            <span className={`paper__stamp ${profile.availability.open ? '' : 'paper__stamp--busy'}`} aria-hidden="true">
+              {profile.availability.open ? 'Open to work' : 'Booked'}
+            </span>
+            <header className="paper__head">
+              <h2>{profile.name}</h2>
+              <p>{cv.contactLine.join('  |  ')}</p>
+            </header>
 
-              <section>
-                <h3>Summary</h3>
-                <p>{cv.summary}</p>
-              </section>
+            <section data-paper-section>
+              <h3>Summary</h3>
+              <p {...line(0)}>{cv.summary}</p>
+            </section>
 
-              <section>
-                <h3>Experience</h3>
-                {cv.experience.map((job) => (
-                  <div key={job.org} className="paper__entry">
-                    <div className="paper__row">
-                      <strong>{job.org}</strong>
-                      <span>{job.place}</span>
-                    </div>
-                    <div className="paper__row paper__row--sub">
-                      <em>{job.role}</em>
-                      <span>{job.period}</span>
-                    </div>
-                    <ul>
-                      {job.points.map((p) => (
-                        <li key={p}>{p}</li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </section>
-
-              <section>
-                <h3>Projects</h3>
-                {cv.projects.map((proj) => (
-                  <div key={proj.name} className="paper__entry">
-                    <div className="paper__row">
-                      <span>
-                        <strong>{proj.name}</strong> | <em>{proj.stack}</em>
-                      </span>
-                      <span>{proj.kind}</span>
-                    </div>
-                    <div className="paper__row paper__row--sub">
-                      <em>{proj.role}</em>
-                    </div>
-                    <ul>
-                      {proj.points.map((p) => (
-                        <li key={p}>{p}</li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </section>
-
-              <section>
-                <h3>Technical Skills</h3>
-                <ul className="paper__skills">
-                  {cv.skills.map((group) => (
-                    <li key={group.label}>
-                      <strong>{group.label}:</strong> {group.items.join(', ')}
-                    </li>
-                  ))}
-                </ul>
-              </section>
-
-              <section>
-                <h3>Education</h3>
-                <div className="paper__entry">
+            <section data-paper-section>
+              <h3>Experience</h3>
+              {cv.experience.map((job, i) => (
+                <div key={job.org} className="paper__entry" {...line(i)}>
                   <div className="paper__row">
-                    <strong>{cv.education.school}</strong>
-                    <span>{cv.education.place}</span>
+                    <strong>{job.org}</strong>
+                    <span>{job.place}</span>
                   </div>
                   <div className="paper__row paper__row--sub">
-                    <em>{cv.education.degree}</em>
+                    <em>{job.role}</em>
+                    <span>{job.period}</span>
                   </div>
-                  <p>{cv.education.detail}</p>
+                  <ul>
+                    {job.points.map((p, j) => (
+                      <li key={p} {...line(i, j + 1)}>
+                        {p}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-              </section>
-            </div>
-          </Tilt>
+              ))}
+            </section>
+
+            <section data-paper-section>
+              <h3>Projects</h3>
+              {cv.projects.map((proj, i) => (
+                <div key={proj.name} className="paper__entry" {...line(i)}>
+                  <div className="paper__row">
+                    <span>
+                      <strong>{proj.name}</strong> | <em>{proj.stack}</em>
+                    </span>
+                    <span>{proj.kind}</span>
+                  </div>
+                  <div className="paper__row paper__row--sub">
+                    <em>{proj.role}</em>
+                  </div>
+                  <ul>
+                    {proj.points.map((p, j) => (
+                      <li key={p} {...line(i, j + 1)}>
+                        {p}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </section>
+
+            <section data-paper-section>
+              <h3>Technical Skills</h3>
+              <ul className="paper__skills">
+                {cv.skills.map((group, j) => (
+                  <li key={group.label} {...line(0, j)}>
+                    <strong>{group.label}:</strong> {group.items.join(', ')}
+                  </li>
+                ))}
+              </ul>
+            </section>
+
+            <section data-paper-section>
+              <h3>Education</h3>
+              <div className="paper__entry" {...line(0)}>
+                <div className="paper__row">
+                  <strong>{cv.education.school}</strong>
+                  <span>{cv.education.place}</span>
+                </div>
+                <div className="paper__row paper__row--sub">
+                  <em>{cv.education.degree}</em>
+                </div>
+                <p>{cv.education.detail}</p>
+              </div>
+            </section>
+          </div>
         </div>
       </section>
     </div>

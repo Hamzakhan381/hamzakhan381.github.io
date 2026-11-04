@@ -15,20 +15,11 @@
     "warpDamping": 4
   },
   "palette": {
-    "dark": {
-      "line": "#e8edf3",
-      "accent": "#38bdf8",
-      "surface": "#0d1115",
-      "dim": "#3b424b",
-      "ok": "#22c55e"
-    },
-    "light": {
-      "line": "#0b0d10",
-      "accent": "#0284c7",
-      "surface": "#ffffff",
-      "dim": "#b9bfc7",
-      "ok": "#16a34a"
-    }
+    "line": "#e8edf3",
+    "accent": "#38bdf8",
+    "surface": "#0d1115",
+    "dim": "#3b424b",
+    "ok": "#22c55e"
   },
   "lights": {
     "ambient": 0.75,
@@ -43,15 +34,12 @@
       -6,
       -2,
       -4
-    ],
-    "light": {
-      "ambient": 1.55,
-      "key": 1.35,
-      "rim": 0.35
-    }
+    ]
   },
   "transition": {
     "exitMs": 900,
+    "enterDelayMs": 520,
+    "idleTimeoutMs": 400,
     "damping": 4.5,
     "drift": 3,
     "minScale": 0.001
@@ -62,10 +50,7 @@
     "near": -3,
     "far": -16,
     "size": 0.5,
-    "opacity": {
-      "dark": 0.24,
-      "light": 0.3
-    },
+    "opacity": 0.24,
     "rise": 0.12,
     "parallax": 6,
     "set": [
@@ -92,10 +77,7 @@
     ],
     "travel": 2.2,
     "fadeNear": 0.85,
-    "color": {
-      "dark": "#e8edf3",
-      "light": "#5b6b82"
-    }
+    "color": "#e8edf3"
   },
   "stack": {
     "x": 0.44,
@@ -149,28 +131,49 @@
     "labelLift": 0.32,
     "activeLift": 0.35
   },
-  "git": {
-    "x": 0.3,
+  "career": {
+    "x": 0.45,
+    "y": -1.1,
     "z": -1,
-    "mobileScale": 0.6,
-    "height": 7.5,
-    "branchX": 1.25,
-    "branchZ": 0.6,
-    "branchStart": 0.12,
-    "branchEnd": 0.88,
-    "mainRadius": 0.035,
-    "branchRadius": 0.028,
-    "segments": 220,
-    "radial": 8,
-    "nodeSize": 0.1,
-    "labelHeight": 0.24,
-    "subLabelHeight": 0.15,
-    "labelGap": 0.3,
+    "mobileScale": 0.55,
+    "mobileY": -0.9,
+    "fit": 0.31,
+    "spacing": 1.45,
+    "radius": 0.42,
+    "baseHeight": 0.7,
+    "step": 0.65,
+    "capHeight": 0.07,
+    "capInset": 0.82,
+    "plateHeight": 0.12,
+    "plateDepth": 1.8,
+    "labelLift": 0.55,
+    "labelHeight": 0.2,
+    "subLabelHeight": 0.13,
+    "labelFit": 0.95,
+    "labelPad": 0.3,
+    "lineStep": 1.6,
+    "subOpacity": 0.75,
+    "minGrow": 0.12,
+    "trendRadius": 0.018,
+    "activeLift": 0.14,
+    "pulse": 3,
+    "pulseDepth": 0.25,
+    "particles": 18,
+    "particleSize": 0.06,
+    "particleRise": 1.1,
+    "particleSpeed": 0.45,
+    "particleSpread": 2.4,
     "tilt": [
-      0.08,
-      -0.35,
+      0.28,
+      -0.5,
       0
-    ]
+    ],
+    "turn": 0.5,
+    "riseStagger": 0.22,
+    "riseDamping": 4.5,
+    "trendFor": 0.9,
+    "gridDivisions": 12,
+    "dateHeight": 0.075
   },
   "rack": {
     "x": 0.5,
@@ -270,7 +273,10 @@
     },
     "minDpr": 1,
     "flipflops": 3,
-    "capBounds": [0.8, 1.3],
+    "capBounds": [
+      0.8,
+      1.3
+    ],
     "bootFps": 6
   }
 }

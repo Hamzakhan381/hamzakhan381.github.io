@@ -1,31 +1,28 @@
-import { useMemo, useSyncExternalStore } from 'react'
+import { useSyncExternalStore } from 'react'
 import { useThree, type ThreeEvent } from '@react-three/fiber'
 import { Edges } from '@react-three/drei'
 import { CanvasTexture, Color, MathUtils, SRGBColorSpace } from 'three'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import config from './scene.json'
-import { useTheme } from '../lib/theme'
 import { scrollState } from '../lib/scroll'
 import { DOUBLE, HALF, clamp } from '../lib/math'
 
-/* ---------- Theme ---------- */
+/* ---------- Palette ---------- */
 
-export type Palette = { line: Color; accent: Color; surface: Color; dim: Color; ok: Color; hex: (typeof config.palette)['dark'] }
+export type Palette = { line: Color; accent: Color; surface: Color; dim: Color; ok: Color; hex: typeof config.palette }
 
-export function usePalette(): Palette {
-  const theme = useTheme()
-  return useMemo(() => {
-    const hex = config.palette[theme]
-    return {
-      line: new Color(hex.line),
-      accent: new Color(hex.accent),
-      surface: new Color(hex.surface),
-      dim: new Color(hex.dim),
-      ok: new Color(hex.ok),
-      hex,
-    }
-  }, [theme])
+const hex = config.palette
+const palette: Palette = {
+  line: new Color(hex.line),
+  accent: new Color(hex.accent),
+  surface: new Color(hex.surface),
+  dim: new Color(hex.dim),
+  ok: new Color(hex.ok),
+  hex,
 }
+
+/** The scene colours (one shared set: the site has a single dark theme). */
+export const usePalette = () => palette
 
 /* ---------- Viewport ---------- */
 

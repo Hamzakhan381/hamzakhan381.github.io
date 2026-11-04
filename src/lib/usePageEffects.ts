@@ -16,13 +16,17 @@ export function usePageEffects<T extends HTMLElement>() {
     if (!el) return
     let ctx: gsap.Context | undefined
     let cancelled = false
+    let frame = 0
     const start = () => {
       if (cancelled) return
-      ctx = gsap.context(() => {
-        playIntro(el)
-        setupReveals(el)
-      }, el)
-      ScrollTrigger.refresh()
+      ctx = gsap.context(() => playIntro(el), el)
+      // The scroll reveals go up a frame later, in their own task: setting up dozens of scroll triggers is the
+      // costliest part of opening a page, and it shouldn't share a frame with React swapping the page in.
+      frame = requestAnimationFrame(() => {
+        if (cancelled) return
+        ctx?.add(() => setupReveals(el))
+        ScrollTrigger.refresh()
+      })
     }
     if (isAppLoaded()) start()
     else {
@@ -34,7 +38,9 @@ export function usePageEffects<T extends HTMLElement>() {
     }
     return () => {
       cancelled = true
-      ctx?.revert()
+      cancelAnimationFrame(frame)
+      // Stop everything but skip restoring styles: the page's elements are about to be removed anyway.
+      ctx?.kill()
     }
   }, [])
 

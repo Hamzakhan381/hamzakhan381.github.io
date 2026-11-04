@@ -1,39 +1,15 @@
-import { useEffect, useRef, useState, type CSSProperties, type MouseEvent } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { Link, NavLink, useLocation } from 'react-router'
 import routes from '../lib/routes.json'
 import { profile } from '../content'
-import { toggleTheme, useTheme } from '../lib/theme'
 import { lockScroll } from '../lib/scroll'
 import { OPEN_PALETTE, isMac } from './CommandPalette'
 import { Icon } from './Icon'
 
-const HALF = 0.5
 const HIDE_AFTER_PX = 140
 const SCROLLED_PX = 24
 const MIN_DELTA_PX = 6
 const menuRoutes = routes.filter((r) => r.path !== '/cv')
-
-function ThemeToggle() {
-  const theme = useTheme()
-  const onClick = (e: MouseEvent<HTMLButtonElement>) => {
-    const { left, top, width, height } = e.currentTarget.getBoundingClientRect()
-    toggleTheme(left + width * HALF, top + height * HALF)
-  }
-  return (
-    <button
-      type="button"
-      className="theme-toggle"
-      onClick={onClick}
-      aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
-      title="Toggle theme"
-    >
-      <span className="theme-toggle__cube" data-theme-face={theme}>
-        <Icon name="moon" className="theme-toggle__face theme-toggle__face--dark" />
-        <Icon name="sun" className="theme-toggle__face theme-toggle__face--light" />
-      </span>
-    </button>
-  )
-}
 
 /** Hides the bar while scrolling down (more room to read) and brings it back on any scroll up. */
 function useAutoHide(pinned: boolean) {
@@ -113,7 +89,6 @@ export function Nav() {
           <Icon name="search" />
           <kbd>{isMac ? '⌘' : 'Ctrl'} K</kbd>
         </button>
-        <ThemeToggle />
         <NavLink to="/cv" className="btn btn--small nav__cta">
           <Icon name="file" /> CV
         </NavLink>

@@ -2,8 +2,7 @@ import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type Keyb
 import { useNavigate } from 'react-router'
 import { gsap } from 'gsap'
 import { reduceMotion } from '../lib/scroll'
-import { HALF, clamp } from '../lib/math'
-import { toggleTheme } from '../lib/theme'
+import { clamp } from '../lib/math'
 import { openProject } from '../lib/projectDialog'
 import { complete, runCommand, type OutLine, type ShellContext } from '../lib/shell'
 import type { TerminalStep } from '../content'
@@ -120,10 +119,6 @@ export function Terminal({ host, session, welcome }: { host: string; session: Te
 
   const shell: ShellContext = {
     navigate: (path) => void navigate(path),
-    toggleTheme: () => {
-      const box = input.current?.getBoundingClientRect()
-      toggleTheme(box?.left ?? window.innerWidth * HALF, box?.top ?? window.innerHeight * HALF)
-    },
     openProject,
     history: () => past.current,
   }

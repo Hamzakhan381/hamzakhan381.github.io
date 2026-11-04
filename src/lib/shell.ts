@@ -7,7 +7,6 @@ export type OutLine = { text: string; href?: string; tone?: 'muted' | 'ok' | 'er
 /** What commands may do to the page around the terminal. */
 export type ShellContext = {
   navigate: (path: string) => void
-  toggleTheme: () => void
   openProject: (slug: string) => void
   history: () => string[]
 }
@@ -104,13 +103,6 @@ const commands: Record<string, Command> = {
       const name = target.split('/').filter(Boolean).join('/').toLowerCase()
       const page = pages.find((p) => p.name === name)
       return page ? goTo(page.path, ctx) : [say(`cd: no such page: ${target}`, 'err')]
-    },
-  },
-  theme: {
-    help: 'switch light / dark',
-    run: (_, ctx) => {
-      ctx.toggleTheme()
-      return [say('→ theme switched', 'ok')]
     },
   },
   date: {

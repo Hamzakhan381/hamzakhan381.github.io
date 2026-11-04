@@ -4,10 +4,8 @@ import routes from '../lib/routes.json'
 import { profile, projects } from '../content'
 import { lockScroll } from '../lib/scroll'
 import { openProject } from '../lib/projectDialog'
-import { toggleTheme } from '../lib/theme'
 import { copyText } from '../lib/toast'
 import { forgetQuality, liteChosen, setQuality } from '../lib/quality'
-import { HALF } from '../lib/math'
 import { Icon, type IconName } from './Icon'
 
 export const OPEN_PALETTE = 'palette:open'
@@ -34,14 +32,6 @@ export function CommandPalette() {
         keywords: `${r.label} ${r.path} page go`,
         run: () => navigate(r.path),
       })),
-      {
-        id: 'theme',
-        label: 'Toggle light / dark theme',
-        hint: 'Action',
-        icon: 'sun',
-        keywords: 'theme dark light mode color',
-        run: () => toggleTheme(window.innerWidth * HALF, window.innerHeight * HALF),
-      },
       liteChosen()
         ? {
             id: 'lite',

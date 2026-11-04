@@ -61,7 +61,7 @@ function Experience() {
   const { ref, active } = useFocusIndex<HTMLOListElement>()
   return (
     <section className="section container" data-track="experience">
-      <SectionHead eyebrow="Experience" title="git log" accent="--career" lead="Scroll through the history. The graph draws each branch as you reach it." />
+      <SectionHead eyebrow="Experience" title="git log" accent="--career" lead="Scroll through the history. Each role is a pillar in the chart; the one you're reading lights up." />
       <ol ref={ref} className="gitlog">
         {experience.map((job, i) => (
           <li key={job.org} id={`job-${i}`} data-focus-item className={`gitlog__item ${active === i ? 'is-active' : ''}`}>

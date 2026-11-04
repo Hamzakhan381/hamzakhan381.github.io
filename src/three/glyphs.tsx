@@ -14,7 +14,6 @@ import config from './scene.json'
 import { tierSettings } from './tier'
 import { scrollState } from '../lib/scroll'
 import { useQuality } from '../lib/quality'
-import { useTheme } from '../lib/theme'
 import { DOUBLE, HALF } from '../lib/math'
 
 const G = config.glyphs
@@ -90,7 +89,6 @@ void main() {
  */
 export function CodeGlyphs() {
   const quality = useQuality()
-  const theme = useTheme()
   const count = tierSettings(quality).glyphs
   const mesh = useRef<InstancedMesh>(null)
   const dummy = useMemo(() => new Object3D(), [])
@@ -117,10 +115,7 @@ export function CodeGlyphs() {
   }, [items, atlas])
   useEffect(() => () => geometry.dispose(), [geometry])
 
-  const uniforms = useMemo(() => ({ uMap: { value: atlas.texture }, uColor: { value: new Color() } }), [atlas])
-  useEffect(() => {
-    uniforms.uColor.value.set(G.color[theme])
-  }, [theme, uniforms])
+  const uniforms = useMemo(() => ({ uMap: { value: atlas.texture }, uColor: { value: new Color(G.color) } }), [atlas])
 
   useFrame((state) => {
     const target = mesh.current
@@ -128,7 +123,7 @@ export function CodeGlyphs() {
     const t = state.clock.elapsedTime
     const wrapAt = G.spreadY * DEPTH_SPREAD * HALF
     const alpha = geometry.getAttribute('aAlpha') as InstancedBufferAttribute
-    const opacity = G.opacity[theme]
+    const opacity = G.opacity
     items.forEach((item, i) => {
       const depth = (item.phase + scrollState.progress * G.travel) % 1
       const rise = ((item.y + t * item.speed + wrapAt) % (wrapAt * DOUBLE)) - wrapAt

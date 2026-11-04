@@ -5,14 +5,13 @@ import { Group, MathUtils, PerspectiveCamera, Vector3 } from 'three'
 import config from './scene.json'
 import { CodeGlyphs } from './glyphs'
 import { ArchitectureStack } from './scenes/ArchitectureStack'
-import { GitGraph } from './scenes/GitGraph'
+import { GrowthChart } from './scenes/GrowthChart'
 import { ServerRack } from './scenes/ServerRack'
 import { NetworkGraph } from './scenes/NetworkGraph'
 import { Developer } from './scenes/Developer'
 import { CodeWindows } from './scenes/CodeWindows'
 import { scrollState, useScrollLocked } from '../lib/scroll'
 import { normalizePath } from '../lib/paths'
-import { useTheme } from '../lib/theme'
 import { degrade, getQuality, useQuality } from '../lib/quality'
 import { useAppLoaded } from '../lib/intro'
 import { dprFor, tierSettings } from './tier'
@@ -30,7 +29,7 @@ const Q = config.quality
 /** Which 3D scene belongs to which route; anything unknown (404) gets the code windows. */
 const scenes: Record<string, ComponentType> = {
   '/': ArchitectureStack,
-  '/about': GitGraph,
+  '/about': GrowthChart,
   '/services': ServerRack,
   '/projects': NetworkGraph,
   '/cv': CodeWindows,
@@ -68,10 +67,40 @@ function CameraRig() {
 function Slot({ leaving, children }: { leaving: boolean; children: React.ReactNode }) {
   const group = useRef<Group>(null)
   const shown = useRef(0)
-  useFrame((_, delta) => {
-    shown.current = MathUtils.damp(shown.current, leaving ? 0 : 1, T.damping, delta)
+  const gl = useThree((s) => s.gl)
+  const camera = useThree((s) => s.camera)
+  const scene = useThree((s) => s.scene)
+  const [compiled, setCompiled] = useState(false)
+
+  // Compile the scene's shaders in parallel (KHR_parallel_shader_compile) while it is hidden, and only start
+  // growing it in once they are ready. Compiling on first draw instead blocks the main thread for a few hundred
+  // milliseconds, right when a page has just opened.
+  useEffect(() => {
     const g = group.current
     if (!g) return
+    let live = true
+    const warm = async () => {
+      try {
+        await gl.compileAsync(g, camera, scene)
+      } catch {
+        /* falls back to compiling on first draw */
+      }
+      if (live) setCompiled(true)
+    }
+    void warm()
+    return () => {
+      live = false
+    }
+  }, [gl, camera, scene])
+
+  useFrame((_, delta) => {
+    const g = group.current
+    if (!g) return
+    if (!compiled) {
+      g.visible = false
+      return
+    }
+    shown.current = MathUtils.damp(shown.current, leaving ? 0 : 1, T.damping, delta)
     const v = shown.current
     g.scale.setScalar(T.minScale + v * (1 - T.minScale))
     g.position.y = (1 - v) * (leaving ? T.drift : -T.drift)
@@ -86,9 +115,23 @@ function SceneSwitcher({ pathname }: { pathname: string }) {
   const [slots, setSlots] = useState([{ key, leaving: false }])
 
   useEffect(() => {
-    setSlots((prev) => [...prev.filter((s) => s.key !== key).map((s) => ({ ...s, leaving: true })), { key, leaving: false }])
-    const timer = window.setTimeout(() => setSlots((prev) => prev.filter((s) => !s.leaving)), T.exitMs)
-    return () => window.clearTimeout(timer)
+    // The old scene starts leaving at once. The new one is built only after the page transition has played and the
+    // browser is idle: building a scene (geometry, shader compiles) takes one long frame, which would otherwise
+    // land in the middle of the page-in animation and stutter it.
+    setSlots((prev) => (prev.some((s) => s.key === key && !s.leaving) ? prev : prev.map((s) => ({ ...s, leaving: true }))))
+    const enter = () =>
+      setSlots((prev) => (prev.some((s) => s.key === key && !s.leaving) ? prev : [...prev.filter((s) => s.key !== key), { key, leaving: false }]))
+    let idle = 0
+    const wait = window.setTimeout(() => {
+      idle = typeof window.requestIdleCallback === 'function' ? window.requestIdleCallback(enter, { timeout: T.idleTimeoutMs }) : 0
+      if (!idle) enter()
+    }, T.enterDelayMs)
+    const sweep = window.setTimeout(() => setSlots((prev) => prev.filter((s) => !s.leaving)), T.exitMs)
+    return () => {
+      window.clearTimeout(wait)
+      window.clearTimeout(sweep)
+      if (idle) window.cancelIdleCallback(idle)
+    }
   }, [key])
 
   return (
@@ -129,7 +172,7 @@ function FrameCap({ fps }: { fps: number }) {
 
 /**
  * The scene graph itself. Memoised so the loop changes above (overlay opened, intro lifted, frame cap) and the
- * theme's light levels re-render only the Canvas settings, never every mesh and label.
+ * dpr changes re-render only the Canvas settings, never every mesh and label.
  */
 const SceneContent = memo(function SceneContent({ pathname }: { pathname: string }) {
   return (
@@ -155,8 +198,6 @@ export default function Scene({ pathname }: { pathname: string }) {
   const [antialias] = useState(() => tierSettings(getQuality()).antialias)
   const [dpr, setDpr] = useState(() => dprFor(quality))
   const dprRef = useRef(dpr)
-  // White surfaces need more fill light to read as white rather than grey.
-  const light = useTheme() === 'light'
   // An open overlay covers the scene, so the GPU gets a break until it closes.
   const paused = useScrollLocked()
 
@@ -189,9 +230,9 @@ export default function Scene({ pathname }: { pathname: string }) {
       eventPrefix="client"
       aria-hidden="true"
     >
-      <ambientLight intensity={light ? L.light.ambient : L.ambient} />
-      <directionalLight intensity={light ? L.light.key : L.key} position={L.keyPosition as [number, number, number]} />
-      <directionalLight intensity={light ? L.light.rim : L.rim} position={L.rimPosition as [number, number, number]} />
+      <ambientLight intensity={L.ambient} />
+      <directionalLight intensity={L.key} position={L.keyPosition as [number, number, number]} />
+      <directionalLight intensity={L.rim} position={L.rimPosition as [number, number, number]} />
       {fps > 0 ? <FrameCap fps={fps} /> : null}
       {/* Frame rate means nothing while the intro deliberately throttles the scene, so only watch it afterwards. */}
       {loaded ? (
