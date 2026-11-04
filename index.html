@@ -102,7 +102,9 @@
       .is-waving .boot__bubble { opacity: 1; transform: none; }
       .boot__term { margin: 0; min-width: 17em; font: 500 clamp(11px, 3.2vw, 13px)/1.75 'Geist Mono', ui-monospace, Menlo, Consolas, monospace; color: var(--b-muted); animation: boot-in 0.6s 0.1s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
       .boot__term b { color: var(--b-accent); font-weight: 500; }
-      .boot__cmd { display: inline-block; color: var(--b-ink); clip-path: inset(0 100% 0 0); animation: boot-typing 0.34s steps(11, end) 0.12s forwards; }
+      /* Typed by shrinking a cover off the text (a transform), so it keeps typing while the bundle runs. */
+      .boot__cmd { position: relative; display: inline-block; color: var(--b-ink); }
+      .boot__cmd::after { content: ''; position: absolute; inset: 0 -0.15em; background: var(--b-bg); transform-origin: 100% 50%; animation: boot-typing 0.34s steps(11, end) 0.12s forwards; }
       .boot__pulse { display: inline-block; width: 0.55em; height: 0.55em; margin-right: 0.35em; border-radius: 50%; background: var(--b-accent); animation: boot-pulse 0.7s ease-in-out infinite alternate; }
       .boot__ready { display: none; color: var(--b-ok); }
       .is-waving .boot__wait { display: none; }
@@ -125,7 +127,7 @@
         56% { transform: rotate(150deg); } 70% { transform: rotate(126deg); } 84% { transform: rotate(146deg); } 100% { transform: rotate(138deg); }
       }
       @keyframes boot-look { to { transform: translateY(-5px) rotate(-5deg); } }
-      @keyframes boot-typing { to { clip-path: inset(0 0 0 0); } }
+      @keyframes boot-typing { to { transform: scaleX(0); } }
       @keyframes boot-pulse { from { opacity: 0.25; } to { opacity: 1; } }
       @keyframes boot-out { to { opacity: 0; } }
       @keyframes boot-dive { to { opacity: 0; transform: scale(2.2); } }
