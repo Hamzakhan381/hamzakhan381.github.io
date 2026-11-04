@@ -1626,6 +1626,184 @@ html[data-quality='low'] .jhero__mouse::after {
   }
 }
 
+/* ---------- About: the scroll story ---------- */
+
+/* Intro, after the reel: a big line in the corner, the chapter index top right, the current role underneath. */
+.shero__inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 100svh;
+  padding-top: 120px;
+  padding-bottom: clamp(56px, 11vh, 120px);
+}
+
+.shero__copy {
+  max-width: min(720px, 58%);
+}
+
+.shero__welcome {
+  margin: 0 0 16px;
+  font: 500 0.78rem var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.shero__title {
+  margin: 0;
+  font: 600 clamp(2.3rem, 5.2vw, 4.9rem) / 1.03 var(--font-display);
+  letter-spacing: -0.045em;
+}
+
+.shero__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 26px 0 0;
+  font: 500 0.82rem var(--font-mono);
+  color: var(--muted);
+}
+
+.shero__index {
+  position: absolute;
+  top: 128px;
+  right: var(--gutter);
+}
+
+.shero__index ol {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  text-align: right;
+}
+
+.shero__index button {
+  padding: 3px 0;
+  border: 0;
+  background: none;
+  font: 500 0.78rem var(--font-mono);
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 0.25s;
+}
+
+.shero__index button:hover,
+.shero__index button:focus-visible {
+  color: var(--accent);
+}
+
+.shero__index span {
+  margin-right: 8px;
+  color: var(--faint);
+}
+
+.shero__interact {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0 0;
+  font: 500 0.72rem var(--font-mono);
+  color: var(--muted);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .shero__interact {
+    display: flex;
+  }
+}
+
+.shero__hint {
+  position: absolute;
+  right: 0;
+  bottom: 26px;
+  left: 0;
+  width: max-content;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  font: 500 0.7rem var(--font-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Chapters keep to the left half; the dev pass hangs on the right and flips to a new face for each one. */
+.schapter > * {
+  max-width: min(640px, 56%);
+}
+
+.words--story {
+  margin-bottom: 22px;
+  font-size: clamp(1.4rem, 2.6vw, 2.2rem);
+}
+
+.schapter__text {
+  color: var(--muted);
+}
+
+.story .edu {
+  margin-bottom: 56px;
+}
+
+.story .code {
+  margin-top: 56px;
+}
+
+.soutro {
+  display: grid;
+  align-items: center;
+  min-height: 92svh;
+  padding: 100px 0;
+}
+
+.soutro__title {
+  margin: 0;
+  font: 700 clamp(2.8rem, 8vw, 7rem) / 0.98 var(--font-display);
+  letter-spacing: -0.05em;
+}
+
+.soutro__lead {
+  margin: 22px 0 28px;
+  font-size: 1.05rem;
+  color: var(--muted);
+}
+
+/* Narrow windows and phones: the text takes the full width and the pass hangs in the space above each chapter's
+   heading, scrolling away as you read (the scene switches layout at the same 900px). */
+@media (max-width: 900px) {
+  .schapter > *,
+  .shero__copy {
+    max-width: none;
+  }
+
+  .shero__index {
+    display: none;
+  }
+
+  .schapter {
+    padding-top: 46svh;
+  }
+}
+
+@media (max-width: 720px) {
+  .shero__hint {
+    display: none;
+  }
+}
+
+/* Short desktop windows: the pass hangs high enough to meet the chapter index, so the index steps aside. */
+@media (min-width: 901px) and (max-height: 700px) {
+  .shero__index {
+    display: none;
+  }
+}
+
 /* Terminal */
 .term,
 .code {
@@ -1831,72 +2009,6 @@ html[data-quality='low'] .jhero__mouse::after {
 }
 
 /* ---------- About ---------- */
-
-.about {
-  display: grid;
-  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-  gap: clamp(32px, 6vw, 80px);
-  align-items: center;
-}
-
-.portrait {
-  position: relative;
-  max-width: 380px;
-  justify-self: center;
-}
-
-.portrait__frame {
-  position: absolute;
-  inset: -14px 14px 14px -14px;
-  border: 1px solid var(--border-strong);
-  border-radius: 24px;
-  transform: translateZ(-40px);
-}
-
-.portrait img {
-  position: relative;
-  display: block;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 3 / 4;
-  object-fit: cover;
-  border-radius: 20px;
-  filter: grayscale(1) contrast(1.05);
-  transition: filter 0.6s;
-  transform: translateZ(30px);
-}
-
-.portrait:hover img {
-  filter: grayscale(0);
-}
-
-.portrait__tag {
-  position: absolute;
-  left: 50%;
-  bottom: -18px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 18px;
-  border-radius: 999px;
-  background: var(--invert);
-  color: var(--on-invert);
-  font: 500 0.82rem var(--font-mono);
-  white-space: nowrap;
-  transform: translateX(-50%) translateZ(70px);
-}
-
-.about__copy p {
-  margin: 0 0 16px;
-  color: var(--muted);
-}
-
-.about__role {
-  font: 500 0.85rem var(--font-mono) !important;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--accent) !important;
-}
 
 /* Code window */
 .code__tab {
@@ -4132,6 +4244,28 @@ html[data-quality='low'] .palette {
   background: #fff;
 }
 
+/* Over the About page's dev pass: a hand, and an open ring that closes while you drag it. */
+.cursor-grab body {
+  cursor: grab;
+}
+
+.is-grabbing body {
+  cursor: grabbing;
+  user-select: none;
+}
+
+.cursor-grab .cursor--ring {
+  width: 56px;
+  height: 56px;
+  margin: -28px 0 0 -28px;
+}
+
+.is-grabbing .cursor--ring {
+  width: 26px;
+  height: 26px;
+  margin: -13px 0 0 -13px;
+}
+
 /* ---------- Responsive ---------- */
 
 @media (max-width: 1100px) {
@@ -4172,7 +4306,6 @@ html[data-quality='low'] .palette {
     display: grid;
   }
 
-  .about,
   .contact,
   .split,
   .bars {
@@ -4194,10 +4327,6 @@ html[data-quality='low'] .palette {
   .to-top {
     right: 14px;
     bottom: 14px;
-  }
-
-  .portrait {
-    max-width: 300px;
   }
 
   .page-hero {

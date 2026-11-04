@@ -69,8 +69,54 @@ export type Home = {
 
 export type Certification = { name: string; issuer: string; date: string; href?: string }
 
+/** The words printed on the About page's 3D dev pass, on each of its faces. */
+export type PassText = {
+  kicker: string
+  serial: string
+  role: string
+  access: string
+  available: string
+  busy: string
+  branch: string
+  back: string
+  jobKicker: string
+  worksAt: string
+  workedAt: string
+  /** The word in a job's period that marks it as current ("Dec 2025 – Present"). */
+  present: string
+  studentKicker: string
+  studiesAt: string
+  stackKicker: string
+  stackTitle: string
+  /** Counted words under the stack and principles faces' headers ("12 tools", "06 rules"). */
+  toolsUnit: string
+  rulesUnit: string
+  principlesKicker: string
+  nowKicker: string
+  labels: { role: string; period: string; degree: string }
+  github: string
+  flipBack: string
+}
+
+/**
+ * The About page is a scroll story in chapters, beside a 3D dev pass of Hamza's that flips to a new face for each one.
+ * `story` holds the intro lines and the headings of the chapters that don't have their own block below.
+ */
 export type About = {
-  hero: Hero
+  story: {
+    welcome: string
+    name: string
+    tagline: string
+    status: string
+    hint: string
+    /** Shown on devices with a mouse, next to the dev pass. */
+    interact: string
+    pass: PassText
+    who: AccentHead & { lead: string }
+    experience: AccentHead & { lead: string }
+    skills: AccentHead
+    outro: AccentHead & { lead: string; cta: string }
+  }
   bio: string[]
   highlights: { value: string; label: string }[]
   principles: SectionHead & { items: { title: string; text: string }[] }

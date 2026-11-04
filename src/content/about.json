@@ -1,9 +1,40 @@
 {
-  "hero": {
-    "eyebrow": "About",
-    "lines": ["Hello, I'm Hamza.", "I build software", "that lasts."],
-    "accentLine": 2,
-    "lead": "My goal is not just to write code, but to design systems that endure, scale, and deliver real-world impact."
+  "story": {
+    "welcome": "Welcome to the personal portfolio of",
+    "name": "Hamza Khan",
+    "tagline": "systems, interfaces and code, by one person.",
+    "status": "Currently",
+    "hint": "Scroll to meet me",
+    "interact": "Drag the pass to swing it, click to flip it",
+    "pass": {
+      "kicker": "Dev pass",
+      "serial": "No. 0381",
+      "role": "Full-Stack Engineer",
+      "access": "Access · all repos",
+      "available": "Available",
+      "busy": "Booked",
+      "branch": "main",
+      "back": "Back side",
+      "jobKicker": "Access pass",
+      "worksAt": "Works at",
+      "workedAt": "Worked at",
+      "present": "Present",
+      "studentKicker": "Student ID",
+      "studiesAt": "Studies at",
+      "stackKicker": "Stack access",
+      "stackTitle": "Tools I ship with",
+      "toolsUnit": "tools",
+      "rulesUnit": "rules",
+      "principlesKicker": "Code of conduct",
+      "nowKicker": "Status",
+      "labels": { "role": "Role", "period": "Period", "degree": "Degree" },
+      "github": "github.com/",
+      "flipBack": "Click to flip back"
+    },
+    "who": { "eyebrow": "Who I am", "title": "Hello, I'm", "accent": "Hamza.", "lead": "My goal is not just to write code, but to design systems that endure, scale, and deliver real-world impact." },
+    "experience": { "eyebrow": "Experience", "title": "git log", "accent": "--career", "lead": "Scroll through the jobs: the pass switches to each company." },
+    "skills": { "eyebrow": "Education & skills", "title": "Learning it,", "accent": "then shipping it." },
+    "outro": { "eyebrow": "Contact", "title": "Let's work", "accent": "together.", "lead": "Thanks for scrolling all the way. If you have a project, a role or just a question, I'd love to hear it.", "cta": "Start a project" }
   },
   "bio": [
     "I'm a Software Engineering student at Air University, Multan, and I love building scalable, high-performance systems. My focus is backend architecture, database design, and full-stack development: turning complex problems into clean, efficient solutions.",

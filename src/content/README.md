@@ -8,8 +8,8 @@ missing or misspelled, the build fails and tells you which one.
 | --- | --- |
 | `profile.json` | Name, role, email, phone, location, availability badge, photo, social links |
 | `home.json` | The Home journey: intro terminal lines and pitch, main tech stack, the about paragraph (words in [brackets] light up in the accent colour), terminal session (plus the line it prints when a visitor clicks in to type commands), stats, git log heading, featured project slugs for the card deck, the closing section, testimonials |
-| `about.json` | About hero, bio paragraphs, highlight numbers, principles, "Right now", certifications |
-| `experience.json` | Jobs shown in the git log (newest first); each one also gets a glowing band in the 3D code DNA helix on the About page |
+| `about.json` | About page story: intro lines and chapter headings (`story`), the words printed on the 3D dev pass (`story.pass`), bio paragraphs, highlight numbers, principles, "Right now", certifications |
+| `experience.json` | Jobs shown in the git log (newest first); each one also gets its own access-pass face on the About page's dev pass |
 | `education.json` | Degrees and focus areas |
 | `skills.json` | Skill bars (`level` is 0–100) and the tools list |
 | `services.json` | Services (one rack unit each), process, ways to work together, FAQ |

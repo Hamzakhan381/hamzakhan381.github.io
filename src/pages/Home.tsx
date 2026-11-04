@@ -1,4 +1,4 @@
-import { Fragment, useLayoutEffect, type RefObject } from 'react'
+import { useLayoutEffect, type RefObject } from 'react'
 import { Link } from 'react-router'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -21,6 +21,7 @@ import { WordReveal } from '../components/WordReveal'
 import { BeamTimeline } from '../components/BeamTimeline'
 import { CardStack } from '../components/CardStack'
 import { JourneyHud } from '../components/JourneyHud'
+import { RollText } from '../components/RollText'
 
 const J = motion.journey
 const DV = J.dive
@@ -29,33 +30,12 @@ const STEPS = ['boot', 'about', 'experience', 'projects', 'contact']
 const SCATTER_CHANNELS = ['x', 'y', 'z', 'rotateX', 'rotateY', 'rotateZ']
 const featured = home.featured.slugs.map(projectBySlug).filter((p): p is Project => Boolean(p))
 
-/** Letters that roll up into place in 3D as the closing headline scrolls in (words stay together when wrapping). */
-function RollText({ text, className = '' }: { text: string; className?: string }) {
-  const words = text.split(' ')
-  return (
-    <span className={`roll ${className}`} aria-hidden="true">
-      {words.map((word, w) => (
-        <Fragment key={`${word}-${w}`}>
-          <span className="roll-word">
-            {Array.from(word).map((ch, c) => (
-              <span key={`${ch}-${c}`} className="roll-char">
-                {ch}
-              </span>
-            ))}
-          </span>
-          {w < words.length - 1 ? ' ' : null}
-        </Fragment>
-      ))}
-    </span>
-  )
-}
-
 /**
  * The scroll choreography of the Home page:
  * 1. intro: the terminal lines and copy fade up once the boot screen lifts (the name decrypts itself);
  * 2. dive: the intro is pinned while the name flies apart, a laptop rises and opens, its code types in and the
  *    camera dives into the screen (the 3D portal follows `journey.dive`);
- * 3. finale: the closing headline rolls up letter by letter while the portal gathers again (`journey.finale`).
+ * 3. finale: the portal gathers again behind the closing headline (`journey.finale`).
  */
 function useJourneyMotion(ref: RefObject<HTMLDivElement | null>) {
   useLayoutEffect(() => {
@@ -140,18 +120,6 @@ function useJourneyMotion(ref: RefObject<HTMLDivElement | null>) {
           journey.finale = self.progress
         },
       })
-      gsap.fromTo(
-        root.querySelectorAll('.roll-char'),
-        { rotateX: J.finale.roll, yPercent: J.finale.lift, opacity: 0, transformPerspective: motion.perspective, transformOrigin: '50% 100%' },
-        {
-          rotateX: 0,
-          yPercent: 0,
-          opacity: 1,
-          stagger: J.finale.stagger,
-          ease: 'power2.out',
-          scrollTrigger: { trigger: one('.jfinale__title'), start: J.finale.titleStart, end: J.finale.titleEnd, scrub: true },
-        },
-      )
     }, root)
     return () => {
       ctx.revert()

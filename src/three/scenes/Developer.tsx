@@ -1,20 +1,18 @@
-import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useFrame, useThree, type ThreeEvent } from '@react-three/fiber'
-import { Billboard, Edges, Outlines, RoundedBox } from '@react-three/drei'
+import { Billboard, Edges, RoundedBox } from '@react-three/drei'
 import {
   Color,
-  DataTexture,
   DoubleSide,
   Group,
   MathUtils,
   Mesh,
   MeshBasicMaterial,
-  NearestFilter,
   PointLight,
-  RedFormat,
   Vector3,
 } from 'three'
 import D from './developer.json'
+import { Ink, LookContext, Toon, useToonGradient } from '../toon'
 import { Label, fromEmptySpace, labelTexture, readTrack, setPointer3D, useFontsVersion, useHalfWidth, useNarrow, usePalette } from '../kit'
 import { contact } from '../../content'
 import { deskMood, now } from '../../lib/deskMood'
@@ -33,31 +31,6 @@ const MIRROR = [-1, 1]
 const BUBBLE_WEIGHT = 600
 
 type Mode = 'idle' | 'hello' | 'typing' | 'poke' | 'sent'
-
-/* ---------- Cartoon look: cel shading + ink outlines that follow the theme ---------- */
-
-type Look = { gradient: DataTexture; ink: Color }
-const LookContext = createContext<Look | null>(null)
-
-function Toon({ color, side }: { color: Color | string; side?: typeof DoubleSide }) {
-  const look = useContext(LookContext)
-  return <meshToonMaterial color={color} gradientMap={look?.gradient} side={side} />
-}
-
-function Ink() {
-  const look = useContext(LookContext)
-  return <Outlines thickness={D.outline} color={look?.ink} />
-}
-
-function useGradient() {
-  return useMemo(() => {
-    const texture = new DataTexture(Uint8Array.from(D.tones), D.tones.length, 1, RedFormat)
-    texture.minFilter = NearestFilter
-    texture.magFilter = NearestFilter
-    texture.needsUpdate = true
-    return texture
-  }, [])
-}
 
 /* ---------- Static set pieces ---------- */
 
@@ -300,8 +273,8 @@ export function Developer() {
   const half = useHalfWidth(D.placement.z)
   const palette = usePalette()
   const camera = useThree((s) => s.camera)
-  const gradient = useGradient()
-  const look = useMemo(() => ({ gradient, ink: palette.line }), [gradient, palette.line])
+  const gradient = useToonGradient(D.tones)
+  const look = useMemo(() => ({ gradient, ink: palette.line, outline: D.outline }), [gradient, palette.line])
   const deskColor = useMemo(() => new Color(D.deskColor), [])
 
   const outer = useRef<Group>(null)

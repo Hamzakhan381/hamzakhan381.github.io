@@ -155,16 +155,26 @@
     },
     "finale": {
       "start": "top bottom",
-      "end": "center center",
-      "roll": -95,
-      "lift": 60,
-      "stagger": 0.035,
-      "titleStart": "top 88%",
-      "titleEnd": "top 50%"
+      "end": "center center"
     },
     "hud": {
       "line": "top 55%",
       "decimals": 3
+    }
+  },
+  "roll": {
+    "roll": -95,
+    "lift": 60,
+    "stagger": 0.035,
+    "start": "top 88%",
+    "end": "top 50%"
+  },
+  "story": {
+    "chapterLine": "top 60%",
+    "heroOut": {
+      "y": -90,
+      "start": "top top",
+      "end": "bottom top"
     }
   }
 }

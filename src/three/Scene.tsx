@@ -5,7 +5,7 @@ import { Group, MathUtils, PerspectiveCamera, Vector3 } from 'three'
 import config from './scene.json'
 import { CodeGlyphs } from './glyphs'
 import { CodePortal } from './scenes/CodePortal'
-import { CodeHelix } from './scenes/CodeHelix'
+import { DevPass } from './scenes/DevPass'
 import { ServerRack } from './scenes/ServerRack'
 import { Galaxy } from './scenes/Galaxy'
 import { Developer } from './scenes/Developer'
@@ -26,10 +26,10 @@ const L = config.lights
 
 const Q = config.quality
 
-/** Which 3D scene belongs to which route; anything unknown (404) gets the code windows. */
+/** Which 3D scene belongs to which route (About: the dev pass); anything unknown (404) gets the code windows. */
 const scenes: Record<string, ComponentType> = {
   '/': CodePortal,
-  '/about': CodeHelix,
+  '/about': DevPass,
   '/services': ServerRack,
   '/projects': Galaxy,
   '/cv': CodeWindows,

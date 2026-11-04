@@ -32,14 +32,16 @@ function LocalTime() {
   return <time>{time}</time>
 }
 
+const PAGES_WITH_OWN_CTA = ['/', '/about']
+
 export function Footer() {
-  // Home ends with its own "let's build" section, so the footer's call to action would only repeat it there.
-  const home = normalizePath(useLocation().pathname) === '/'
+  // Home and About end with their own call to action, so the footer's would only repeat it there.
+  const quiet = PAGES_WITH_OWN_CTA.includes(normalizePath(useLocation().pathname))
   return (
     <footer className="footer">
       <div className="container">
-        <div className={`footer__top ${home ? 'footer__top--quiet' : ''}`}>
-          {home ? null : (
+        <div className={`footer__top ${quiet ? 'footer__top--quiet' : ''}`}>
+          {quiet ? null : (
             <Link to="/contact" className="footer__cta" data-reveal>
               <span className="footer__cta-small">Have a project in mind?</span>
               <span className="footer__cta-big">
