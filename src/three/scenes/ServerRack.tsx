@@ -3,7 +3,7 @@ import { useFrame, type ThreeEvent } from '@react-three/fiber'
 import { Edges } from '@react-three/drei'
 import { Group, MathUtils, MeshBasicMaterial } from 'three'
 import config from '../scene.json'
-import { Label, fromEmptySpace, readTrack, setPointer3D, useHalfWidth, useNarrow, usePalette } from '../kit'
+import { Label, fitLabelHeight, fromEmptySpace, readTrack, setPointer3D, useFontsVersion, useHalfWidth, useNarrow, usePalette } from '../kit'
 import { services } from '../../content'
 import { scrollState, scrollToCentre } from '../../lib/scroll'
 import { HALF } from '../../lib/math'
@@ -19,7 +19,8 @@ const VENT_WIDTH = 0.035
 const VENT_SPACING = 0.11
 const VENT_HEIGHT_RATIO = 0.55
 const VENT_INSET = 0.35
-const LABEL_INSET = 0.9
+/** Clear space between the label and the status LEDs on its left / the vents on its right. */
+const LABEL_GAP = 0.12
 const FACE_OFFSET = 0.006
 const UNIT_INSET = 0.12
 const INDEX_DIGITS = 2
@@ -60,6 +61,15 @@ export function ServerRack() {
   const unitDepth = R.depth - UNIT_INSET
   const face = unitDepth * HALF + FACE_OFFSET
   const unitY = (i: number) => height * HALF - R.unitGap - R.unitHeight * HALF - i * pitch
+
+  // Each label sits between the status LEDs and the vents, all at one text size: the largest at which the longest
+  // service name still fits, so names added in services.json never run into the vents.
+  useFontsVersion()
+  const ledsEnd = -unitWidth * HALF + LED_INSET * HALF + (R.leds - 1) * LED_SPACING + R.ledSize * HALF
+  const ventsStart = unitWidth * HALF - VENT_INSET - (R.vents - 1) * VENT_SPACING - VENT_WIDTH * HALF
+  const labelStart = ledsEnd + LABEL_GAP
+  const labelTexts = units.map((service, i) => `${String(i + 1).padStart(INDEX_DIGITS, '0')}  ${service.short}`)
+  const labelHeight = fitLabelHeight(labelTexts, ventsStart - LABEL_GAP - labelStart, R.labelHeight)
 
   const posts = useMemo(
     () =>
@@ -131,11 +141,11 @@ export function ServerRack() {
               </mesh>
             ))}
             <Label
-              text={`${String(i + 1).padStart(INDEX_DIGITS, '0')}  ${service.short}`}
-              height={R.labelHeight}
+              text={labelTexts[i]}
+              height={labelHeight}
               color={on ? palette.accent : palette.line}
               align="left"
-              position={[-unitWidth * HALF + LABEL_INSET, 0, face]}
+              position={[labelStart, 0, face]}
             />
             {Array.from({ length: R.vents }, (_, k) => (
               <mesh key={`v${k}`} position={[unitWidth * HALF - VENT_INSET - k * VENT_SPACING, 0, face]}>

@@ -44,6 +44,14 @@
 }
 
 /* White theme: paper-like page, real elevation on cards, and accents that pass WCAG AA (4.5:1) for text. */
+/* On phones the 3D scene sits behind the cards rather than beside them: make them solid so no line shows through text. */
+@media (max-width: 720px) {
+  :root,
+  :root[data-theme='dark'] {
+    --card-bg: rgb(14, 16, 19);
+  }
+}
+
 :root[data-theme='light'] {
   --bg: #f4f5f7;
   --bg-soft: #eceef1;
@@ -1569,15 +1577,20 @@ html[data-quality='low'] .scroll-hint {
   font: 400 0.86rem/1.8 var(--font-mono);
 }
 
+/* Long lines wrap instead of being cut off; continuation lines hang past the line number, under the code. */
 .code__line {
   display: block;
+  padding-left: calc(4.4em + 2ch);
   padding-right: 22px;
-  white-space: pre;
+  text-indent: calc(-4.4em - 2ch);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 .code__num {
   display: inline-block;
   width: 3.2em;
+  text-indent: 0;
   padding-right: 1.2em;
   text-align: right;
   color: var(--editor-faint);
@@ -2227,6 +2240,8 @@ html[data-quality='low'] .scroll-hint {
   margin: 0;
   padding: 18px 20px;
   overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
   font: 400 0.85rem/1.8 var(--font-mono);
   color: var(--editor-fg);
 }

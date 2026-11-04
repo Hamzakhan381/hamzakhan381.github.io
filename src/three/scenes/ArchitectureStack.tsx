@@ -16,6 +16,8 @@ const SLAB_OPACITY = 0.94
 const CONNECTOR_RADIUS = 0.008
 const CONNECTOR_SIDES = 6
 const PACKET_SEGMENTS = 10
+/** How far open (0 closed, 1 fully exploded) the stack must be before every slab shows its label. */
+const LABELS_FROM = 0.35
 
 type Vec3 = [number, number, number]
 
@@ -35,6 +37,7 @@ export function ArchitectureStack() {
   const spin = useRef<Group>(null)
   const slabs = useRef<(Group | null)[]>([])
   const connectors = useRef<(Mesh | null)[]>([])
+  const labels = useRef<(Group | null)[]>([])
   const packets = useRef<InstancedMesh>(null)
   const [active, setActive] = useState(-1)
   const activeRef = useRef(-1)
@@ -93,6 +96,12 @@ export function ArchitectureStack() {
     }
     const top = (layers.length - 1) * HALF * gap
     const span = (layers.length - 1) * gap
+    // While the stack is closed, every slab but the top one hides most of its label: show those once it opens.
+    const opened = (gap - S.gapClosed) / (S.gapOpen - S.gapClosed) > LABELS_FROM
+    labels.current.forEach((_, i) => {
+      const label = labels.current[i]
+      if (label) label.visible = i === 0 || opened
+    })
 
     if (outer.current) {
       outer.current.position.set(narrow ? 0 : half * S.x, (narrow ? S.mobileY : S.y) + track.y, S.z)
@@ -147,12 +156,15 @@ export function ArchitectureStack() {
                   <Edges color={on ? palette.accent : palette.dim} />
                 </mesh>
               ))}
-              <Billboard position={[-S.width * HALF, S.labelLift, S.depth * HALF]}>
+              <Billboard ref={(el) => void (labels.current[i] = el)} position={[-S.width * HALF, S.labelLift, S.depth * HALF]}>
+                {/* On a solid tag: when the stack opens up, long layer names would otherwise cross the chips behind them. */}
                 <Label
                   text={`0${i + 1}  ${layer.name.toUpperCase()}`}
                   height={S.labelHeight}
                   color={on ? palette.accent : palette.line}
                   align="left"
+                  plate={palette.surface}
+                  plateEdge={on ? palette.accent : palette.dim}
                 />
               </Billboard>
             </group>

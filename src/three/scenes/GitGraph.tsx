@@ -3,7 +3,7 @@ import { useFrame, type ThreeEvent } from '@react-three/fiber'
 import { Billboard } from '@react-three/drei'
 import { CatmullRomCurve3, Group, LineCurve3, MathUtils, Mesh, TubeGeometry, Vector3 } from 'three'
 import config from '../scene.json'
-import { Label, fromEmptySpace, readTrack, setPointer3D, useHalfWidth, useNarrow, usePalette } from '../kit'
+import { Label, fromEmptySpace, labelTexture, readTrack, setPointer3D, useFontsVersion, useHalfWidth, useNarrow, usePalette } from '../kit'
 import { experience } from '../../content'
 import { scrollState, scrollToCentre } from '../../lib/scroll'
 import { DOUBLE, HALF, clamp } from '../../lib/math'
@@ -17,6 +17,12 @@ const BRANCH_DROP = 0.08
 const BRANCH_SPREAD = 0.15
 const POINTER_TILT = 0.1
 const DIM_OPACITY = 0.35
+/** World units kept clear between a label's end and the screen edge (the section rail's dots live there). */
+const EDGE_MARGIN = 0.65
+/** Line spacing between the company and the dates, as a multiple of their text height. */
+const LINE_STEP = 1.35
+const PERIOD_OPACITY = 0.7
+const ROLE_WEIGHT = 600
 
 type Branch = { geometry: TubeGeometry; start: number; end: number; tip: Vector3; label: Vector3 }
 
@@ -93,6 +99,23 @@ export function GitGraph() {
     }
   }, [])
 
+  // Room for the labels between the branch tips and the right edge of the screen, in the graph's own units. Each
+  // label block (role, company, dates) shrinks as a whole to fit, so it never runs off the page and the role stays
+  // the largest line.
+  useFontsVersion()
+  const scale = narrow ? G.mobileScale : 1
+  const graphX = narrow ? 0 : half * G.x
+  const labelRoom = (half - EDGE_MARGIN - graphX) / scale - (G.branchX + G.labelGap) * Math.cos(G.tilt[1])
+  const labelLines = experience.map((job) => ({ role: job.role, org: `@ ${job.org}`, period: job.period }))
+  const blockScale = labelLines.map((lines) => {
+    const widest = Math.max(
+      G.labelHeight * labelTexture(lines.role, ROLE_WEIGHT, false).aspect,
+      G.subLabelHeight * labelTexture(lines.org).aspect,
+      G.subLabelHeight * labelTexture(lines.period).aspect,
+    )
+    return Math.min(1, labelRoom / widest)
+  })
+
   useEffect(
     () => () => {
       mainGeometry.dispose()
@@ -125,8 +148,7 @@ export function GitGraph() {
     if (head.current) head.current.position.y = G.height * HALF - p * G.height
 
     if (outer.current) {
-      const scale = narrow ? G.mobileScale : 1
-      outer.current.position.set(narrow ? 0 : half * G.x, track.y + (p * G.height - G.height * HALF) * scale, G.z)
+      outer.current.position.set(graphX, track.y + (p * G.height - G.height * HALF) * scale, G.z)
       outer.current.scale.setScalar(scale)
       outer.current.rotation.set(G.tilt[0] + scrollState.pointerY * POINTER_TILT, G.tilt[1] + scrollState.pointerX * POINTER_TILT, G.tilt[2])
     }
@@ -143,8 +165,31 @@ export function GitGraph() {
             <meshBasicMaterial color={i === active ? palette.accent : palette.line} toneMapped={false} />
           </mesh>
           <Billboard position={b.label.toArray()} onPointerMove={hoverAt(i)} onPointerOut={leave} onClick={open(i)}>
-            <Label text={experience[i].role} height={G.labelHeight} color={i === active ? palette.accent : palette.line} weight={600} mono={false} align="left" opacity={i === active || active < 0 ? 1 : DIM_OPACITY} />
-            <Label text={`@ ${experience[i].org} · ${experience[i].period}`} height={G.subLabelHeight} color={palette.line} align="left" position={[0, -G.labelHeight, 0]} opacity={i === active || active < 0 ? 1 : DIM_OPACITY} />
+            <Label
+              text={labelLines[i].role}
+              height={G.labelHeight * blockScale[i]}
+              color={i === active ? palette.accent : palette.line}
+              weight={ROLE_WEIGHT}
+              mono={false}
+              align="left"
+              opacity={i === active || active < 0 ? 1 : DIM_OPACITY}
+            />
+            <Label
+              text={labelLines[i].org}
+              height={G.subLabelHeight * blockScale[i]}
+              color={palette.line}
+              align="left"
+              position={[0, -G.labelHeight * blockScale[i], 0]}
+              opacity={i === active || active < 0 ? 1 : DIM_OPACITY}
+            />
+            <Label
+              text={labelLines[i].period}
+              height={G.subLabelHeight * blockScale[i]}
+              color={palette.line}
+              align="left"
+              position={[0, -(G.labelHeight + G.subLabelHeight * LINE_STEP) * blockScale[i], 0]}
+              opacity={(i === active || active < 0 ? 1 : DIM_OPACITY) * PERIOD_OPACITY}
+            />
           </Billboard>
         </group>
       ))}

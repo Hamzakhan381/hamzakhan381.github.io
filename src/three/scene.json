@@ -150,7 +150,7 @@
     "activeLift": 0.35
   },
   "git": {
-    "x": 0.42,
+    "x": 0.3,
     "z": -1,
     "mobileScale": 0.6,
     "height": 7.5,
@@ -186,7 +186,7 @@
     "slideDamping": 6,
     "leds": 3,
     "ledSize": 0.06,
-    "vents": 7,
+    "vents": 5,
     "labelHeight": 0.16,
     "tilt": [
       0.18,
@@ -213,7 +213,8 @@
     "lineOpacity": 0.28,
     "spin": 0.05,
     "turn": 1.4,
-    "tilt": 0.35
+    "tilt": 0.35,
+    "x": 0.6
   },
   "windows": {
     "x": 0.5,

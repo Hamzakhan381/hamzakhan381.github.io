@@ -346,6 +346,7 @@
       0.25
     ],
     "height": 0.13,
+    "maxWidth": 2.6,
     "padX": 0.24,
     "padY": 0.13,
     "damping": 8,

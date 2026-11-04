@@ -15,7 +15,7 @@ import {
   Vector3,
 } from 'three'
 import D from './developer.json'
-import { Label, fromEmptySpace, readTrack, setPointer3D, useHalfWidth, useNarrow, usePalette } from '../kit'
+import { Label, fromEmptySpace, labelTexture, readTrack, setPointer3D, useFontsVersion, useHalfWidth, useNarrow, usePalette } from '../kit'
 import { contact } from '../../content'
 import { deskMood, now } from '../../lib/deskMood'
 import { scrollState } from '../../lib/scroll'
@@ -31,6 +31,7 @@ const LOW = 12
 const CAPSULE_CAPS = 8
 const STEAM_SEGMENTS = 10
 const MIRROR = [-1, 1]
+const BUBBLE_WEIGHT = 600
 
 type Mode = 'idle' | 'hello' | 'typing' | 'poke' | 'sent'
 
@@ -567,22 +568,31 @@ export function Developer() {
           <CodeLines accent={palette.accent} line={palette.line} fast={mode === 'typing'} />
         </Holo>
         <Holo spec={D.holo.status} accent={palette.accent}>
-          <Label text={statusText} height={D.holo.labelHeight} color={mode === 'sent' ? palette.accent : palette.line} position={[0, 0, D.faceOffset]} />
+          <Label
+            text={statusText}
+            height={D.holo.labelHeight}
+            maxWidth={D.holo.status.size[0] - D.holo.margin * DOUBLE}
+            color={mode === 'sent' ? palette.accent : palette.line}
+            position={[0, 0, D.faceOffset]}
+          />
         </Holo>
       </group>
     </LookContext.Provider>
   )
 }
 
+/** A bubble sized to its measured text (shrinking long lines to `maxWidth`), so words never spill past its edge. */
 function SpeechBubble({ text, fill, ink }: { text: string; fill: Color; ink: Color }) {
   const B = D.bubble
-  const width = text.length * B.height * HALF + B.padX
+  useFontsVersion()
+  const { aspect } = labelTexture(text, BUBBLE_WEIGHT, false)
+  const height = Math.min(B.height, B.maxWidth / aspect)
   return (
     <group>
-      <RoundedBox args={[width, B.height + B.padY, B.depth]} radius={B.radius} smoothness={4}>
+      <RoundedBox args={[height * aspect + B.padX, height + B.padY, B.depth]} radius={B.radius} smoothness={4}>
         <meshBasicMaterial color={fill} toneMapped={false} />
       </RoundedBox>
-      <Label text={text} height={B.height} color={ink} weight={600} mono={false} position={[0, 0, D.faceOffset * DOUBLE]} />
+      <Label text={text} height={height} color={ink} weight={BUBBLE_WEIGHT} mono={false} position={[0, 0, D.faceOffset * DOUBLE]} />
     </group>
   )
 }

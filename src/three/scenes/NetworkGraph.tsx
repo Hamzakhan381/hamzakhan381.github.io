@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { BufferGeometry, Float32BufferAttribute, Group, InstancedMesh, Object3D, Vector3 } from 'three'
 import config from '../scene.json'
-import { useNarrow, usePalette } from '../kit'
+import { useHalfWidth, useNarrow, usePalette } from '../kit'
 import { scrollState } from '../../lib/scroll'
 import { DOUBLE, HALF } from '../../lib/math'
 
@@ -38,6 +38,7 @@ function buildGraph() {
 /** Projects: a slowly turning service mesh, with data packets hopping from node to node along its links. */
 export function NetworkGraph() {
   const narrow = useNarrow()
+  const half = useHalfWidth(N.z)
   const palette = usePalette()
   const group = useRef<Group>(null)
   const nodeMesh = useRef<InstancedMesh>(null)
@@ -102,7 +103,8 @@ export function NetworkGraph() {
         t * N.spin + scrollState.progress * N.turn + scrollState.spin + scrollState.pointerX * POINTER_TILT,
         0,
       )
-      group.current.position.set(0, 0, N.z)
+      // Off to the right on wide screens, so its nodes and links stay clear of the hero text on the left.
+      group.current.position.set(narrow ? 0 : half * N.x, 0, N.z)
       group.current.scale.setScalar(narrow ? N.mobileScale : 1)
     }
   })

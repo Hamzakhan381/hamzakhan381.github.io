@@ -1,5 +1,6 @@
-import { useMemo } from 'react'
+import { useMemo, useSyncExternalStore } from 'react'
 import { useThree, type ThreeEvent } from '@react-three/fiber'
+import { Edges } from '@react-three/drei'
 import { CanvasTexture, Color, MathUtils, SRGBColorSpace } from 'three'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import config from './scene.json'
@@ -88,6 +89,7 @@ const LABEL_PAD = 0.3
 const LINE_HEIGHT = 1.3
 const ANISOTROPY = 4
 const DEFAULT_WEIGHT = 500
+const PLATE_OPACITY = 0.92
 const labelCache = new Map<string, { texture: CanvasTexture; aspect: number }>()
 
 /** White text rendered to a canvas once; tint it with the material colour so it follows the theme. */
@@ -117,9 +119,39 @@ export function labelTexture(text: string, weight = DEFAULT_WEIGHT, mono = true)
   return entry
 }
 
+// Canvases only draw with a web font once it has loaded, and fonts no longer hold up the first paint, so a label made
+// early would keep the fallback face. When fonts finish loading, drop every cached texture and let labels redraw.
+let fontsVersion = 0
+const fontListeners = new Set<() => void>()
+document.fonts?.addEventListener('loadingdone', () => {
+  labelCache.forEach((entry) => entry.texture.dispose())
+  labelCache.clear()
+  fontsVersion += 1
+  fontListeners.forEach((notify) => notify())
+})
+
+/** Re-renders the caller when web fonts finish loading, so anything sized from label text measures it again. */
+export const useFontsVersion = () =>
+  useSyncExternalStore(
+    (notify) => {
+      fontListeners.add(notify)
+      return () => {
+        fontListeners.delete(notify)
+      }
+    },
+    () => fontsVersion,
+  )
+
+/** The largest text height, up to `height`, at which every one of `texts` fits within `maxWidth`. */
+export function fitLabelHeight(texts: string[], maxWidth: number, height: number, weight?: number, mono?: boolean) {
+  return texts.reduce((fitted, text) => Math.min(fitted, maxWidth / labelTexture(text, weight, mono).aspect), height)
+}
+
 type LabelProps = {
   text: string
   height: number
+  /** Shrinks the text (never stretches it) so it is no wider than this. */
+  maxWidth?: number
   color: Color
   position?: [number, number, number]
   weight?: number
@@ -127,17 +159,44 @@ type LabelProps = {
   /** 'left' anchors the text's left edge at `position`. */
   align?: 'center' | 'left'
   opacity?: number
+  /** Sets the text on a solid tag of this colour (outlined in `plateEdge`), so it stays readable over any geometry. */
+  plate?: Color
+  plateEdge?: Color
 }
 
-export function Label({ text, height, color, position = [0, 0, 0], weight, mono, align = 'center', opacity = 1 }: LabelProps) {
+export function Label({
+  text,
+  height,
+  maxWidth,
+  color,
+  position = [0, 0, 0],
+  weight,
+  mono,
+  align = 'center',
+  opacity = 1,
+  plate,
+  plateEdge,
+}: LabelProps) {
+  useFontsVersion()
   const { texture, aspect } = labelTexture(text, weight, mono)
-  const width = height * aspect
+  const fitted = maxWidth ? Math.min(height, maxWidth / aspect) : height
+  const width = fitted * aspect
   const x = align === 'left' ? position[0] + width * HALF : position[0]
   return (
-    <mesh position={[x, position[1], position[2]]} renderOrder={1}>
-      <planeGeometry args={[width, height]} />
-      <meshBasicMaterial map={texture} color={color} transparent opacity={opacity} depthWrite={false} toneMapped={false} />
-    </mesh>
+    <group position={[x, position[1], position[2]]}>
+      {plate ? (
+        // The text texture already carries its own padding, so a plate of the same size makes a snug tag.
+        <mesh renderOrder={1}>
+          <planeGeometry args={[width, fitted]} />
+          <meshBasicMaterial color={plate} transparent opacity={opacity * PLATE_OPACITY} depthWrite={false} toneMapped={false} />
+          {plateEdge ? <Edges color={plateEdge} /> : null}
+        </mesh>
+      ) : null}
+      <mesh renderOrder={2}>
+        <planeGeometry args={[width, fitted]} />
+        <meshBasicMaterial map={texture} color={color} transparent opacity={opacity} depthWrite={false} toneMapped={false} />
+      </mesh>
+    </group>
   )
 }
 
