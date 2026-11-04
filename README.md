@@ -7,7 +7,7 @@ floating code glyphs drift behind every page.
 | Page     | 3D scene (scroll-driven)                                         | Page widgets |
 | -------- | ---------------------------------------------------------------- | ------------ |
 | Home     | Architecture stack explodes into 5 layers; packets flow through; click a slab to jump to its card | Terminal that types as you scroll, then takes real commands (`help`, `projects`, `open cashup`, `sudo hire hamza`…); draggable tech sphere, counters |
-| About    | Career growth chart: one glowing pillar per role, rising in turn with a trend line across their tops; the role you are reading lifts and streams data; click a pillar to jump to that job | profile.ts code window, git-log timeline, skill bars, keycap tools |
+| About    | Code DNA: a turning double helix of rungs with code symbols on each strand; it zips together as you reach the experience, each role is a band of rungs, and the band you are reading glows while a scanner ring slides to it; click a band to jump to that job | profile.ts code window, git-log timeline, skill bars, keycap tools |
 | Services | Server rack; each service's unit slides out when it's centred or hovered; click to jump to it | Process staircase, engagement cards, FAQ |
 | Projects | Live service-mesh network with hopping packets                  | Z-depth featured gallery, FLIP-animated filters, live GitHub ring, case-study dialog |
 | CV       | Floating editor windows                                          | Printable paper CV that lands as it scrolls into view, gets a scanner sweep and an availability stamp, and writes each section in as you reach it |

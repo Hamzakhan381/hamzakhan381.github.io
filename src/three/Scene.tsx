@@ -5,7 +5,7 @@ import { Group, MathUtils, PerspectiveCamera, Vector3 } from 'three'
 import config from './scene.json'
 import { CodeGlyphs } from './glyphs'
 import { ArchitectureStack } from './scenes/ArchitectureStack'
-import { GrowthChart } from './scenes/GrowthChart'
+import { CodeHelix } from './scenes/CodeHelix'
 import { ServerRack } from './scenes/ServerRack'
 import { NetworkGraph } from './scenes/NetworkGraph'
 import { Developer } from './scenes/Developer'
@@ -29,7 +29,7 @@ const Q = config.quality
 /** Which 3D scene belongs to which route; anything unknown (404) gets the code windows. */
 const scenes: Record<string, ComponentType> = {
   '/': ArchitectureStack,
-  '/about': GrowthChart,
+  '/about': CodeHelix,
   '/services': ServerRack,
   '/projects': NetworkGraph,
   '/cv': CodeWindows,
