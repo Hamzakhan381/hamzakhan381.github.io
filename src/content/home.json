@@ -73,5 +73,9 @@
     { "value": 3, "suffix": "", "label": "Roles held" },
     { "value": 6, "suffix": "", "label": "Disciplines" }
   ],
-  "testimonials": []
+  "testimonials": [],
+  "boot": {
+    "hello": "Hi! 👋",
+    "line": "I'm Hamza. Come on in."
+  }
 }

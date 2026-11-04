@@ -1,29 +1,26 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { Link } from 'react-router'
 import { profile } from '../content'
 import { Icon, type IconName } from './Icon'
 
-type Face = { id: string; label: string; icon: IconName; href: string; internal?: boolean }
+type Face = { label: string; icon: IconName }
 
 /** Face order around the cube; the tour in styles.css (@keyframes cube-tour) visits them in this order. */
 const SIDES = ['front', 'right', 'back', 'left', 'top', 'bottom'] as const
-type Side = (typeof SIDES)[number]
 
-const links: Face[] = [
-  { id: 'email', label: 'Email', icon: 'mail', href: `mailto:${profile.email}` },
-  ...profile.socials.map((s): Face => ({ id: s.label, label: s.label, icon: s.icon, href: s.href })),
-  { id: 'cv', label: 'CV', icon: 'file', href: '/cv', internal: true },
-  { id: 'contact', label: 'Say hi', icon: 'send', href: '/contact', internal: true },
+const faces: Face[] = [
+  { label: 'Say hi', icon: 'send' },
+  ...profile.socials.map((s): Face => ({ label: s.label, icon: s.icon })),
+  { label: 'Email', icon: 'mail' },
+  { label: 'CV', icon: 'file' },
 ]
-const faces = links.slice(0, SIDES.length)
 
 /**
- * A CSS 3D cube of contact links that tours its faces. Hovering pauses it, keyboard focus turns the
- * focused face forward, and it only animates while on screen.
+ * A CSS 3D cube that tours the ways to reach me. The whole cube is one link to the contact page (single faces
+ * would overlap as it turns, making them hard to hit); hovering pauses it, and it only animates while on screen.
  */
 export function SocialCube() {
-  const scene = useRef<HTMLDivElement>(null)
-  const [focused, setFocused] = useState<Side | null>(null)
+  const scene = useRef<HTMLAnchorElement>(null)
 
   useEffect(() => {
     const el = scene.current
@@ -34,44 +31,26 @@ export function SocialCube() {
   }, [])
 
   return (
-    <div ref={scene} className="cube-scene">
-      <div className="cube-tilt">
-        <div className="cube" data-face={focused ?? undefined}>
+    <Link ref={scene} to="/contact" className="cube-scene" aria-label="Get in touch">
+      <span className="cube-tilt" aria-hidden="true">
+        <span className="cube">
           {SIDES.map((side, i) => {
             const face = faces[i]
-            const className = `cube__face cube__face--${side}`
-            if (!face)
-              return (
-                <span key={side} className={className} aria-hidden="true">
-                  {profile.initials}
-                </span>
-              )
-            const content = (
-              <>
-                <Icon name={face.icon} />
-                <span>{face.label}</span>
-              </>
-            )
-            const focusProps = { onFocus: () => setFocused(side), onBlur: () => setFocused(null) }
-            return face.internal ? (
-              <Link key={side} to={face.href} className={className} {...focusProps}>
-                {content}
-              </Link>
-            ) : (
-              <a
-                key={side}
-                href={face.href}
-                className={className}
-                target={face.href.startsWith('http') ? '_blank' : undefined}
-                rel="noreferrer"
-                {...focusProps}
-              >
-                {content}
-              </a>
+            return (
+              <span key={side} className={`cube__face cube__face--${side} ${face ? '' : 'cube__face--mono'}`}>
+                {face ? (
+                  <>
+                    <Icon name={face.icon} />
+                    <span>{face.label}</span>
+                  </>
+                ) : (
+                  profile.initials
+                )}
+              </span>
             )
           })}
-        </div>
-      </div>
-    </div>
+        </span>
+      </span>
+    </Link>
   )
 }

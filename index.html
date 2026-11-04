@@ -16,7 +16,124 @@
       } catch (e) {
         document.documentElement.dataset.theme = 'dark';
       }
+      // The boot intro (developer typing, then waving hi) plays on the first visit of a session, unless motion is reduced.
+      try {
+        var seen = sessionStorage.getItem('hk-visited') || matchMedia('(prefers-reduced-motion: reduce)').matches;
+        document.documentElement.classList.add(seen ? 'no-boot' : 'boot');
+      } catch (e) {
+        document.documentElement.classList.add('boot');
+      }
     </script>
+    <style>
+      /* Boot intro. Inline so it paints with the HTML, before any JavaScript or stylesheet arrives.
+         Every moving part animates transform or opacity only, so it stays smooth while the app boots. */
+      .no-boot #boot { display: none; }
+      .boot body { overflow: hidden; }
+      #boot {
+        --b-bg: #050607; --b-ink: #f4f6f8; --b-muted: #8d949e; --b-accent: #38bdf8; --b-ok: #3fb950;
+        --b-glow: rgba(56, 189, 248, 0.3); --b-halo: rgba(56, 189, 248, 0.09);
+        --b-skin: #f2c7a0; --b-nose: #d89c74; --b-hair: #1d1a18; --b-hoodie: #3a4351; --b-cuff: #4b5563; --b-hood: #2a313b;
+        --b-chair: #1c2027; --b-laptop: #c9ced6; --b-laptop-edge: #9aa2ad; --b-desk: #1f242b; --b-desk-front: #14181d;
+        --b-mug: #f4f6f8; --b-glasses: #0f1114; --b-string: #e8edf3; --b-mouth: #74291f; --b-blush: #f59e9e;
+        --b-bubble: #f4f6f8; --b-bubble-ink: #0b0d12; --b-mug-line: transparent;
+        position: fixed; inset: 0; z-index: 100;
+        display: grid; place-content: center; justify-items: center; gap: 14px;
+        padding: 16px;
+        background: radial-gradient(42% 36% at 50% 44%, var(--b-halo), transparent 70%), var(--b-bg);
+        color: var(--b-ink);
+        animation: boot-failsafe 0.4s 15s forwards;
+      }
+      /* If a view transition ever runs while the intro is up, keep the intro on top of its snapshots, live and unfaded. */
+      #boot { view-transition-name: boot-intro; }
+      ::view-transition-group(boot-intro) { z-index: 100; animation: none; }
+      ::view-transition-old(boot-intro) { display: none; }
+      ::view-transition-new(boot-intro) { animation: none; }
+      [data-theme='light'] #boot {
+        --b-bg: #f4f5f7; --b-ink: #0b0d12; --b-muted: #4f5662; --b-accent: #0369a1; --b-ok: #15803d;
+        --b-glow: rgba(14, 165, 233, 0.24); --b-halo: rgba(14, 165, 233, 0.1);
+        --b-chair: #d3d9e0; --b-laptop: #b5bdc8; --b-laptop-edge: #8f98a5; --b-desk: #e2e6eb; --b-desk-front: #d2d8df;
+        --b-bubble: #0b0d12; --b-bubble-ink: #f4f6f8; --b-mug-line: #aab3be;
+      }
+      .boot__stage { position: relative; width: min(420px, 84vw); aspect-ratio: 4 / 3; transform-origin: 50% 68%; animation: boot-in 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+      .boot__layer, .boot__layer > svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+      #boot svg { display: block; }
+      .b-skin { fill: var(--b-skin); } .b-hair { fill: var(--b-hair); } .b-hoodie { fill: var(--b-hoodie); } .b-cuff { fill: var(--b-cuff); }
+      .b-hood { fill: var(--b-hood); } .b-chair { fill: var(--b-chair); } .b-laptop { fill: var(--b-laptop); } .b-laptop-edge { fill: var(--b-laptop-edge); }
+      .b-desk { fill: var(--b-desk); } .b-desk-front { fill: var(--b-desk-front); } .b-accent { fill: var(--b-accent); } .b-glasses-fill { fill: var(--b-glasses); }
+      .b-mug { fill: var(--b-mug); } .b-coffee { fill: #5b3a29; } .b-pot { fill: #d9622b; } .b-pot-rim { fill: #b84d1d; }
+      .b-leaf { fill: #34d399; } .b-leaf-dark { fill: #10b981; } .b-blush { fill: var(--b-blush); } .b-mouth { fill: var(--b-mouth); }
+      .b-line { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+      .b-string { stroke: var(--b-string); stroke-width: 2.4; } .b-band { stroke: var(--b-glasses); stroke-width: 6; }
+      .b-brow { stroke: var(--b-hair); stroke-width: 3.6; } .b-nose { stroke: var(--b-nose); stroke-width: 2.2; }
+      .b-mouth-line { stroke: var(--b-mouth); stroke-width: 2.6; } .b-steam { stroke: var(--b-muted); stroke-width: 2.4; }
+      .b-glare { stroke: #fff; stroke-width: 2; opacity: 0.55; } .b-code { stroke: var(--b-accent); stroke-width: 2.6; }
+      .b-mug-handle { stroke: var(--b-mug-line); stroke-width: 6.5; }
+      .b-mug-handle-in { stroke: var(--b-mug); stroke-width: 4; }
+      .b-glasses { fill: rgba(186, 225, 255, 0.16); stroke: var(--b-glasses); stroke-width: 2.8; }
+      .b-mug { stroke: var(--b-mug-line); stroke-width: 1.2; }
+      /* Typing: both arms tap away behind the lid while the head nods along. */
+      .boot__arm--wave { transform-origin: 32.5% 52.67%; animation: boot-type-l 0.17s ease-in-out infinite alternate; }
+      .boot__arm--rest { transform-origin: 67.5% 52.67%; animation: boot-type-r 0.17s ease-in-out 0.085s infinite alternate; }
+      .boot__head { transform-origin: 50% 46%; animation: boot-nod 1.3s ease-in-out infinite; }
+      .boot__eyes { transform: translateY(3px); transition: transform 0.25s ease; }
+      .boot__brows { transition: transform 0.25s ease; }
+      .boot__mouth-open, .boot__blush { opacity: 0; transition: opacity 0.2s ease; }
+      .boot__glow { position: absolute; left: 22%; top: 34%; width: 56%; height: 34%; background: radial-gradient(closest-side, var(--b-glow), transparent); animation: boot-flicker 1.4s ease-in-out infinite alternate; }
+      .boot__steam { animation: boot-steam 2.2s ease-in-out infinite; }
+      .boot__code { position: absolute; top: 55%; left: var(--x); font: 500 clamp(10px, 3vw, 13px)/1 'Geist Mono', ui-monospace, Menlo, Consolas, monospace; color: var(--b-accent); white-space: nowrap; opacity: 0; animation: boot-code 1.75s cubic-bezier(0.25, 0.7, 0.35, 1) var(--d) infinite; }
+      /* Hi: he looks up, smiles, raises an arm and waves while the bubble pops. */
+      .is-waving .boot__arm--wave { animation: boot-hi 1.05s cubic-bezier(0.3, 0.7, 0.3, 1) forwards; }
+      .is-waving .boot__arm--rest { animation: none; transform: rotate(15deg); }
+      .is-waving .boot__head { animation: boot-look 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+      .is-waving .boot__eyes { transform: translateY(-0.5px); }
+      .is-waving .boot__brows { transform: translateY(-3px); }
+      .is-waving .boot__mouth-open { opacity: 1; }
+      .is-waving .boot__mouth-calm { opacity: 0; }
+      .is-waving .boot__blush { opacity: 0.6; }
+      .is-waving .boot__code { animation-play-state: paused; opacity: 0; transition: opacity 0.2s; }
+      .boot__bubble {
+        position: absolute; left: 60%; top: 0; display: grid; gap: 2px; width: max-content; max-width: 48%;
+        padding: 10px 14px; border-radius: 16px 16px 16px 4px; background: var(--b-bubble); color: var(--b-bubble-ink);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.28); font: 500 clamp(11px, 3vw, 13px)/1.35 Geist, ui-sans-serif, system-ui, sans-serif;
+        opacity: 0; transform: scale(0.4) rotate(-10deg); transform-origin: 0 100%;
+        transition: opacity 0.2s 0.28s, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.28s;
+      }
+      .boot__bubble b { font-size: 1.45em; font-weight: 700; letter-spacing: -0.02em; }
+      .is-waving .boot__bubble { opacity: 1; transform: none; }
+      .boot__term { margin: 0; min-width: 17em; font: 500 clamp(11px, 3.2vw, 13px)/1.75 'Geist Mono', ui-monospace, Menlo, Consolas, monospace; color: var(--b-muted); animation: boot-in 0.6s 0.1s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+      .boot__term b { color: var(--b-accent); font-weight: 500; }
+      .boot__cmd { display: inline-block; color: var(--b-ink); clip-path: inset(0 100% 0 0); animation: boot-typing 0.34s steps(11, end) 0.12s forwards; }
+      .boot__pulse { display: inline-block; width: 0.55em; height: 0.55em; margin-right: 0.35em; border-radius: 50%; background: var(--b-accent); animation: boot-pulse 0.7s ease-in-out infinite alternate; }
+      .boot__ready { display: none; color: var(--b-ok); }
+      .is-waving .boot__wait { display: none; }
+      .is-waving .boot__ready { display: inline; }
+      /* Leaving: the view dives into his laptop while the veil fades onto the page. */
+      #boot.is-leaving, #boot.is-skipping { pointer-events: none; animation: boot-out 0.5s cubic-bezier(0.4, 0, 0.6, 1) 0.1s forwards; }
+      #boot.is-skipping { animation-duration: 0.25s; animation-delay: 0s; }
+      .is-leaving .boot__stage { animation: boot-dive 0.6s cubic-bezier(0.55, 0, 0.75, 0.2) forwards; }
+      .is-skipping .boot__stage { animation: boot-dive 0.25s ease-in forwards; }
+      .is-leaving .boot__term, .is-skipping .boot__term { opacity: 0; transition: opacity 0.2s; }
+      @keyframes boot-in { from { transform: translateY(14px) scale(0.96); } }
+      @keyframes boot-type-l { from { transform: rotate(-13deg); } to { transform: rotate(-18deg); } }
+      @keyframes boot-type-r { from { transform: rotate(13deg); } to { transform: rotate(18deg); } }
+      @keyframes boot-nod { 50% { transform: translateY(1.6px) rotate(1.2deg); } }
+      @keyframes boot-flicker { from { opacity: 0.55; } to { opacity: 1; } }
+      @keyframes boot-steam { 0% { opacity: 0; transform: translateY(6px); } 45% { opacity: 0.7; } 100% { opacity: 0; transform: translateY(-12px); } }
+      @keyframes boot-code { 0% { opacity: 0; transform: translate(0, 0) scale(0.7); } 22% { opacity: 0.9; } 75% { opacity: 0; } 100% { opacity: 0; transform: translate(var(--dx), -7.5em) scale(1); } }
+      @keyframes boot-hi {
+        0% { transform: rotate(-15deg); } 28% { transform: rotate(146deg); } 42% { transform: rotate(124deg); }
+        56% { transform: rotate(150deg); } 70% { transform: rotate(126deg); } 84% { transform: rotate(146deg); } 100% { transform: rotate(138deg); }
+      }
+      @keyframes boot-look { to { transform: translateY(-5px) rotate(-5deg); } }
+      @keyframes boot-typing { to { clip-path: inset(0 0 0 0); } }
+      @keyframes boot-pulse { from { opacity: 0.25; } to { opacity: 1; } }
+      @keyframes boot-out { to { opacity: 0; } }
+      @keyframes boot-dive { to { opacity: 0; transform: scale(2.2); } }
+      @keyframes boot-failsafe { to { opacity: 0; visibility: hidden; } }
+      @media (max-width: 600px) { @keyframes boot-dive { to { opacity: 0; transform: scale(1.5); } } }
+      @media (prefers-reduced-motion: reduce) { #boot { display: none; } }
+    </style>
+    <noscript><style>#boot { display: none; }</style></noscript>
     <link rel="canonical" href="https://hamzakhan381.github.io/" />
     <meta property="og:title" content="Muhammad Hamza Khan — Full-Stack Engineer" />
     <meta property="og:description" content="Portfolio of Muhammad Hamza Khan, a full-stack engineer focused on scalable systems, backend architecture and modern web interfaces." />
@@ -30,8 +147,10 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preconnect" href="https://api.github.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <!-- Fonts load without blocking the first paint; text shows in the system font until they arrive. -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@400;500&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@400;500&display=swap" /></noscript>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -50,6 +169,91 @@
     </script>
   </head>
   <body>
+    <div id="boot" aria-hidden="true">
+      <div class="boot__stage">
+        <svg class="boot__layer" viewBox="0 0 400 300">
+          <rect class="b-chair" x="124" y="106" width="152" height="164" rx="32" />
+          <ellipse class="b-hood" cx="200" cy="146" rx="47" ry="18" />
+          <path class="b-hoodie" d="M114 270 L118 186 C120 164 136 150 160 147 L240 147 C264 150 280 164 282 186 L286 270 Z" />
+          <rect class="b-skin" x="190" y="122" width="20" height="28" rx="8" />
+          <path class="b-hoodie" d="M172 146 Q200 160 228 146 L230 162 L170 162 Z" />
+          <path class="b-line b-string" d="M192 158 L191 175 M208 158 L209 175" />
+        </svg>
+        <div class="boot__layer boot__arm--wave">
+          <svg viewBox="0 0 400 300">
+            <rect class="b-hoodie" x="117" y="146" width="26" height="82" rx="13" />
+            <rect class="b-cuff" x="118" y="217" width="24" height="10" rx="5" />
+            <ellipse class="b-skin" cx="130" cy="237" rx="11" ry="11.5" />
+            <rect class="b-skin" x="121" y="240" width="5" height="15" rx="2.5" />
+            <rect class="b-skin" x="126.5" y="242" width="5" height="16.5" rx="2.5" />
+            <rect class="b-skin" x="132" y="242" width="5" height="16" rx="2.5" />
+            <rect class="b-skin" x="137.4" y="240" width="4.6" height="13" rx="2.3" />
+            <rect class="b-skin" x="112" y="227" width="5.4" height="14" rx="2.7" transform="rotate(-38 114.7 234)" />
+          </svg>
+        </div>
+        <div class="boot__layer boot__arm--rest">
+          <svg viewBox="0 0 400 300">
+            <rect class="b-hoodie" x="257" y="146" width="26" height="82" rx="13" />
+            <rect class="b-cuff" x="258" y="217" width="24" height="10" rx="5" />
+            <ellipse class="b-skin" cx="270" cy="237" rx="11" ry="11.5" />
+          </svg>
+        </div>
+        <div class="boot__layer boot__head">
+          <svg viewBox="0 0 400 300">
+            <g transform="translate(0 4)">
+            <ellipse class="b-skin" cx="200" cy="92" rx="38" ry="41" />
+            <path class="b-hair" d="M162 95 C157 60 179 46 202 47 C227 48 245 63 238 95 C234 81 224 71 208 72 C195 73 185 68 177 60 C172 71 166 83 162 95 Z" />
+            <path class="b-line b-band" d="M157 97 C153 45 247 45 243 97" />
+            <rect class="b-accent" x="147" y="79" width="16" height="33" rx="7.5" />
+            <rect class="b-accent" x="237" y="79" width="16" height="33" rx="7.5" />
+            <g class="boot__brows"><path class="b-line b-brow" d="M176 79 Q184 74 192 78 M208 78 Q216 74 224 79" /></g>
+            <g class="boot__eyes b-glasses-fill"><circle cx="184" cy="93" r="3.4" /><circle cx="216" cy="93" r="3.4" /></g>
+            <rect class="b-glasses" x="170.5" y="83" width="27" height="19" rx="7" />
+            <rect class="b-glasses" x="202.5" y="83" width="27" height="19" rx="7" />
+            <path class="b-line b-band" style="stroke-width: 2.8" d="M197.5 91 Q200 88 202.5 91" />
+            <path class="b-line b-glare" d="M175 90 L180 85.5 M207 90 L212 85.5" />
+            <path class="b-line b-nose" d="M201 99 Q197 105 202 107" />
+            <g class="boot__blush b-blush"><ellipse cx="174" cy="110" rx="6" ry="3.4" /><ellipse cx="226" cy="110" rx="6" ry="3.4" /></g>
+            <path class="b-line b-mouth-line boot__mouth-calm" d="M191 116 Q200 121 209 116" />
+            <path class="b-mouth boot__mouth-open" d="M188 113 Q200 131 212 113 Z" />
+            </g>
+          </svg>
+        </div>
+        <div class="boot__glow"></div>
+        <svg class="boot__layer" viewBox="0 0 400 300">
+          <rect class="b-desk" x="14" y="246" width="372" height="12" rx="6" />
+          <rect class="b-desk-front" x="26" y="256" width="348" height="44" />
+          <path class="b-leaf-dark" d="M76 226 C62 218 57 205 61 196 C71 202 76 213 76 226 Z" />
+          <path class="b-leaf-dark" d="M82 226 C96 218 101 205 97 196 C87 202 82 213 82 226 Z" />
+          <path class="b-leaf" d="M79 226 C70 212 70 197 79 186 C88 197 88 212 79 226 Z" />
+          <path class="b-pot" d="M65 223 H93 L89 246 H69 Z" />
+          <rect class="b-pot-rim" x="62" y="220" width="34" height="7" rx="2.5" />
+          <rect class="b-laptop" x="128" y="170" width="144" height="74" rx="8" />
+          <rect x="133" y="173.5" width="134" height="2.5" rx="1.25" fill="#fff" opacity="0.35" />
+          <rect class="b-laptop-edge" x="116" y="240" width="168" height="8" rx="3" />
+          <circle class="b-glasses-fill" cx="200" cy="207" r="15" />
+          <path class="b-line b-code" d="M193 201 L188 207 L193 213 M207 201 L212 207 L207 213 M203 199 L197 215" />
+          <path class="b-line b-mug-handle" d="M333 222 H338 A7 7 0 0 1 338 236 H333" />
+          <path class="b-line b-mug-handle-in" d="M333 222 H338 A7 7 0 0 1 338 236 H333" />
+          <rect class="b-mug" x="306" y="214" width="28" height="32" rx="5" />
+          <rect class="b-accent" x="306" y="224" width="28" height="5" />
+          <ellipse class="b-coffee" cx="320" cy="215.5" rx="12" ry="2.6" />
+        </svg>
+        <div class="boot__layer boot__steam">
+          <svg viewBox="0 0 400 300"><path class="b-line b-steam" d="M315 207 C311 201 319 197 315 191 M325 206 C321 200 329 196 325 190" /></svg>
+        </div>
+        <span class="boot__code" style="--x: 36%; --dx: -3.6em; --d: 0s">&lt;/&gt;</span>
+        <span class="boot__code" style="--x: 47%; --dx: -1.6em; --d: 0.44s">{ }</span>
+        <span class="boot__code" style="--x: 57%; --dx: 2em; --d: 0.88s">=&gt;</span>
+        <span class="boot__code" style="--x: 42%; --dx: -2.8em; --d: 1.3s">( )</span>
+        <span class="boot__code" style="--x: 62%; --dx: 3.4em; --d: 0.22s">;</span>
+        <div class="boot__bubble"><b data-boot="hello">Hi! 👋</b><span data-boot="line">I'm Hamza. Come on in.</span></div>
+      </div>
+      <p class="boot__term">
+        <b>~/portfolio $</b> <span class="boot__cmd">npm run dev</span><br />
+        <span class="boot__wait"><i class="boot__pulse"></i>starting dev server…</span><span class="boot__ready">✓ <span data-boot="ready">ready</span></span>
+      </p>
+    </div>
     <div id="root"></div>
     <noscript>This portfolio needs JavaScript for its 3D scene. Email: hamza.best81@gmail.com</noscript>
     <script type="module" src="/src/main.tsx"></script>

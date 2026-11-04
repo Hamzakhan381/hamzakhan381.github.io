@@ -24,6 +24,7 @@
   },
   "intro": {
     "charRotate": -100,
+    "charLift": 50,
     "charStagger": 0.02,
     "duration": 1.1,
     "fadeY": 30,
@@ -82,5 +83,11 @@
     "rotateX": 14,
     "lineDepth": 110,
     "scrub": 0.5
+  },
+  "boot": {
+    "minTyping": 0.7,
+    "wave": 0.95,
+    "exit": 0.62,
+    "skipExit": 0.27
   }
 }

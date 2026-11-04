@@ -1,8 +1,10 @@
 import { useMemo } from 'react'
 import { useThree, type ThreeEvent } from '@react-three/fiber'
 import { CanvasTexture, Color, MathUtils, SRGBColorSpace } from 'three'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import config from './scene.json'
 import { useTheme } from '../lib/theme'
+import { scrollState } from '../lib/scroll'
 import { DOUBLE, HALF, clamp } from '../lib/math'
 
 /* ---------- Theme ---------- */
@@ -46,15 +48,37 @@ const DOUBLE_TAN_HALF_FOV = Math.tan(MathUtils.degToRad(config.camera.fov) * HAL
  * `progress` runs 0→1 across the pinned stretch and drives the scene's scroll animation.
  */
 export function readTrack(name: string, z: number): Track {
-  const el = document.querySelector(`[data-track="${name}"]`)
-  if (!el) return ABSENT
-  const rect = el.getBoundingClientRect()
+  const box = trackBox(name)
+  if (!box) return ABSENT
   const vh = window.innerHeight
+  const top = box.top - scrollState.y
+  const bottom = top + box.height
   const worldPerPx = (DOUBLE_TAN_HALF_FOV * (config.camera.z - z)) / vh
-  const pinnedSpan = Math.max(rect.height - vh, 1)
-  const progress = clamp(-rect.top / pinnedSpan, 0, 1)
-  const y = rect.top > 0 ? -rect.top * worldPerPx : Math.max(vh - rect.bottom, 0) * worldPerPx
+  const pinnedSpan = Math.max(box.height - vh, 1)
+  const progress = clamp(-top / pinnedSpan, 0, 1)
+  const y = top > 0 ? -top * worldPerPx : Math.max(vh - bottom, 0) * worldPerPx
   return { y, progress, present: true }
+}
+
+type TrackBox = { el: Element; top: number; height: number }
+const trackBoxes = new Map<string, TrackBox>()
+
+// Section positions are measured once and reused every frame: measuring per frame would force a layout whenever
+// a scroll animation has just written styles. Every layout change ends in a ScrollTrigger refresh, so drop the
+// cache then (and on resize) and measure again on the next read.
+const forgetTracks = () => trackBoxes.clear()
+ScrollTrigger.addEventListener('refresh', forgetTracks)
+window.addEventListener('resize', forgetTracks, { passive: true })
+
+function trackBox(name: string) {
+  const cached = trackBoxes.get(name)
+  if (cached?.el.isConnected) return cached
+  const el = document.querySelector(`[data-track="${name}"]`)
+  if (!el) return undefined
+  const rect = el.getBoundingClientRect()
+  const box = { el, top: rect.top + window.scrollY, height: rect.height }
+  trackBoxes.set(name, box)
+  return box
 }
 
 /* ---------- Text labels ---------- */

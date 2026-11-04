@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react'
-import { gsap } from 'gsap'
 import { scrollState, scrollToTopSmooth } from '../lib/scroll'
 import { Icon } from './Icon'
 import { HALF, TAU } from '../lib/math'
@@ -14,15 +13,25 @@ export function ToTop() {
   const button = useRef<HTMLButtonElement>(null)
   const ring = useRef<SVGCircleElement>(null)
 
+  // Updated from scroll events, not every frame: reading scroll position while styles are dirty forces a layout.
   useEffect(() => {
-    const tick = () => {
+    let lastOffset = -1
+    const update = () => {
       const el = button.current
       if (!el) return
       el.classList.toggle('is-visible', window.scrollY > window.innerHeight * SHOW_AFTER_SCREENS)
-      ring.current?.setAttribute('stroke-dashoffset', String(CIRCUMFERENCE * (1 - scrollState.progress)))
+      const offset = Math.round(CIRCUMFERENCE * (1 - scrollState.progress))
+      if (offset === lastOffset) return
+      lastOffset = offset
+      ring.current?.setAttribute('stroke-dashoffset', String(offset))
     }
-    gsap.ticker.add(tick)
-    return () => gsap.ticker.remove(tick)
+    update()
+    window.addEventListener('scroll', update, { passive: true })
+    window.addEventListener('resize', update, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', update)
+      window.removeEventListener('resize', update)
+    }
   }, [])
 
   const centre = RING_SIZE * HALF

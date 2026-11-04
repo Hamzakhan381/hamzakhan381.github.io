@@ -23,7 +23,7 @@ function usePointerParallax() {
     let x = 0
     let y = 0
     const tick = () => {
-      if (window.scrollY > window.innerHeight) return
+      if (scrollState.y > window.innerHeight) return
       const nx = x + (scrollState.pointerX - x) * PARALLAX_EASE
       const ny = y + (scrollState.pointerY - y) * PARALLAX_EASE
       if (Math.abs(nx - x) + Math.abs(ny - y) < PARALLAX_EPSILON) return

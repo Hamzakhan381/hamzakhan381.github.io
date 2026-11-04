@@ -518,8 +518,9 @@ main {
   display: inline-block;
 }
 
-html:not(.is-loaded) .split-char,
-html:not(.is-loaded) [data-intro] {
+/* Hidden until the page intro plays. Not while the boot intro covers the page: the page renders under it. */
+html:not(.is-loaded):not(.boot) .split-char,
+html:not(.is-loaded):not(.boot) [data-intro] {
   opacity: 0;
 }
 
@@ -1442,12 +1443,21 @@ html[data-quality='low'] .scroll-hint {
   background: var(--surface-strong);
   font: 500 0.82rem var(--font-mono);
   white-space: nowrap;
-  will-change: transform, opacity;
+  will-change: transform;
+  transition:
+    color 0.4s,
+    border-color 0.4s;
 }
 
 .sphere__tag:nth-child(5n + 1) {
   border-color: var(--accent);
   color: var(--accent);
+}
+
+/* Tags on the far side recede into the muted colour (still readable) rather than fading out. */
+.sphere__tag.is-back {
+  border-color: var(--border);
+  color: var(--muted);
 }
 
 .quotes {
@@ -2971,9 +2981,10 @@ html[data-quality='low'] .scroll-hint {
   min-width: 0;
 }
 
-/* Contact cube: tours its faces, pauses on hover, turns a focused face forward. */
+/* Contact cube: tours its faces and pauses on hover; the whole cube links to the contact page. */
 .cube-scene {
   --cube: 132px;
+  display: block;
   flex: none;
   width: var(--cube);
   height: var(--cube);
@@ -2982,6 +2993,7 @@ html[data-quality='low'] .scroll-hint {
 }
 
 .cube-tilt {
+  display: block;
   width: 100%;
   height: 100%;
   transform: rotateX(-16deg) rotateY(-28deg);
@@ -2990,6 +3002,7 @@ html[data-quality='low'] .scroll-hint {
 
 .cube {
   position: relative;
+  display: block;
   width: 100%;
   height: 100%;
   transform-style: preserve-3d;
@@ -3003,17 +3016,6 @@ html[data-quality='low'] .scroll-hint {
 .cube-scene:hover .cube {
   animation-play-state: paused;
 }
-
-.cube[data-face] {
-  animation: none;
-  transition: transform 0.7s var(--ease-out);
-}
-
-.cube[data-face='right'] { transform: rotateY(-90deg); }
-.cube[data-face='back'] { transform: rotateY(-180deg); }
-.cube[data-face='left'] { transform: rotateY(-270deg); }
-.cube[data-face='top'] { transform: rotateX(-90deg); }
-.cube[data-face='bottom'] { transform: rotateX(90deg); }
 
 @keyframes cube-tour {
   0%, 13% { transform: rotateX(0deg) rotateY(0deg); }
@@ -3049,13 +3051,18 @@ html[data-quality='low'] .scroll-hint {
   color: var(--accent);
 }
 
-a.cube__face:hover,
-a.cube__face:focus-visible {
+.cube-scene:hover .cube__face,
+.cube-scene:focus-visible .cube__face {
   border-color: var(--accent);
-  outline: none;
 }
 
-span.cube__face {
+.cube-scene:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 14px;
+  border-radius: 18px;
+}
+
+.cube__face--mono {
   font: 600 1.6rem var(--font-display);
   letter-spacing: -0.04em;
 }
@@ -3622,81 +3629,6 @@ html[data-quality='medium'] .palette,
 html[data-quality='low'] .palette {
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
-}
-
-/* ---------- Loader ---------- */
-
-.loader {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  display: grid;
-  place-items: center;
-  background: var(--bg);
-  clip-path: inset(0 0 0 0);
-}
-
-.loader__inner {
-  display: grid;
-  justify-items: center;
-  gap: 18px;
-  perspective: 420px;
-}
-
-.loader__cube {
-  position: relative;
-  width: 56px;
-  height: 56px;
-  margin-bottom: 18px;
-  transform-style: preserve-3d;
-  animation: cube-spin 2.4s cubic-bezier(0.6, 0, 0.4, 1) infinite;
-}
-
-.loader__face {
-  position: absolute;
-  inset: 0;
-  border: 1.5px solid var(--text);
-  background: color-mix(in srgb, var(--text) 4%, transparent);
-}
-
-.loader__face--front { transform: translateZ(28px); }
-.loader__face--back { transform: rotateY(180deg) translateZ(28px); }
-.loader__face--left { transform: rotateY(-90deg) translateZ(28px); }
-.loader__face--right { transform: rotateY(90deg) translateZ(28px); border-color: var(--accent); }
-.loader__face--top { transform: rotateX(90deg) translateZ(28px); }
-.loader__face--bottom { transform: rotateX(-90deg) translateZ(28px); border-color: var(--accent); }
-
-@keyframes cube-spin {
-  0% { transform: rotateX(-25deg) rotateY(0deg); }
-  100% { transform: rotateX(-25deg) rotateY(360deg); }
-}
-
-.loader__name {
-  margin: 0;
-  font: 600 1.1rem var(--font-mono);
-  letter-spacing: 0.4em;
-}
-
-.loader__bar {
-  width: 180px;
-  height: 1px;
-  overflow: hidden;
-  background: var(--border);
-}
-
-.loader__bar span {
-  display: block;
-  height: 100%;
-  background: var(--accent);
-  transform-origin: 0 50%;
-  transition: transform 0.3s;
-}
-
-.loader__pct {
-  margin: 0;
-  font: 500 0.75rem var(--font-mono);
-  letter-spacing: 0.3em;
-  color: var(--muted);
 }
 
 /* ---------- Cursor: inverts whatever is under it ---------- */

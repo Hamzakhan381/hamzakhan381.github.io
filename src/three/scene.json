@@ -257,15 +257,19 @@
       "dpr": 1.75,
       "touchDpr": 1.5,
       "antialias": true,
-      "glyphs": 40
+      "glyphs": 40,
+      "fps": 0
     },
     "medium": {
       "dpr": 1.25,
       "touchDpr": 1.25,
       "antialias": false,
-      "glyphs": 14
+      "glyphs": 14,
+      "fps": 30
     },
     "minDpr": 1,
-    "flipflops": 3
+    "flipflops": 3,
+    "capBounds": [0.8, 1.3],
+    "bootFps": 6
   }
 }

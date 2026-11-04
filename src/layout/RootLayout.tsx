@@ -13,13 +13,13 @@ import { Outlet, useLocation } from 'react-router'
 import { gsap } from 'gsap'
 import routes from '../lib/routes.json'
 import { initScroll, scrollToTop } from '../lib/scroll'
-import { appLoaded, markAppLoaded } from '../lib/intro'
+import { appLoaded, markAppLoaded, useAppLoaded } from '../lib/intro'
 import { openProjectFromUrl } from '../lib/projectDialog'
-import { getQuality, useQuality } from '../lib/quality'
+import { useQuality } from '../lib/quality'
 import { normalizePath } from '../lib/paths'
 import { Nav } from '../components/Nav'
 import { Footer } from '../components/Footer'
-import { Loader } from '../components/Loader'
+import { BootScreen } from '../components/BootScreen'
 import { Cursor } from '../components/Cursor'
 import { CommandPalette } from '../components/CommandPalette'
 import { ProjectDialog } from '../components/ProjectDialog'
@@ -29,25 +29,20 @@ import { Toaster } from '../components/Toaster'
 
 const Scene = lazy(() => import('../three/Scene'))
 
-const READY_TIMEOUT_MS = 3500
+/** Read by the inline script in index.html, which decides whether the boot intro plays (first visit of a session). */
 const SEEN_KEY = 'hk-visited'
-
-/** The branded loader plays once per browser session; later page loads go straight to content. */
-function isFirstVisit() {
-  try {
-    return !sessionStorage.getItem(SEEN_KEY)
-  } catch {
-    return true
-  }
-}
 
 function rememberVisit() {
   try {
     sessionStorage.setItem(SEEN_KEY, '1')
   } catch {
-    /* storage blocked: the loader simply shows again next time */
+    /* storage blocked: the intro simply plays again next time */
   }
 }
+
+/** True when index.html is showing the boot intro, i.e. it decided this is the first visit of the session. */
+const bootShowing = () => document.documentElement.classList.contains('boot')
+
 const NOT_FOUND = { title: 'Page not found — Muhammad Hamza Khan', description: routes[0].description }
 
 const hasWebGL = (() => {
@@ -58,14 +53,13 @@ const hasWebGL = (() => {
   }
 })()
 
-class SceneBoundary extends Component<{ children: ReactNode; onError: () => void }, { failed: boolean }> {
+class SceneBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   state = { failed: false }
   static getDerivedStateFromError() {
     return { failed: true }
   }
   componentDidCatch(error: unknown) {
     console.warn('3D scene disabled:', error)
-    this.props.onError()
   }
   render() {
     return this.state.failed ? <div className="scene-fallback" aria-hidden="true" /> : this.props.children
@@ -80,7 +74,17 @@ function usePageMeta(pathname: string) {
   }, [pathname])
 }
 
-/** Opens the project named in `?project=` once the loader has lifted, and again after every navigation. */
+/**
+ * Page transitions switch on once the app has loaded. Before that they would only snapshot a page nobody sees yet
+ * (costly while booting), and the snapshots are drawn above everything, including the boot intro. Its own component
+ * so the switch re-renders just this boundary, not the page inside it.
+ */
+function PageTransitions({ children }: { children: ReactNode }) {
+  const loaded = useAppLoaded()
+  return <ViewTransition default={loaded ? 'page-swap' : 'none'}>{children}</ViewTransition>
+}
+
+/** Opens the project named in `?project=` once the intro has lifted, and again after every navigation. */
 function useProjectDeepLink(pathname: string, search: string) {
   useEffect(() => {
     let cancelled = false
@@ -100,27 +104,24 @@ export function RootLayout() {
   const quality = useQuality()
   // Low-tier devices skip the WebGL scene entirely; the CSS backdrop stands in for it.
   const show3D = hasWebGL && quality !== 'low'
-  const [ready, setReady] = useState(() => !hasWebGL || getQuality() === 'low')
-  const markReady = useCallback(() => setReady(true), [])
-  const [firstVisit] = useState(isFirstVisit)
-  const onLoaderDone = useCallback(() => {
+  const [showBoot] = useState(bootShowing)
+  const onBootDone = useCallback(() => {
     rememberVisit()
     markAppLoaded()
   }, [])
 
+
+  // No intro this time (repeat visit or reduced motion): drop its markup and play the page intro straight away.
   useLayoutEffect(() => {
-    if (!firstVisit) markAppLoaded()
-  }, [firstVisit])
+    if (showBoot) return
+    document.getElementById('boot')?.remove()
+    markAppLoaded()
+  }, [showBoot])
 
   useEffect(() => initScroll(), [])
   useLayoutEffect(() => scrollToTop(), [pathname])
   usePageMeta(pathname)
   useProjectDeepLink(pathname, search)
-
-  useEffect(() => {
-    const timer = window.setTimeout(markReady, READY_TIMEOUT_MS)
-    return () => window.clearTimeout(timer)
-  }, [markReady])
 
   useEffect(() => {
     const bar = gsap.to('.scroll-progress', {
@@ -138,26 +139,26 @@ export function RootLayout() {
     <>
       <div className="backdrop" aria-hidden="true" />
       {show3D ? (
-        <SceneBoundary onError={markReady}>
+        <SceneBoundary>
           <Suspense fallback={null}>
-            <Scene pathname={pathname} onReady={markReady} />
+            <Scene pathname={pathname} />
           </Suspense>
         </SceneBoundary>
       ) : null}
       <div className="vignette" aria-hidden="true" />
-      {firstVisit ? <Loader ready={ready} onDone={onLoaderDone} /> : null}
+      {showBoot ? <BootScreen onDone={onBootDone} /> : null}
       <Cursor />
       <a className="skip-link" href="#main">
         Skip to content
       </a>
       <Nav />
       <SectionRail />
-      <ViewTransition default="page-swap">
+      <PageTransitions>
         <main id="main">
           <Outlet />
           <Footer />
         </main>
-      </ViewTransition>
+      </PageTransitions>
       <ToTop />
       <CommandPalette />
       <ProjectDialog />

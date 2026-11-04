@@ -9,8 +9,9 @@ const AUTO_SPIN = 0.25
 const DRAG_GAIN = 1.5
 const FRICTION = 0.94
 const MIN_SCALE = 0.55
-const MIN_OPACITY = 0.18
 const DEPTH_LAYERS = 100
+/** Tags deeper than this (0 = back, 1 = front) switch to the muted colour, which still meets text contrast. */
+const BACK_DEPTH = 0.4
 
 /** A rotating sphere of tags laid out in 3D and projected each frame; drag to spin it. */
 export function TagSphere({ tags, label }: { tags: string[]; label: string }) {
@@ -34,6 +35,9 @@ export function TagSphere({ tags, label }: { tags: string[]; label: string }) {
     })
     sizer.observe(root)
 
+    // Depth shows through scale, stacking and colour. Stacking and colour change only when a tag crosses a
+    // layer, so a frame is just one transform per tag (composited) instead of opacity and z-index writes too.
+    const layers = items.map(() => -1)
     const draw = () => {
       const [sx, cx, sy, cy] = [Math.sin(state.rx), Math.cos(state.rx), Math.sin(state.ry), Math.cos(state.ry)]
       points.forEach((p, i) => {
@@ -44,8 +48,11 @@ export function TagSphere({ tags, label }: { tags: string[]; label: string }) {
         const near = (z2 + 1) * HALF
         const el = items[i]
         el.style.transform = `translate(-50%, -50%) translate3d(${x1 * radius}px, ${y2 * radius}px, 0) scale(${MIN_SCALE + near * (1 - MIN_SCALE)})`
-        el.style.opacity = String(MIN_OPACITY + near * (1 - MIN_OPACITY))
-        el.style.zIndex = String(Math.round(near * DEPTH_LAYERS))
+        const layer = Math.round(near * DEPTH_LAYERS)
+        if (layer === layers[i]) return
+        layers[i] = layer
+        el.style.zIndex = String(layer)
+        el.classList.toggle('is-back', near < BACK_DEPTH)
       })
     }
 

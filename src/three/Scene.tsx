@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ComponentType } from 'react'
+import { memo, useEffect, useMemo, useRef, useState, type ComponentType } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { PerformanceMonitor } from '@react-three/drei'
 import { Group, MathUtils, PerspectiveCamera, Vector3 } from 'three'
@@ -14,11 +14,14 @@ import { scrollState, useScrollLocked } from '../lib/scroll'
 import { normalizePath } from '../lib/paths'
 import { useTheme } from '../lib/theme'
 import { degrade, getQuality, useQuality } from '../lib/quality'
+import { useAppLoaded } from '../lib/intro'
 import { dprFor, tierSettings } from './tier'
 
 const CAMERA_NEAR = 0.1
 const CAMERA_FAR = 60
-const FRAMES_BEFORE_READY = 2
+const MS_PER_SECOND = 1000
+/** rAF timestamps jitter by a millisecond or two; without slack a 30 fps cap would drop to 20 on a 60 Hz screen. */
+const FRAME_SLACK_MS = 2
 const T = config.transition
 const L = config.lights
 
@@ -102,17 +105,53 @@ function SceneSwitcher({ pathname }: { pathname: string }) {
   )
 }
 
-function ReadySignal({ onReady }: { onReady: () => void }) {
-  const frames = useRef(0)
-  useFrame(() => {
-    frames.current += 1
-    if (frames.current === FRAMES_BEFORE_READY) onReady()
-  })
+/**
+ * Renders at most `fps` frames a second (the Canvas runs with frameloop "demand"), which halves GPU and
+ * main-thread cost on the medium tier while the motion still reads as smooth.
+ */
+function FrameCap({ fps }: { fps: number }) {
+  const invalidate = useThree((s) => s.invalidate)
+  useEffect(() => {
+    const interval = MS_PER_SECOND / fps
+    let frame = 0
+    let last = 0
+    const tick = (now: number) => {
+      frame = requestAnimationFrame(tick)
+      if (now - last < interval - FRAME_SLACK_MS) return
+      last = now
+      invalidate()
+    }
+    frame = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(frame)
+  }, [fps, invalidate])
   return null
 }
 
-export default function Scene({ pathname, onReady }: { pathname: string; onReady: () => void }) {
+/**
+ * The scene graph itself. Memoised so the loop changes above (overlay opened, intro lifted, frame cap) and the
+ * theme's light levels re-render only the Canvas settings, never every mesh and label.
+ */
+const SceneContent = memo(function SceneContent({ pathname }: { pathname: string }) {
+  return (
+    <>
+      <CameraRig />
+      <CodeGlyphs />
+      <SceneSwitcher pathname={pathname} />
+    </>
+  )
+})
+
+function frameloopFor(paused: boolean, capped: boolean) {
+  if (paused) return 'never'
+  return capped ? 'demand' : 'always'
+}
+
+export default function Scene({ pathname }: { pathname: string }) {
   const quality = useQuality()
+  // Under the boot intro the scene is hidden: tick just often enough to compile shaders and settle, and leave the
+  // main thread to the page's first render. The tier's own rate takes over as the intro lifts.
+  const loaded = useAppLoaded()
+  const fps = loaded ? tierSettings(quality).fps : Q.bootFps
   const [antialias] = useState(() => tierSettings(getQuality()).antialias)
   const [dpr, setDpr] = useState(() => dprFor(quality))
   const dprRef = useRef(dpr)
@@ -141,7 +180,7 @@ export default function Scene({ pathname, onReady }: { pathname: string; onReady
   return (
     <Canvas
       className="scene-canvas"
-      frameloop={paused ? 'never' : 'always'}
+      frameloop={frameloopFor(paused, fps > 0)}
       dpr={dpr}
       camera={{ fov: config.camera.fov, near: CAMERA_NEAR, far: CAMERA_FAR, position: [0, 0, config.camera.z] }}
       gl={{ antialias, powerPreference: 'high-performance', alpha: true, stencil: false }}
@@ -153,11 +192,19 @@ export default function Scene({ pathname, onReady }: { pathname: string; onReady
       <ambientLight intensity={light ? L.light.ambient : L.ambient} />
       <directionalLight intensity={light ? L.light.key : L.key} position={L.keyPosition as [number, number, number]} />
       <directionalLight intensity={light ? L.light.rim : L.rim} position={L.rimPosition as [number, number, number]} />
-      <PerformanceMonitor onDecline={lower} onIncline={raise} flipflops={Q.flipflops} onFallback={degrade} />
-      <CameraRig />
-      <CodeGlyphs />
-      <SceneSwitcher pathname={pathname} />
-      <ReadySignal onReady={onReady} />
+      {fps > 0 ? <FrameCap fps={fps} /> : null}
+      {/* Frame rate means nothing while the intro deliberately throttles the scene, so only watch it afterwards. */}
+      {loaded ? (
+        <PerformanceMonitor
+          onDecline={lower}
+          onIncline={raise}
+          flipflops={Q.flipflops}
+          onFallback={degrade}
+          // A capped loop runs at `fps` by design, so judge it against that rather than the display rate.
+          bounds={fps > 0 ? () => [fps * Q.capBounds[0], fps * Q.capBounds[1]] : undefined}
+        />
+      ) : null}
+      <SceneContent pathname={pathname} />
     </Canvas>
   )
 }

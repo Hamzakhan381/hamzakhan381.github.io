@@ -29,6 +29,8 @@ const router = createBrowserRouter([
   },
 ])
 
+// In production this bundle starts one frame after the HTML has painted (see paintBeforeApp in vite.config.ts),
+// so the boot intro is already on screen when React's first render takes the main thread.
 createRoot(document.getElementById('root') as HTMLElement).render(
   <StrictMode>
     <RouterProvider router={router} />

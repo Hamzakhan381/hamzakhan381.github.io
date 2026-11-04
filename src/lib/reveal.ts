@@ -109,8 +109,9 @@ export function playIntro(root: HTMLElement) {
   all(root, '.split-line').forEach((line, i) => {
     tl.fromTo(
       line.querySelectorAll('.split-char'),
-      { opacity: 0, rotateX: INTRO.charRotate, y: '0.5em', transformPerspective: PERSPECTIVE, transformOrigin: '50% 100%' },
-      { opacity: 1, rotateX: 0, y: 0, duration: INTRO.duration, stagger: INTRO.charStagger, clearProps: 'transform' },
+      // yPercent rather than an em offset: GSAP would measure a probe element per letter to convert em to px.
+      { opacity: 0, rotateX: INTRO.charRotate, yPercent: INTRO.charLift, transformPerspective: PERSPECTIVE, transformOrigin: '50% 100%' },
+      { opacity: 1, rotateX: 0, yPercent: 0, duration: INTRO.duration, stagger: INTRO.charStagger, clearProps: 'transform' },
       i * INTRO.lineDelay,
     )
   })

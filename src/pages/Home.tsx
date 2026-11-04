@@ -62,7 +62,8 @@ export default function Home() {
               </Link>
             </div>
           </PageHero>
-          <div className="marquee" aria-label={`Tech stack: ${home.marquee.join(', ')}`} data-intro>
+          <div className="marquee" data-intro>
+            <p className="sr-only">Tech stack: {home.marquee.join(', ')}</p>
             <div className="marquee__track" aria-hidden="true">
               {[...home.marquee, ...home.marquee].map((item, i) => (
                 <span key={`${item}-${i}`}>{item}</span>

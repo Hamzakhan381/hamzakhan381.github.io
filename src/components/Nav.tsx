@@ -83,8 +83,11 @@ export function Nav() {
     <>
       <div className="scroll-progress" aria-hidden="true" />
       <header ref={header} className="nav">
-        <Link to="/" className="nav__logo" aria-label={`${profile.name}, home`}>
-          <span className="nav__mark">HK</span>
+        {/* The accessible name contains the visible name, so voice users can say what they see. */}
+        <Link to="/" className="nav__logo" aria-label={`${profile.shortName}, home`}>
+          <span className="nav__mark" aria-hidden="true">
+            {profile.initials}
+          </span>
           <span className="nav__name">Hamza Khan</span>
         </Link>
 

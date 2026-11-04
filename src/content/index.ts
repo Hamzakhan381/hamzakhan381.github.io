@@ -56,6 +56,8 @@ export type Home = {
   stackSphere: SectionHead & { lead: string }
   stats: Stat[]
   testimonials: Testimonial[]
+  /** Speech bubble of the developer in the first-visit intro (the intro itself is drawn in index.html). */
+  boot: { hello: string; line: string }
 }
 
 export type Certification = { name: string; issuer: string; date: string; href?: string }

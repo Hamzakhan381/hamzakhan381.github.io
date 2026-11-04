@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { scrollState } from './scroll'
 import { HALF } from './math'
 
@@ -15,36 +16,44 @@ export function useFocusIndex<T extends HTMLElement>() {
     const root = ref.current
     if (!root) return
     const items = Array.from(root.querySelectorAll<HTMLElement>('[data-focus-item]'))
-    let frame = 0
+    // Positions in page coordinates, measured on layout changes only, so scrolling never forces a layout.
+    let span = { top: 0, bottom: 0 }
+    let centres: number[] = []
+
+    const measure = () => {
+      const y = window.scrollY
+      const bounds = root.getBoundingClientRect()
+      span = { top: bounds.top + y, bottom: bounds.bottom + y }
+      centres = items.map((item) => {
+        const r = item.getBoundingClientRect()
+        return (r.top + r.bottom) * HALF + y
+      })
+    }
 
     const update = () => {
-      frame = 0
-      const mid = window.innerHeight * HALF
-      const bounds = root.getBoundingClientRect()
+      const mid = scrollState.y + window.innerHeight * HALF
       const index =
-        bounds.top < mid && bounds.bottom > mid
-          ? items
-              .map((item) => {
-                const r = item.getBoundingClientRect()
-                return Math.abs((r.top + r.bottom) * HALF - mid)
-              })
-              .reduce((best, distance, i, all) => (distance < all[best] ? i : best), 0)
+        span.top < mid && span.bottom > mid
+          ? centres.reduce((best, centre, i) => (Math.abs(centre - mid) < Math.abs(centres[best] - mid) ? i : best), 0)
           : -1
       if (index === scrollState.focus) return
       scrollState.focus = index
       setActive(index)
     }
-    const schedule = () => {
-      if (!frame) frame = requestAnimationFrame(update)
+
+    const remeasure = () => {
+      measure()
+      update()
     }
 
-    update()
-    window.addEventListener('scroll', schedule, { passive: true })
-    window.addEventListener('resize', schedule)
+    remeasure()
+    window.addEventListener('scroll', update, { passive: true })
+    window.addEventListener('resize', remeasure)
+    ScrollTrigger.addEventListener('refresh', remeasure)
     return () => {
-      cancelAnimationFrame(frame)
-      window.removeEventListener('scroll', schedule)
-      window.removeEventListener('resize', schedule)
+      window.removeEventListener('scroll', update)
+      window.removeEventListener('resize', remeasure)
+      ScrollTrigger.removeEventListener('refresh', remeasure)
       scrollState.focus = -1
     }
   }, [])

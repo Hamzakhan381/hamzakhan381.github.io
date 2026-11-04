@@ -18,6 +18,12 @@ cards that tilt back as they leave, a ⌘K / Ctrl+K command palette (pages, proj
 a back-to-top progress ring, an "on this page" section rail on wide screens, pointer parallax on page titles, a cursor
 spotlight on the dot grid, and a 3D contact cube in the footer.
 
+On the first visit of a session, a cartoon developer types on his laptop while the app boots, then looks up, waves
+and says hi before the view dives into his laptop and the page opens (about two seconds; any key, click or scroll
+skips it). It is plain SVG and CSS inside `index.html`, so it paints with the HTML before any JavaScript arrives, and
+it animates only transforms and opacity, so it stays smooth while the page loads underneath. The bubble text is in
+`src/content/home.json` (`boot`) and the timings in `src/lib/motion.json` (`boot`).
+
 Every project has a case-study dialog with a shareable link (`/projects?project=cashup`); ← → step through them.
 The terminal's commands live in `src/lib/shell.ts` and read from the same JSON content as the pages.
 
@@ -36,7 +42,10 @@ All content is in `src/content/*.json`; see [src/content/README.md](src/content/
 - Device tiers (`src/lib/quality.ts`): high, medium and low, picked from CPU cores, memory, pointer type and the GPU
   renderer. Low-tier devices skip WebGL and smooth scrolling entirely; the tier also steps down at runtime when the
   frame rate stays low. Visitors can force it with "lite mode" in the command palette or `?quality=low`.
-- Adaptive pixel ratio (drops to 1x when frame rate dips), fewer glyphs and no antialiasing on the medium tier.
+- Adaptive pixel ratio (drops to 1x when frame rate dips); on the medium tier the 3D scene renders at 30 fps with
+  fewer glyphs and no antialiasing.
+- Fonts load without blocking the first paint, and the page renders under the intro, so it is ready the moment the
+  intro lifts. Page view transitions only switch on after the first load.
 - Only the current page's 3D scene is mounted; packets, nodes and code glyphs use instanced meshes (one draw call each).
 - The 3D scene stops rendering while an overlay (menu, command palette, project dialog) covers it.
 - No per-frame layout reads in scroll handlers, and no backdrop blur over the live canvas on phones and modest GPUs.

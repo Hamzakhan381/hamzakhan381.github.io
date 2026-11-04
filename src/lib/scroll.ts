@@ -13,6 +13,7 @@ const LENIS_LERP = 0.12
 const LENIS_WHEEL_MULTIPLIER = 0.9
 const ANCHOR_SCROLL_DURATION = 1.4
 const ANCHOR_OFFSET = -96
+const REFRESH_SETTLE_MS = 150
 
 /**
  * Mutable store shared between the DOM and the WebGL scene. Kept outside React
@@ -21,6 +22,8 @@ const ANCHOR_OFFSET = -96
 export const scrollState = {
   /** 0 at the top of the current page, 1 at the bottom. */
   progress: 0,
+  /** Scroll offset in px, cached from scroll events so per-frame code never reads (and forces) layout. */
+  y: 0,
   /** Scroll velocity from Lenis, roughly px per frame. */
   velocity: 0,
   /** Pointer position normalised to -1..1. */
@@ -36,11 +39,21 @@ if (import.meta.env.DEV) Object.assign(window, { __scrollState: scrollState })
 
 
 let lenis: Lenis | null = null
+/** Furthest scroll offset; re-measured when the page or window resizes rather than on every scroll. */
+let maxScroll = 0
+
+function measureMaxScroll() {
+  maxScroll = document.documentElement.scrollHeight - window.innerHeight
+}
 
 function updateProgress() {
-  const max = document.documentElement.scrollHeight - window.innerHeight
-  scrollState.progress = max > 0 ? clamp(window.scrollY / max, 0, 1) : 0
+  scrollState.y = window.scrollY
+  scrollState.progress = maxScroll > 0 ? clamp(scrollState.y / maxScroll, 0, 1) : 0
 }
+
+// Native scroll is the source of truth so keyboard, scrollbar and anchor jumps all reach the scene. Registered as
+// this module loads, before any component adds its own scroll listener, so scrollState is current when they run.
+window.addEventListener('scroll', updateProgress, { passive: true })
 
 export function initScroll() {
   const onPointer = (e: PointerEvent) => {
@@ -48,12 +61,15 @@ export function initScroll() {
     scrollState.pointerY = 1 - (e.clientY / window.innerHeight) * DOUBLE
   }
   window.addEventListener('pointermove', onPointer, { passive: true })
-  // Native scroll is the source of truth so keyboard, scrollbar and anchor jumps all reach the scene.
-  window.addEventListener('scroll', updateProgress, { passive: true })
 
+  // The page height changes many times while it loads (fonts, images, the 3D scene, lazy sections). A refresh
+  // re-measures every trigger, so do it once things settle rather than on every change.
+  let refreshTimer = 0
   const ro = new ResizeObserver(() => {
+    measureMaxScroll()
     updateProgress()
-    ScrollTrigger.refresh()
+    window.clearTimeout(refreshTimer)
+    refreshTimer = window.setTimeout(() => ScrollTrigger.refresh(), REFRESH_SETTLE_MS)
   })
   ro.observe(document.body)
 
@@ -62,16 +78,23 @@ export function initScroll() {
     lenis = new Lenis({ lerp: LENIS_LERP, wheelMultiplier: LENIS_WHEEL_MULTIPLIER, autoRaf: false })
     lenis.on('scroll', (instance: Lenis) => {
       scrollState.velocity = instance.velocity
+      scrollState.y = instance.scroll
       ScrollTrigger.update()
     })
     gsap.ticker.add(tick)
     gsap.ticker.lagSmoothing(0)
   }
-  updateProgress()
+  const onResize = () => {
+    measureMaxScroll()
+    updateProgress()
+  }
+  window.addEventListener('resize', onResize, { passive: true })
+  onResize()
 
   return () => {
+    window.removeEventListener('resize', onResize)
     window.removeEventListener('pointermove', onPointer)
-    window.removeEventListener('scroll', updateProgress)
+    window.clearTimeout(refreshTimer)
     ro.disconnect()
     gsap.ticker.remove(tick)
     lenis?.destroy()
