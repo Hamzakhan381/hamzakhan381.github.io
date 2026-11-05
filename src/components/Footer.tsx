@@ -34,6 +34,28 @@ function LocalTime() {
 
 const PAGES_WITH_OWN_CTA = ['/', '/about']
 
+/** The site's own source on GitHub (a user site lives in `<user>.github.io`). */
+const REPO = `https://github.com/${profile.githubUser}/${profile.githubUser.toLowerCase()}.github.io`
+const builtOn = new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(__BUILD_DATE__))
+
+/** Which build of the site this is: the commit it was built from (linked to its source) and the date it went up. */
+function BuildStamp() {
+  const commit = __BUILD_COMMIT__
+  return (
+    <span className="footer__build">
+      <span className="footer__build-dot" aria-hidden="true" /> build{' '}
+      {commit === 'dev' ? (
+        <code>dev</code>
+      ) : (
+        <a href={`${REPO}/commit/${commit}`} target="_blank" rel="noreferrer">
+          <code>{commit}</code>
+        </a>
+      )}{' '}
+      · updated {builtOn}
+    </span>
+  )
+}
+
 export function Footer() {
   // Home and About end with their own call to action, so the footer's would only repeat it there.
   const quiet = PAGES_WITH_OWN_CTA.includes(normalizePath(useLocation().pathname))
@@ -63,7 +85,7 @@ export function Footer() {
         </div>
         <div className="footer__row footer__row--meta">
           <p className="footer__copy">
-            © {new Date().getFullYear()} {profile.name}. Built with React, Three.js & GSAP.
+            © {new Date().getFullYear()} {profile.name}. Built with React, Three.js & GSAP. <BuildStamp />
           </p>
           <p className="footer__copy">
             <span className="pulse-dot" aria-hidden="true" /> <LocalTime /> in {profile.location} · {profile.timezone}

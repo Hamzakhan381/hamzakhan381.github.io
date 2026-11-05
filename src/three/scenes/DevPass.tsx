@@ -4,6 +4,7 @@ import {
   AdditiveBlending,
   BufferAttribute,
   BufferGeometry,
+  Color,
   CanvasTexture,
   DoubleSide,
   ExtrudeGeometry,
@@ -16,12 +17,15 @@ import {
   Plane,
   Raycaster,
   RepeatWrapping,
+  PlaneGeometry,
   Shape,
+  ShaderMaterial,
   ShapeGeometry,
   SRGBColorSpace,
   TorusGeometry,
   Vector2,
   Vector3,
+  Vector4,
 } from 'three'
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js'
 import config from '../scene.json'
@@ -62,6 +66,61 @@ const PLATE_Y = CLIP.y - CLIP.strapY
 const RING_Y = CLIP.ringY - CLIP.strapY
 const JAW_Y = -(face.slot.y / FACE_H) * CARD.height - CLIP.strapY
 const JAW_Z = CARD.depth * HALF + CLIP.jawZ
+/* The contactless signal sits where the face layout leaves it room in the header (mirrored on the back). */
+const EMBLEM = face.emblem
+const PRINT_W = CARD.width - CARD.printInset
+const PRINT_H = CARD.height - CARD.printInset
+const SIGNAL_X = (EMBLEM.x / FACE_W - HALF) * PRINT_W
+const SIGNAL_Y = BODY_Y + (HALF - EMBLEM.y / FACE_H) * PRINT_H
+const SIGNAL_SIZE = (EMBLEM.r / FACE_W) * PRINT_W * DOUBLE
+const SIGNAL_Z = PRINT_Z + CARD.printLift
+
+const signalVertex = /* glsl */ `
+varying vec2 vUv;
+void main() {
+  vUv = uv;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}
+`
+/**
+ * The contactless symbol, drawn crisp at any size: four arcs with round ends, which light up one after another from
+ * the inside out, like a card talking to a reader, then fade back to a faint glow.
+ */
+const signalFragment = /* glsl */ `
+uniform vec3 uColor;
+uniform float uTime;
+uniform float uBlink;
+uniform vec4 uWaves;
+uniform float uShift;
+uniform float uSpread;
+uniform float uWidth;
+uniform float uPeriod;
+uniform float uStagger;
+uniform float uBase;
+varying vec2 vUv;
+// Distance from p to an arc of radius r spanning ±uSpread around the +x axis (round ends).
+float arcDistance(vec2 p, float r) {
+  float a = atan(p.y, p.x);
+  if (abs(a) <= uSpread) return abs(length(p) - r);
+  vec2 end = r * vec2(cos(uSpread), sign(a) * sin(uSpread));
+  return length(p - end);
+}
+float wave(vec2 p, float r, float index, float aa) {
+  float shape = 1.0 - smoothstep(uWidth * 0.5 - aa, uWidth * 0.5 + aa, arcDistance(p, r));
+  float k = fract(uTime / uPeriod - index * uStagger);
+  float pulse = smoothstep(0.0, 0.08, k) * (1.0 - smoothstep(0.22, 0.42, k));
+  float light = mix(1.0, uBase + (1.0 - uBase) * pulse, uBlink);
+  return shape * light;
+}
+void main() {
+  vec2 p = (vUv - 0.5) * 2.0;
+  p.x += uShift;
+  float aa = fwidth(length(p)) * 1.2;
+  float glow = max(max(wave(p, uWaves.x, 0.0, aa), wave(p, uWaves.y, 1.0, aa)), max(wave(p, uWaves.z, 2.0, aa), wave(p, uWaves.w, 3.0, aa)));
+  if (glow < 0.005) discard;
+  gl_FragColor = vec4(mix(uColor, vec3(1.0), glow * 0.25), glow);
+}
+`
 
 type Spring = { x: number; v: number }
 
@@ -313,10 +372,36 @@ export function DevPass() {
       clip: clipGeometry(),
       jaw: new RoundedBoxGeometry(jw, jh, jd, CLIP.jawSegments, jr),
       ring: new TorusGeometry(rr, rt, rs, rt2),
+      signal: new PlaneGeometry(SIGNAL_SIZE, SIGNAL_SIZE),
       strap: strapGeometry(),
       stars: starGeometry(),
     }
   }, [])
+  // Built here rather than in JSX: R3F copies a `uniforms` prop, so the per-frame time would never arrive.
+  const signal = useMemo(() => {
+    const [w0, w1, w2, w3] = EMBLEM.waves
+    const B = EMBLEM.blink
+    return new ShaderMaterial({
+      vertexShader: signalVertex,
+      fragmentShader: signalFragment,
+      uniforms: {
+        uColor: { value: new Color(config.palette.accent) },
+        uTime: { value: 0 },
+        uBlink: { value: reduceMotion ? 0 : 1 },
+        uWaves: { value: new Vector4(w0, w1, w2, w3) },
+        uShift: { value: EMBLEM.shift },
+        uSpread: { value: EMBLEM.spread },
+        uWidth: { value: EMBLEM.width },
+        uPeriod: { value: B.period },
+        uStagger: { value: B.stagger },
+        uBase: { value: B.base },
+      },
+      transparent: true,
+      depthWrite: false,
+      toneMapped: false,
+    })
+  }, [])
+  useEffect(() => () => signal.dispose(), [signal])
   const materials = useMemo(
     () => ({
       body: new MeshStandardMaterial({ color: P.body.color, roughness: P.body.roughness }),
@@ -399,7 +484,7 @@ export function DevPass() {
   useEffect(() => {
     let live = true
     const load = async () => {
-      const cut = await loadIdPhoto(profile.photo.large, Math.round((face.photo.w / FACE_W) * faceWidth))
+      const cut = await loadIdPhoto(Math.round((face.photo.w / FACE_W) * faceWidth))
       if (live) setPhoto(cut)
     }
     const start = idle(() => void load())
@@ -583,6 +668,7 @@ export function DevPass() {
     const dt = Math.min(rawDelta, P.maxDelta)
     const s = sim.current
     if (loaded) s.age += dt
+    signal.uniforms.uTime.value += dt
 
     // Which face this moment of the story wants: the ID, the job being read, the student ID then the stack, …
     const ch = clamp(story.chapter, 0, P.faces.length - 1)
@@ -711,6 +797,8 @@ export function DevPass() {
           <mesh geometry={geometries.clip} material={materials.metal} position={[0, PLATE_Y, CLIP_Z]} />
           <mesh geometry={geometries.jaw} material={materials.metal} position={[0, JAW_Y, JAW_Z]} />
           <mesh geometry={geometries.ring} material={materials.metal} position={[0, RING_Y, CLIP_Z]} />
+          <mesh geometry={geometries.signal} material={signal} position={[SIGNAL_X, SIGNAL_Y, SIGNAL_Z]} />
+          <mesh geometry={geometries.signal} material={signal} position={[-SIGNAL_X, SIGNAL_Y, -SIGNAL_Z]} rotation={[0, Math.PI, 0]} />
           {/* An invisible sheet over the card that catches hover, drag and taps from either side. */}
           <mesh position={[0, BODY_Y, 0]} onPointerDown={onDown} onClick={onTap} onPointerOver={onOver} onPointerOut={onOut}>
             <planeGeometry args={[CARD.width, CARD.height]} />

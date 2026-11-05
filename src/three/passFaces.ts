@@ -40,6 +40,11 @@ const accent = config.palette.accent
 const ACCENT_RGB = [HEX_R, HEX_G, HEX_B].map((at) => channel(accent, at)).join(',')
 /** The site accent at `alpha`, for gradients and strokes. */
 const accentAlpha = (alpha: number) => `rgba(${ACCENT_RGB},${alpha})`
+const INK_RGB = [HEX_R, HEX_G, HEX_B].map((at) => channel(C.ink, at)).join(',')
+/** The card's ink colour at `alpha`, for fine print. */
+const inkAlpha = (alpha: number) => `rgba(${INK_RGB},${alpha})`
+/** Grows each QR module a hair so neighbours meet without hairline seams. */
+const FILL_OVERLAP = 0.5
 /** A stable random number in [0, 1) for `i` on stream `stream`. */
 const random01 = (i: number, stream: number) => (hash(i, stream) + 1) * HALF
 const pad2 = (n: number) => String(n).padStart(PAD_DIGITS, '0')
@@ -108,20 +113,28 @@ async function cropOf(source: ImageBitmap | HTMLImageElement, sx: number, sy: nu
   return canvas
 }
 
-export async function loadIdPhoto(url: string, width: number): Promise<Photo> {
+/**
+ * The photo printed on the pass, `width` pixels wide on the texture. Its source is a full-resolution head-and-shoulders
+ * crop of the portrait (`PH.window` says where it sits in the whole photo, so the hand-traced outline, which is in
+ * whole-photo coordinates, still lines up), so the face is drawn down from more pixels than it needs: sharp, never
+ * upscaled.
+ */
+export async function loadIdPhoto(width: number): Promise<Photo> {
   // Decoded, cropped and resized off the main thread: drawing the full photo into a canvas made the browser decode
   // it on the main thread, a long task right as the page opened.
-  const source = await decodePhoto(url)
-  const iw = source instanceof ImageBitmap ? source.width : source.naturalWidth
-  const ih = source instanceof ImageBitmap ? source.height : source.naturalHeight
+  const source = await decodePhoto(PH.source)
+  const [wx0, wy0, wx1, wy1] = PH.window
+  // The whole photo's size in this file's pixels, and where the window starts in it.
+  const iw = (source instanceof ImageBitmap ? source.width : source.naturalWidth) / (wx1 - wx0)
+  const ih = (source instanceof ImageBitmap ? source.height : source.naturalHeight) / (wy1 - wy0)
   const height = Math.round((width * F.photo.h) / F.photo.w)
   const [x0, y0, x1] = PH.crop
   const crop = { x: x0, y: y0, w: x1 - x0, h: ((x1 - x0) * iw * height) / (width * ih) }
-  // The cut-out mask is worked out at a fraction of the size (it is feathered anyway), which keeps the per-pixel
-  // keying to a few milliseconds.
+  // The cut-out mask is worked out at three quarters of the size (it is feathered anyway), which keeps the per-pixel
+  // keying to a few milliseconds while the edges stay clean.
   const mw = Math.round(width * PH.maskScale)
   const mh = Math.round(height * PH.maskScale)
-  const [sx, sy, sw, sh] = [crop.x * iw, crop.y * ih, crop.w * iw, crop.h * ih]
+  const [sx, sy, sw, sh] = [(crop.x - wx0) * iw, (crop.y - wy0) * ih, crop.w * iw, crop.h * ih]
   const [full, reduced] = await Promise.all([cropOf(source, sx, sy, sw, sh, width, height), cropOf(source, sx, sy, sw, sh, mw, mh)])
   if (source instanceof ImageBitmap) source.close()
   const person = canvasOf(width, height)
@@ -154,10 +167,12 @@ export async function loadIdPhoto(url: string, width: number): Promise<Photo> {
   const out = canvasOf(width, height)
   const oc = out.getContext('2d')
   if (!oc) return person
-  const [top, bottom] = PH.backdrop
-  const backdrop = oc.createLinearGradient(0, 0, 0, height)
-  backdrop.addColorStop(0, top)
-  backdrop.addColorStop(1, bottom)
+  // A studio backdrop: a soft light behind his head falling off to darker edges, so he stands out from it.
+  const [light, edge] = PH.backdrop
+  const [lx, ly, reach] = PH.light
+  const backdrop = oc.createRadialGradient(width * lx, height * ly, 0, width * lx, height * ly, width * reach)
+  backdrop.addColorStop(0, light)
+  backdrop.addColorStop(1, edge)
   oc.fillStyle = backdrop
   oc.fillRect(0, 0, width, height)
   // The photo was taken against a bright white wall; a light grade brings his skin and suit back from the glare.
@@ -263,6 +278,15 @@ function makePen(canvas: HTMLCanvasElement) {
     },
     image(src: CanvasImageSource, sx: number, sy: number, sw: number, sh: number, dx: number, dy: number, dw: number, dh: number) {
       g.drawImage(src, sx, sy, sw, sh, dx, dy, dw, dh)
+    },
+    /** A rounded rectangle filled with a diagonal gradient through `colors`. */
+    gradientRound(x: number, y: number, w: number, h: number, r: number, colors: string[]) {
+      const gradient = g.createLinearGradient(x, y, x + w, y + h)
+      colors.forEach((color, i) => gradient.addColorStop(i / Math.max(colors.length - 1, 1), color))
+      g.beginPath()
+      g.roundRect(x, y, w, h, r)
+      g.fillStyle = gradient
+      g.fill()
     },
     /** The card's printed background: night blue, a diagonal accent sheen and an engineering dot grid. */
     background() {
@@ -426,6 +450,32 @@ function title(pen: Pen, text: string) {
   pen.text(text, F.pad, F.title.y, C.ink)
 }
 
+/**
+ * Security microtext: a line of tiny repeated print across the card, the way real passes carry it. `y` is the
+ * baseline; it runs from edge to edge between the margins.
+ */
+function microtext(pen: Pen, y: number) {
+  const M = F.micro
+  const unit = `${profile.githubUser}  ·  ${T.role}  ·  ${T.kicker}  ·  `.toUpperCase()
+  pen.font(MEDIUM, M.font, MONO)
+  const line = unit.repeat(Math.ceil(F.width / Math.max(pen.width(unit), 1)) + 1)
+  pen.clipped(F.pad, y - M.font, F.width, M.font * DOUBLE, 0, () => pen.text(line, F.pad, y, inkAlpha(M.alpha)))
+}
+
+/** A real QR code, printed module by module, that opens his GitHub when scanned (the pattern is in passFace.json). */
+function qrCode(pen: Pen) {
+  const B = F.badge
+  const Q = B.qr
+  const count = Q.rows.length + Q.quiet * DOUBLE
+  const cell = B.size / count
+  pen.round(B.x, B.y, B.size, B.size, Q.radius, Q.paper)
+  Q.rows.forEach((row, r) =>
+    Array.from(row).forEach((bit, c) => {
+      if (bit === '1') pen.rect(B.x + (c + Q.quiet) * cell, B.y + (r + Q.quiet) * cell, cell + FILL_OVERLAP, cell + FILL_OVERLAP, Q.ink)
+    }),
+  )
+}
+
 function statusPill(pen: Pen, x: number, y: number) {
   return pill(pen, x, y, (available ? T.available : T.busy).toUpperCase(), available ? C.ok : C.busy, true)
 }
@@ -448,6 +498,7 @@ const specs: Record<string, (index: number) => Spec> = {
       pen.text(T.role, F.pad, F.role.y, accent)
       const first = pill(pen, F.pad, F.pills.y, T.access.toUpperCase(), accent)
       statusPill(pen, F.pad + first + F.pills.gap, F.pills.y)
+      qrCode(pen)
     },
   }),
 
@@ -583,6 +634,8 @@ const specs: Record<string, (index: number) => Spec> = {
 /** The card chrome every face shares: background, clip slot, header, barcode and commit footer. */
 function frame(pen: Pen, spec: Spec) {
   pen.background()
+  microtext(pen, F.micro.top)
+  microtext(pen, F.micro.bottom)
   const S = F.slot
   pen.round(S.x - S.w * HALF, S.y - S.h * HALF, S.w, S.h, S.h * HALF, C.slot)
   const H = F.header

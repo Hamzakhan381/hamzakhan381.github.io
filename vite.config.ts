@@ -1,3 +1,4 @@
+import { execSync } from 'node:child_process'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { defineConfig, type Plugin } from 'vite'
@@ -150,8 +151,21 @@ function paintBeforeApp(): Plugin {
   }
 }
 
+/** The short hash of the commit being built, for the footer's build stamp; "dev" when git isn't available. */
+function buildCommit() {
+  try {
+    return execSync('git rev-parse --short HEAD').toString().trim()
+  } catch {
+    return 'dev'
+  }
+}
+
 export default defineConfig({
   plugins: [react(), tailwindcss(), staticRoutes(), paintBeforeApp()],
+  define: {
+    __BUILD_COMMIT__: JSON.stringify(buildCommit()),
+    __BUILD_DATE__: JSON.stringify(new Date().toISOString()),
+  },
   build: {
     target: 'es2022',
     // three.js lives in the lazily-loaded 3D chunks; it is large by nature.
