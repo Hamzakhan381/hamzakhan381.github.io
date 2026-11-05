@@ -88,10 +88,16 @@ export function forgetQuality() {
   }
 }
 
-/** Steps down one tier; called when the 3D scene keeps missing frames. */
+/**
+ * Missed frames never take the page below this tier: 'low' removes the 3D scene, which only the device check or
+ * the visitor's own lite-mode choice may do. A slow moment shouldn't make the background vanish for the visit.
+ */
+const RUNTIME_FLOOR = ORDER.indexOf('medium')
+
+/** Steps down one tier, but not past `RUNTIME_FLOOR`; called when the 3D scene keeps missing frames. */
 export function degrade() {
   const index = ORDER.indexOf(current)
-  if (index > 0) setQuality(ORDER[index - 1])
+  if (index > RUNTIME_FLOOR) setQuality(ORDER[index - 1])
 }
 
 export const useQuality = () =>

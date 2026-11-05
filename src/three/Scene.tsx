@@ -196,6 +196,19 @@ const SceneContent = memo(function SceneContent({ pathname }: { pathname: string
   )
 })
 
+const pageVisible = () => document.visibilityState === 'visible'
+
+/** Whether the tab is in front; the browser stops drawing frames while it isn't. */
+function usePageVisible() {
+  const [visible, setVisible] = useState(pageVisible)
+  useEffect(() => {
+    const sync = () => setVisible(pageVisible())
+    document.addEventListener('visibilitychange', sync)
+    return () => document.removeEventListener('visibilitychange', sync)
+  }, [])
+  return visible
+}
+
 function frameloopFor(paused: boolean, capped: boolean) {
   if (paused) return 'never'
   return capped ? 'demand' : 'always'
@@ -212,6 +225,11 @@ export default function Scene({ pathname }: { pathname: string }) {
   const dprRef = useRef(dpr)
   // An open overlay covers the scene, so the GPU gets a break until it closes.
   const paused = useScrollLocked()
+  const visible = usePageVisible()
+  // The frame monitor only runs while frames are actually being drawn. A paused loop (an overlay is open) or a
+  // background tab otherwise reads as one very long frame and steps the quality down on its own. Unmounting it
+  // for those spells means it starts measuring afresh when drawing resumes.
+  const monitoring = loaded && !paused && visible
 
   useEffect(() => {
     dprRef.current = dprFor(quality)
@@ -247,8 +265,8 @@ export default function Scene({ pathname }: { pathname: string }) {
       <directionalLight intensity={L.key} position={L.keyPosition as [number, number, number]} />
       <directionalLight intensity={L.rim} position={L.rimPosition as [number, number, number]} />
       {fps > 0 ? <FrameCap fps={fps} /> : null}
-      {/* Frame rate means nothing while the intro deliberately throttles the scene, so only watch it afterwards. */}
-      {loaded ? (
+      {/* Frame rate means nothing while the intro throttles the scene or nothing is drawn, so watch only otherwise. */}
+      {monitoring ? (
         <PerformanceMonitor
           onDecline={lower}
           onIncline={raise}
