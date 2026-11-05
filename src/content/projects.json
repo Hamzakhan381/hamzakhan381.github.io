@@ -10,6 +10,40 @@
   "categories": ["Web", "Systems", "Data", "Networking", "Mobile", "Design"],
   "items": [
     {
+      "slug": "galaxy-vpn",
+      "title": "Galaxy VPN",
+      "subtitle": "Android VPN client in Flutter",
+      "category": "Mobile",
+      "featured": true,
+      "summary": "An Android VPN app that finds the fastest free relay in each country and connects to it over SSTP or OpenVPN, through a native VpnService.",
+      "highlights": ["Live relay discovery: probes VPN Gate and VPNBook servers with a real handshake and lists the fastest one per country", "SSTP tunnel written natively in Kotlin, with OpenVPN as a fallback over UDP 53 or TCP 443", "Kill switch, auto-reconnect, IP rotation and a clear VPN permission disclosure", "Clean architecture with Provider state and a tested VPN state machine"],
+      "stack": ["Flutter", "Dart", "Kotlin", "VpnService", "OpenVPN", "SSTP"],
+      "links": { "github": "https://github.com/Hamzakhan381/GalaxyVpn" },
+      "screens": [
+        { "src": "/apps/galaxy-vpn/1.webp", "alt": "Home: one-tap connect and the fastest server" },
+        { "src": "/apps/galaxy-vpn/2.webp", "alt": "Relay servers by country, with live ping" },
+        { "src": "/apps/galaxy-vpn/3.webp", "alt": "Connection and relay settings" },
+        { "src": "/apps/galaxy-vpn/4.webp", "alt": "Welcome: sign up, log in or continue as a guest" }
+      ]
+    },
+    {
+      "slug": "puck-rush",
+      "title": "Puck Rush",
+      "subtitle": "Neon air hockey game in Flutter",
+      "category": "Mobile",
+      "featured": true,
+      "summary": "A neon air hockey arcade for Android with its own physics engine, an AI opponent with four difficulty levels and a two-player mode on one phone.",
+      "highlights": ["Custom physics engine: puck momentum, rail rebounds and mallet strikes", "AI opponent across Easy, Medium, Hard and Insane", "Power-ups (shield and boost), local two-player mode and match stats", "Canvas-drawn neon table and glowing arena themes"],
+      "stack": ["Flutter", "Dart", "CustomPainter", "Game physics"],
+      "links": { "github": "https://github.com/Hamzakhan381/Puck-Rush-Air-Hockey" },
+      "screens": [
+        { "src": "/apps/puck-rush/1.webp", "alt": "Arena hub: quick play, vs AI or two players" },
+        { "src": "/apps/puck-rush/2.webp", "alt": "Live match against the AI" },
+        { "src": "/apps/puck-rush/3.webp", "alt": "Choosing the AI difficulty" },
+        { "src": "/apps/puck-rush/4.webp", "alt": "Settings: sound, haptics, goals and arena colour" }
+      ]
+    },
+    {
       "slug": "cashup",
       "title": "CashUp",
       "subtitle": "Online transaction web application",

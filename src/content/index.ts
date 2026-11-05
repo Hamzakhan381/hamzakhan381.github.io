@@ -165,6 +165,8 @@ export type Project = {
   highlights: string[]
   stack: string[]
   links: { github?: string; live?: string }
+  /** Real app screens (phone screenshots, 412 × 915), shown in phone frames on mobile projects. */
+  screens?: { src: string; alt: string }[]
 }
 
 /** `ringHint` is added to the hero lead on wide screens, where the live repos sit on a draggable ring. */

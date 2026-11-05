@@ -1,5 +1,6 @@
 import type { Project } from '../content'
 import { openProjectLink, projectHref } from '../lib/projectDialog'
+import { AppScreens } from './AppScreens'
 import { Icon } from './Icon'
 
 const INDEX_DIGITS = 2
@@ -59,7 +60,7 @@ export function StackTree({ project }: { project: Project }) {
   )
 }
 
-/** Large case-study panel: details on the left, a faux terminal "cloning" the repo on the right. */
+/** Large case-study panel: details on the left; on the right, the app's real screens or a faux terminal "cloning" the repo. */
 export function FeaturedProject({ project, index, total }: { project: Project; index: number; total?: number }) {
   return (
     <article className="featured card">
@@ -88,7 +89,7 @@ export function FeaturedProject({ project, index, total }: { project: Project; i
         </ul>
         <ProjectLinks project={project} />
       </div>
-      <StackTree project={project} />
+      {project.screens ? <AppScreens project={project} /> : <StackTree project={project} />}
     </article>
   )
 }

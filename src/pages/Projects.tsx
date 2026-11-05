@@ -9,6 +9,7 @@ import { usePageEffects } from '../lib/usePageEffects'
 import { useMediaQuery } from '../lib/useMediaQuery'
 import { PageHero } from '../components/PageHero'
 import { SectionHead } from '../components/Section'
+import { AppScreens } from '../components/AppScreens'
 import { Carousel3D } from '../components/Carousel3D'
 import { Icon } from '../components/Icon'
 import { Tilt } from '../components/Tilt'
@@ -143,20 +144,23 @@ export default function Projects() {
         <SectionHead eyebrow={projects.caseStudies.eyebrow} title={projects.caseStudies.title} accent={projects.caseStudies.accent} />
         <div className="cases">
           {projects.items.map((p) => (
-            <Tilt key={p.slug} className="card case" data-swing>
-              <span className="chip">{p.category}</span>
-              <h3>
-                <a className="case__link" href={projectHref(p.slug)} onClick={openProjectLink(p.slug)}>
-                  {p.title}
-                </a>
-              </h3>
-              <p className="case__sub">{p.subtitle}</p>
-              <p>{p.summary}</p>
-              <ul className="tags">
-                {p.stack.map((t) => (
-                  <li key={t}>{t}</li>
-                ))}
-              </ul>
+            <Tilt key={p.slug} className={p.screens ? 'card case case--app' : 'card case'} data-swing>
+              <div className="case__text">
+                <span className="chip">{p.category}</span>
+                <h3>
+                  <a className="case__link" href={projectHref(p.slug)} onClick={openProjectLink(p.slug)}>
+                    {p.title}
+                  </a>
+                </h3>
+                <p className="case__sub">{p.subtitle}</p>
+                <p>{p.summary}</p>
+                <ul className="tags">
+                  {p.stack.map((t) => (
+                    <li key={t}>{t}</li>
+                  ))}
+                </ul>
+              </div>
+              <AppScreens project={p} />
             </Tilt>
           ))}
         </div>

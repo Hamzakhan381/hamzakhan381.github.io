@@ -6,6 +6,7 @@ import { lockScroll } from '../lib/scroll'
 import { copyText } from '../lib/toast'
 import { normalizePath } from '../lib/paths'
 import { StackTree } from './ProjectCards'
+import { AppScreens } from './AppScreens'
 import { Icon } from './Icon'
 
 const INDEX_DIGITS = 2
@@ -118,6 +119,12 @@ export function ProjectDialog() {
           </h2>
           <p className="project-dialog__sub">{project.subtitle}</p>
           <p className="project-dialog__summary">{project.summary}</p>
+          {project.screens ? (
+            <section className="project-dialog__screens">
+              <h3>App screens</h3>
+              <AppScreens project={project} variant="strip" />
+            </section>
+          ) : null}
 
           <div className="project-dialog__grid">
             <section>
